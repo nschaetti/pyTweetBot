@@ -1,0 +1,52 @@
+{
+	"database" :
+	{
+		"host" : "",
+		"username" : "",
+		"password" : "",
+		"database" : ""
+	},
+	"twitter" :
+	{
+		"auth_token1" : "",
+		"auth_token2" : "",
+		"access_token1" : "",
+		"access_token2" : "",
+		"user" : ""
+	},
+	"friends" :
+	{
+		"new_followers" : 336,
+		"new_unfollow" : 336,
+		"unfollow_interval" : 604800
+	},
+	"direct_message" : "",
+	"news_settings" : {
+		"interval_days" : 1,
+		"exclude" : []
+	},
+	"news" :
+	[
+		{
+			"keyword" : "",
+			"countries" : ["us","fr"],
+			"languages" : ["en","fr"],
+			"hashtags" : []
+		}
+	],
+	"retweet" :
+	{
+		"interval_days" : 1,
+		"keywords" : [],
+		"nbpages" : 40,
+		"retweet_prob" : 0.5,
+		"limit_prob" : 1.0,
+		"count" : 192
+	},
+	"instagram" :
+    {
+        "login" : "",
+        "password" : "",
+        "hashtags" : []
+    }
+}
