@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : directmessage.pyTweetBotDirectMessager.py
-# Description : Direct message class.
+# File : pyTweetBot.py
+# Description : pyTweetBot action in the DB.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -22,3 +22,34 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Import
+import MySQLdb as mdb
+
+
+# pyTweetBot class for actions
+# contained in the DB.
+class PyTweetBotAction(object):
+    """
+    pyTweetBot class for actions contained in the DB.
+    """
+
+    # Constructor
+    def __init__(self, tweet_id, text, exec_date):
+        """
+        Constructor
+        :param tweet_id: Tweet's ID (like, retweet).
+        :param text: Tweet's text (tweet).
+        :param exec_date: Date of execution.
+        """
+        self._id = -1
+        self._tweet_id = tweet_id
+        self._text = text
+        self._exec_date = exec_date
+    # end __init__
+
+    # Insert
+    def insert(self):
+        pass
+    # end insert
+
+# end pyTweetBot
