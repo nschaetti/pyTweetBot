@@ -24,6 +24,8 @@
 
 # Import
 import argparse
+from config.pyTweetBotConfig import PyTweetBotConfig
+from twitter.pyTweetBotConnector import PyTweetBotConnector
 
 ####################################################
 # Main function
@@ -36,6 +38,14 @@ if __name__ == "__main__":
 
     # Argument
     parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
+    parser.add_argument("--config", type=str, help="Configuration file")
     args = parser.parse_args()
+
+    # Load configuration file
+    config = PyTweetBotConfig.load(args.config)
+
+    # Connection to Twitter
+    twitter_connector = PyTweetBotConnector(config)
+    print(twitter_connector.get_followers(n_pages=1)[0])
 
 # end if

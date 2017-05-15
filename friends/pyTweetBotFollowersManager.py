@@ -29,7 +29,11 @@ from twitter.pyTweetBotConnector import PyTweetBotConnector
 @singleton
 class PyTweetBotFollowersManager(object):
 
+    # Constructor
     def __init__(self):
+        """
+        Constructor
+        """
         self.twitter_connect = PyTweetBotConnector.getinstance()
     # end __init__
 

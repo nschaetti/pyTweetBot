@@ -23,6 +23,7 @@
 #
 
 import tweepy
+import time
 from patterns.singleton import singleton
 
 
@@ -34,17 +35,15 @@ class PyTweetBotConnector(object):
     """
 
     # Constructor
-    def __init__(self, auth_token1, auth_token2, access_token1, access_token2):
+    def __init__(self, bot_config):
         """
         Constructor
-        :param auth_token1: Twitter first auth token.
-        :param auth_token2: Twitter second auth token.
-        :param access_token1: Twitter first access token.
-        :param access_token2: Twitter second access token.
+        :param bot_config: Bot configuration object.
         """
         # Auth to Twitter
-        auth = tweepy.OAuthHandler(auth_token1, auth_token2)
-        auth.set_access_token(access_token1, access_token2)
+        config = bot_config.get_twitter_config()
+        auth = tweepy.OAuthHandler(config['auth_token1'], config['auth_token2'])
+        auth.set_access_token(config['access_token1'], config['access_token2'])
         self._api = tweepy.API(auth)
     # end __init__
 
@@ -114,42 +113,32 @@ class PyTweetBotConnector(object):
     # end get_time_line
 
     # Get followers
-    def get_followers(self):
-
+    def get_followers(self, n_pages):
+        """
+        Get followers
+        :return:
+        """
+        follower_list = list()
+        page_count = 0
         # For each pages
         for page in tweepy.Cursor(self._api.followers).pages():
-
             # For each follower in the page
             for follower in page:
-                # print follower
-                # Check if in data base
-                cur = con.cursor()
-                cur.execute("SELECT * FROM friends WHERE screen_name like '" + follower.screen_name + "'")
-                rows = cur.fetchall()
+                follower_list.append(follower)
+            # end for
 
-                # Exists or not
-                if len(rows) == 0:
-                    print '[' + time.strftime("%Y-%m-%d %H:%M") + '] ' + "Inserting " + follower.screen_name
+            # Inc
+            page_count += 1
 
-                    # Insert
-                    cur.execute(
-                        "INSERT INTO friends (screen_name,direction,friends_count,followers_count,statuses_count,date,day) VALUES ('" + follower.screen_name + "','in'," + str(
-                            follower.friends_count) + "," + str(follower.followers_count) + "," + str(
-                            follower.statuses_count) + "," + str(time.time()) + "," + str(day_num) + ")")
-                    con.commit()
+            # Limit
+            if page_count >= n_pages:
+                break
+            # end if
 
-                # Send direct message
-                # sendDirectMessage(api, follower, json_data)
-                else:
-                    print '[' + time.strftime("%Y-%m-%d %H:%M") + '] ' + "Updating " + follower.screen_name
-                    cur.execute("UPDATE friends SET direction = 'in', friends_count = " + str(
-                        follower.friends_count) + ", followers_count = " + str(
-                        follower.followers_count) + ", statuses_count = " + str(
-                        follower.statuses_count) + ", day = " + str(
-                        day_num) + " WHERE screen_name like '" + follower.screen_name + "'")
-                    con.commit()
+            # Wait 60s
             time.sleep(60)
         # end for
+        return follower_list
     # end get_followers
 
 # end PyTweetBotConnector
