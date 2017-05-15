@@ -22,14 +22,18 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from patterns.singleton import singleton
 
+def singleton(class_):
 
-@singleton
-class PyTweetBotFollowersManager(object):
+    instances = {}
 
-    def __init__(self):
-        pass
-    # end __init__
+    def getinstance(*args, **kwargs):
+        if class_ not in instances:
+            instances[class_] = class_(*args, **kwargs)
+        # end if
+        return instances[class_]
+    # end getinstance
 
-# end pyTweetBotFollowersManager
+    return getinstance
+
+# end singleton

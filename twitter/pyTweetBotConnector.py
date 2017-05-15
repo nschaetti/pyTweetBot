@@ -23,9 +23,11 @@
 #
 
 import tweepy
+from patterns.singleton import singleton
 
 
 # Twitter connector
+@singleton
 class PyTweetBotConnector(object):
     """
     Twitter Connector
@@ -101,8 +103,14 @@ class PyTweetBotConnector(object):
         self._api.send_direct_message(user_id=user_id, text=text)
     # end send_direct_message
 
-    # Get timeline
-    def get_timeline(self, n_pages):
+    # Get time line
+    def get_time_line(self, n_pages):
+        """
+        Get time line.
+        :param n_pages:
+        :return:
+        """
         c = tweepy.Cursor(self._api.home_timeline).pages(limit=n_pages)
+    # end get_time_line
 
 # end PyTweetBotConnector
