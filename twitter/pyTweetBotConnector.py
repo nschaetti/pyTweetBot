@@ -113,4 +113,43 @@ class PyTweetBotConnector(object):
         c = tweepy.Cursor(self._api.home_timeline).pages(limit=n_pages)
     # end get_time_line
 
+    # Get followers
+    def get_followers(self):
+
+        # For each pages
+        for page in tweepy.Cursor(self._api.followers).pages():
+
+            # For each follower in the page
+            for follower in page:
+                # print follower
+                # Check if in data base
+                cur = con.cursor()
+                cur.execute("SELECT * FROM friends WHERE screen_name like '" + follower.screen_name + "'")
+                rows = cur.fetchall()
+
+                # Exists or not
+                if len(rows) == 0:
+                    print '[' + time.strftime("%Y-%m-%d %H:%M") + '] ' + "Inserting " + follower.screen_name
+
+                    # Insert
+                    cur.execute(
+                        "INSERT INTO friends (screen_name,direction,friends_count,followers_count,statuses_count,date,day) VALUES ('" + follower.screen_name + "','in'," + str(
+                            follower.friends_count) + "," + str(follower.followers_count) + "," + str(
+                            follower.statuses_count) + "," + str(time.time()) + "," + str(day_num) + ")")
+                    con.commit()
+
+                # Send direct message
+                # sendDirectMessage(api, follower, json_data)
+                else:
+                    print '[' + time.strftime("%Y-%m-%d %H:%M") + '] ' + "Updating " + follower.screen_name
+                    cur.execute("UPDATE friends SET direction = 'in', friends_count = " + str(
+                        follower.friends_count) + ", followers_count = " + str(
+                        follower.followers_count) + ", statuses_count = " + str(
+                        follower.statuses_count) + ", day = " + str(
+                        day_num) + " WHERE screen_name like '" + follower.screen_name + "'")
+                    con.commit()
+            time.sleep(60)
+        # end for
+    # end get_followers
+
 # end PyTweetBotConnector

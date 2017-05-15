@@ -23,13 +23,18 @@
 #
 
 from patterns.singleton import singleton
+from twitter.pyTweetBotConnector import PyTweetBotConnector
 
 
 @singleton
 class PyTweetBotFollowersManager(object):
 
     def __init__(self):
-        pass
+        self.twitter_connect = PyTweetBotConnector.getinstance()
     # end __init__
+
+    def update(self):
+
+    # end update
 
 # end pyTweetBotFollowersManager
