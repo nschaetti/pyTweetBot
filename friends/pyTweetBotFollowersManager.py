@@ -34,7 +34,7 @@ class PyTweetBotFollowersManager(object):
     # end __init__
 
     def update(self):
-
+        pass
     # end update
 
 # end pyTweetBotFollowersManager
