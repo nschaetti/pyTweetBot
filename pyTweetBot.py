@@ -24,8 +24,11 @@
 
 # Import
 import argparse
-from config.pyTweetBotConfig import PyTweetBotConfig
-from twitter.pyTweetBotConnector import PyTweetBotConnector
+from config.BotConfig import BotConfig
+from db.DBConnector import DBConnector
+from friends.FriendsManager import FriendsManager
+from twitter.TweetBotConnect import TweetBotConnector
+from friends.FriendsManager import FriendsManager
 
 ####################################################
 # Main function
@@ -42,10 +45,24 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Load configuration file
-    config = PyTweetBotConfig.load(args.config)
+    config = BotConfig.load(args.config)
+
+    # Connection to MySQL
+    dbc = config.get_database_config()
+    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
+                                  db_name=dbc["database"])
 
     # Connection to Twitter
-    twitter_connector = PyTweetBotConnector(config)
-    print(twitter_connector.get_followers(n_pages=1)[0])
+    twitter_connector = TweetBotConnector(config)
+    #print(twitter_connector.get_followers(n_pages=1)[0])
+    """friends_manager = FriendsManager()
+    friends = friends_manager.get_followers()
+    for friend in friends:
+        print(friend.friend_screen_name)
+    # end for"""
+
+    # Friends
+    friends_manager = FriendsManager()
+    friends_manager.update()
 
 # end if
