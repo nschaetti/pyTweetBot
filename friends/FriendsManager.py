@@ -19,19 +19,36 @@ class FriendsManager(object):
         return session.query(Friend).all()
     # end get_followers
 
+    # Follower exists
+    def exists(self, follower):
+        session = DBConnector().get_session()
+        if type(follower) == "str":
+
+        # end if
+    # end exists
+
     # Update
     def update(self):
         # Twitter connection
         twitter_con = TweetBotConnector()
 
         # Get followers
-        """followers = twitter_con.get_followers(n_pages=1)
+        followers = twitter_con.get_followers(n_pages=1)
 
-        # For each followers
-        for follower in followers:
-            print(follower.screen_name)
-        # end for"""
-        print(twitter_con.next())
+        # Get follower cursor
+        cursor = twitter_con.get_followers_cursor()
+
+        # For each page
+        for page in cursor:
+            # For each follower
+            for follower in page:
+                if not self._exists(follower):
+                    self._add_follower(follower)
+                else:
+                    return
+                # end if
+            # end for
+        # end for
     # end update
 
 # end FriendsManager

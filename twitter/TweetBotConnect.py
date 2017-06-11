@@ -45,8 +45,11 @@ class TweetBotConnector(object):
         auth = tweepy.OAuthHandler(config['auth_token1'], config['auth_token2'])
         auth.set_access_token(config['access_token1'], config['access_token2'])
         self._api = tweepy.API(auth)
-        self._cursor = None
+        self._cursor = tweepy.Cursor(self._api.followers).pages()
         self._page = None
+        self._followers = list()
+        self._current_follower = 0
+        self._load_followers()
     # end __init__
 
     # Retweet
@@ -149,21 +152,36 @@ class TweetBotConnector(object):
         self._page = None
     # end reset
 
+    # Load followers
+    def _load_followers(self):
+        self._page = self._cursor.next()
+        self._followers = list()
+        for follower in self._page:
+            self._followers.append(follower)
+        # end for
+        self._current_follower = 0
+    # end load
+
     def next(self):
-        # Page cursor
-        if self._page is None:
-            self._cursor = tweepy.Cursor(self._api.followers).pages()
-            print(self._cursor)
-            self._page = self._cursor.next()
-        # end if
-        print(type(self._page))
-        next_follower = self._page.next()
-        if next_follower is None:
-            self._page = self._cursor.next()
-            next_follower = self._page.next()
+        # Follower
+        follower = self._followers[self._current_follower]
+
+        # Next follower
+        self._current_follower += 1
+        if self._current_follower >= len(self._followers):
+            self._load_followers()
         # end if
 
-        return next_follower
+        return follower
     # end next
+
+    # Get followers cursor
+    def get_followers_cursor(self):
+        """
+        Get followers cursor.
+        :return: Followers cursor.
+        """
+        return tweepy.Cursor(self._api.followers).pages()
+    # end get_followers_cursor
 
 # end TweetBotConnector
