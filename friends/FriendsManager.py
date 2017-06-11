@@ -20,20 +20,46 @@ class FriendsManager(object):
     # end get_followers
 
     # Follower exists
-    def exists(self, follower):
+    @staticmethod
+    def exists(follower):
+        """
+        Follower exists.
+        :param follower:
+        :return:
+        """
         session = DBConnector().get_session()
-        if type(follower) == "str":
-
+        if len(session.query(Friend).filter(Friend.friend_screen_name == follower.screen_name).all()) > 0:
+            return True
         # end if
+        return False
     # end exists
 
+    # Add a follower
+    @staticmethod
+    def add_follower(follower):
+        """
+        Add follower
+        :param follower: Twitter follower
+        :return:
+        """
+        session = DBConnector().get_session()
+        new_friend = Friend(friend_screen_name=follower.screen_name, friend_description=follower.description,
+                            friend_location=follower.location, friend_direction="In")
+        session.add(new_friend)
+    # end add_follower
+
     # Update
-    def update(self):
+    @staticmethod
+    def update():
+        """
+        Update
+        :return:
+        """
+        # DB session
+        session = DBConnector().get_session()
+
         # Twitter connection
         twitter_con = TweetBotConnector()
-
-        # Get followers
-        followers = twitter_con.get_followers(n_pages=1)
 
         # Get follower cursor
         cursor = twitter_con.get_followers_cursor()
@@ -42,13 +68,15 @@ class FriendsManager(object):
         for page in cursor:
             # For each follower
             for follower in page:
-                if not self._exists(follower):
-                    self._add_follower(follower)
+                if not FriendsManager.exists(follower):
+                    FriendsManager.add_follower(follower)
                 else:
+                    session.commit()
                     return
                 # end if
             # end for
         # end for
+        session.commit()
     # end update
 
 # end FriendsManager
