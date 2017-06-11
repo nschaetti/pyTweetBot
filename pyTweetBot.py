@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     # Argument
     parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
-    parser.add_argument("--config", type=str, help="Configuration file")
+    parser.add_argument("--config", type=str, help="Configuration file", required=True)
     args = parser.parse_args()
 
     # Load configuration file

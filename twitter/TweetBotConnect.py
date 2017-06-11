@@ -156,7 +156,7 @@ class TweetBotConnector(object):
             print(self._cursor)
             self._page = self._cursor.next()
         # end if
-
+        print(type(self._page))
         next_follower = self._page.next()
         if next_follower is None:
             self._page = self._cursor.next()
