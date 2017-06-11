@@ -40,7 +40,7 @@ class DBConnector(object):
         :param password:
         :param db_name:
         """
-        self._engine = create_engine("mysql://{}:{}@{}/{}".format(username, password, host, db_name))
+        self._engine = create_engine("mysql://{}:{}@{}/{}?charset=utf8mb4".format(username, password, host, db_name))
         Base.metadata.bind = self._engine
         db_session = sessionmaker(bind=self._engine)
         self._session = db_session()

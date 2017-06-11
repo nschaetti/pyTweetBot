@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
 
 from patterns.singleton import singleton
 from db.DBConnector import DBConnector
@@ -68,6 +71,7 @@ class FriendsManager(object):
         for page in cursor:
             # For each follower
             for follower in page:
+                print(follower.description)
                 if not FriendsManager().exists(follower):
                     FriendsManager().add_follower(follower)
                 else:

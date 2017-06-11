@@ -24,29 +24,27 @@
 
 # Import
 import datetime
-from sqlalchemy import Column, Integer, String, BigInteger, DateTime, Boolean
-from sqlalchemy.types import Enum
+from sqlalchemy import Column, BigInteger, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from .Base import Base
+from .Friend import Friend
 
 
-# Friend
-class Friend(Base):
+# Following
+class Following(Base):
     """
-    Friend
+    Following
     """
 
     # Table name
-    __tablename__ = "pytwb_friends"
+    __tablename__ = "pytwb_following"
 
     # Fields
-    friend_id = Column(BigInteger, primary_key=True, autoincrement=True)
-    friend_screen_name = Column(String(100), nullable=False, unique=True)
-    friend_description = Column(String(1000), nullable=False)
-    friend_location = Column(String(100), nullable=False)
-    #friend_direction = Column(Enum('In', 'Out'), nullable=False)
-    friend_followers_count = Column(Integer, nullable=False, default=0)
-    friend_friends_count = Column(Integer, nullable=False, default=0)
-    friend_statuses_count = Column(Integer, nullable=False, default=0)
-    friend_date = Column(DateTime, nullable=False, default=datetime.datetime.now())
-    friend_special = Column(Boolean, nullable=False, default=False)
-# end Friend
+    following_id = Column(BigInteger, primary_key=True, autoincrement=True)
+    following_friend = Column(BigInteger, ForeignKey('pytwb_friends.friend_id'), nullable=False)
+    following_last_update = Column(DateTime, nullable=False, default=datetime.datetime.now())
+
+    # Relationships
+    friend = relationship(Friend)
+
+# end Following
