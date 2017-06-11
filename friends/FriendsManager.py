@@ -69,7 +69,7 @@ class FriendsManager(object):
             # For each follower
             for follower in page:
                 if not FriendsManager().exists(follower):
-                    FriendsManager.add_follower(follower)
+                    FriendsManager().add_follower(follower)
                 else:
                     session.commit()
                     return
