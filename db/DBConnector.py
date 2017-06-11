@@ -24,8 +24,9 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from db.obj.Base import Base
 from patterns.singleton import singleton
-from db.Base import Base
 
 
 @singleton

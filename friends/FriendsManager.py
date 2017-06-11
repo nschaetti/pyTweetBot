@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 #
 
-from patterns.singleton import singleton
 from db.DBConnector import DBConnector
-from db.Friend import Friend
+from db.obj.Friend import Friend
+from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
 
 

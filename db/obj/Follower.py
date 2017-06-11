@@ -30,21 +30,21 @@ from .Base import Base
 from .Friend import Friend
 
 
-# Following
-class Following(Base):
+# Follower
+class Follower(Base):
     """
-    Following
+    Friend
     """
 
     # Table name
-    __tablename__ = "pytwb_following"
+    __tablename__ = "pytwb_followers"
 
     # Fields
-    following_id = Column(BigInteger, primary_key=True, autoincrement=True)
-    following_friend = Column(BigInteger, ForeignKey('pytwb_friends.friend_id'), nullable=False)
-    following_last_update = Column(DateTime, nullable=False, default=datetime.datetime.now())
+    follower_id = Column(BigInteger, primary_key=True, autoincrement=True)
+    follower_friend = Column(BigInteger, ForeignKey('pytwb_friends.friend_id'), nullable=False)
+    follower_last_update = Column(DateTime, nullable=False, default=datetime.datetime.now())
 
     # Relationships
     friend = relationship(Friend)
 
-# end Following
+# end Friend

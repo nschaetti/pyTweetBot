@@ -22,18 +22,12 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from sqlalchemy.ext.declarative import declarative_base
+import db.obj.Statistic
 from sqlalchemy import create_engine
-import db.Base
-import db.Action
-import db.Friend
-import db.Model
-import db.ModelTokens
-import db.Statistic
 
 # Create an engine that stores data in the local directory's
 engine = create_engine("mysql://root:1234@localhost/nilsbot")
 
 # Create all tables in  the engine. This is equivalent to "Create Table"
 # statements in raw SQL.
-db.Base.metadata.create_all(engine, checkfirst=True)
+db.obj.Base.metadata.create_all(engine, checkfirst=True)
