@@ -142,7 +142,6 @@ class FriendsManager(object):
     def update_followers(self, update_time=datetime.datetime.now()):
         """
         Update the list of followers
-        :return:
         """
         # Get follower cursor
         cursor = self._twitter_con.get_followers_cursor()
@@ -159,6 +158,10 @@ class FriendsManager(object):
 
     # Update the list of following
     def update_following(self, update_time=datetime.datetime.now()):
+        """
+        Update the list of followings
+        :param update_time: Date and time of the last update.
+        """
         pass
     # end update_following
 
@@ -172,10 +175,10 @@ class FriendsManager(object):
         update_time = datetime.datetime.now()
 
         # Update followers
-        self.update_followers()
+        self.update_followers(update_time)
 
         # Update following
-        self.update_following()
+        self.update_following(update_time)
     # end update
 
 # end FriendsManager
