@@ -32,7 +32,7 @@ class FriendsManager(object):
         :return: The friend DB object.
         """
         print(friend)
-        return self._session.query(Friend).filter(Friend.friend_screen_name == friend.screen_name).one()
+        return self._session.query(Friend).filter(Friend.friend_screen_name == friend.friend_screen_name).one()
     # end get_friend
 
     # Get a follower from the DB
