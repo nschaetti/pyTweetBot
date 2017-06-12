@@ -31,6 +31,7 @@ class FriendsManager(object):
         :param friend: The friend to get as a Tweepy object.
         :return: The friend DB object.
         """
+        print(friend)
         return self._session.query(Friend).filter(Friend.friend_screen_name == friend.screen_name).one()
     # end get_friend
 
