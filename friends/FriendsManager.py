@@ -121,6 +121,8 @@ class FriendsManager(object):
         :param update_time: Date and time of the update
         :return:
         """
+        print("add follower")
+        print(follower)
         # Add in friends database
         friend = self.add_friend(follower)
 
@@ -185,6 +187,7 @@ class FriendsManager(object):
         Update followers and following
         :return:
         """
+        print("update")
         # Time of the update
         update_time = datetime.datetime.now()
 
