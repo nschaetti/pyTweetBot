@@ -49,7 +49,6 @@ class TweetBotConnector(object):
         self._page = None
         self._followers = list()
         self._current_follower = 0
-        self._load_followers()
     # end __init__
 
     # Retweet
