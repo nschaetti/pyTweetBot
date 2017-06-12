@@ -184,4 +184,13 @@ class TweetBotConnector(object):
         return tweepy.Cursor(self._api.followers).pages()
     # end get_followers_cursor
 
+    # Get following cursor
+    def get_following_cursor(self):
+        """
+        Get following cursor.
+        :return: Following cursor.
+        """
+        return tweepy.Cursor(self._api.friends).pages()
+    # end get_followers_cursor
+
 # end TweetBotConnector
