@@ -43,7 +43,6 @@ class Friend(Base):
     friend_screen_name = Column(String(100), nullable=False, unique=True)
     friend_description = Column(String(1000), nullable=False)
     friend_location = Column(String(100), nullable=False)
-    #friend_direction = Column(Enum('In', 'Out'), nullable=False)
     friend_followers_count = Column(Integer, nullable=False, default=0)
     friend_friends_count = Column(Integer, nullable=False, default=0)
     friend_statuses_count = Column(Integer, nullable=False, default=0)
