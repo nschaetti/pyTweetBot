@@ -9,7 +9,7 @@ from db.obj.Follower import Follower
 from db.obj.Following import Following
 from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
-from sqlalchemy import update
+from sqlalchemy import update, delete
 import time
 
 
@@ -173,6 +173,9 @@ class FriendsManager(object):
             self._session.commit()
             time.sleep(60)
         # end for
+
+        # Delete old
+        self._delete_follower(update_time)
     # end update_followers
 
     # Update the list of following
@@ -181,7 +184,22 @@ class FriendsManager(object):
         Update the list of followings
         :param update_time: Date and time of the last update.
         """
-        pass
+        # Get follower cursor
+        cursor = self._twitter_con.get_followers_cursor()
+
+        # For each page
+        for page in cursor:
+            # For each following
+            for following in page:
+                FriendsManager().add_following(following, update_time)
+            # end for
+            # Commit and wait
+            self._session.commit()
+            time.sleep(60)
+        # end for
+
+        # Delete old
+        self._delete_following(update_time)
     # end update_following
 
     # Update followers and following
@@ -190,7 +208,6 @@ class FriendsManager(object):
         Update followers and following
         :return:
         """
-        print("update")
         # Time of the update
         update_time = datetime.datetime.now()
 
@@ -200,5 +217,25 @@ class FriendsManager(object):
         # Update following
         self.update_following(update_time)
     # end update
+
+    # Delete followers
+    def _delete_followers(self, update_time):
+        """
+        Delete followers
+        :param update_time:
+        :return:
+        """
+        delete(Follower).where(Follower.follower_last_update != update_time)
+    # end _delete_followers
+
+    # Delete following
+    def _delete_following(self, update_time):
+        """
+        Delete following
+        :param update_time:
+        :return:
+        """
+        delete(Following).where(Following.following_last_update != update_time)
+    # end _delete_followers
 
 # end FriendsManager
