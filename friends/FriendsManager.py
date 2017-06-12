@@ -10,6 +10,7 @@ from db.obj.Following import Following
 from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import update
+import time
 
 
 @singleton
@@ -168,8 +169,10 @@ class FriendsManager(object):
             for follower in page:
                 FriendsManager().add_follower(follower, update_time)
             # end for
+            # Commit and wait
+            self._session.commit()
+            time.sleep(60)
         # end for
-        self._session.commit()
     # end update_followers
 
     # Update the list of following
