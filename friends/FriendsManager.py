@@ -128,7 +128,7 @@ class FriendsManager(object):
 
         # If follower doesn't exist
         if not self.follower_exists(friend):
-            new_follower = Follower(follower_friend=friend, follower_last_update=update_time)
+            new_follower = Follower(follower_friend=friend.friend_id, follower_last_update=update_time)
             self._session.add(new_follower)
         else:
             update(Follower).where(Follower.follower_friend.friend_screen_name == follower.screen_name).\
