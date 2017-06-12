@@ -69,7 +69,7 @@ class FriendsManager(object):
         print(friend)
         # Friend exists
         if friend is not None:
-            if len(self._session.query(Follower).filter(Follower.follower_friend == friend).all()) > 0:
+            if len(self._session.query(Follower).filter(Follower.follower_friend == friend.friend_id).all()) > 0:
                 return True
             # end if
         # end if
@@ -92,7 +92,6 @@ class FriendsManager(object):
                 return True
             # end if
         # end if
-
         return False
     # end following_exists
 
