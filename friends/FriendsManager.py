@@ -10,6 +10,7 @@ from db.obj.Following import Following
 from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import update, delete
+import sqlalchemy.orm.exc
 import time
 
 
@@ -26,14 +27,24 @@ class FriendsManager(object):
     # end __init_-
 
     # Get a friend from the DB
-    def get_friend(self, friend):
+    def get_friend_by_id(self, friend_id):
         """
         Get a friend from the DB.
-        :param friend: The friend to get as a Tweepy object.
+        :param friend_id: The friend to get as a Tweepy object.
         :return: The friend DB object.
         """
-        return self._session.query(Friend).filter(Friend.friend_screen_name == friend.friend_screen_name).one()
-    # end get_friend
+        return self._session.query(Friend).filter(Friend.friend_id == friend_id).one()
+    # end get_friend_by_id
+
+    # Get a friend from the DB
+    def get_friend_by_name(self, screen_name):
+        """
+        Get a friend from the DB.
+        :param screen_name: The friend to get as a Tweepy object.
+        :return: The friend DB object.
+        """
+        return self._session.query(Friend).filter(Friend.friend_screen_name == screen_name).one()
+    # end get_friend_by_name
 
     # Get a follower from the DB
     def get_follower(self, screen_name):
@@ -46,71 +57,80 @@ class FriendsManager(object):
     # end get_follower
 
     # Friend exists
-    def exists(self, friend):
+    def exists(self, screen_name):
         """
         Follower exists.
-        :param friend:
+        :param screen_name:
         :return:
         """
-        if len(self._session.query(Friend).filter(Friend.friend_screen_name == friend.screen_name).all()) > 0:
+        if len(self._session.query(Friend).filter(Friend.friend_screen_name == screen_name).all()) > 0:
             return True
         # end if
         return False
     # end exists
 
     # Follower exists
-    def follower_exists(self, follower):
+    def follower_exists(self, screen_name):
         """
         The follower exists in the DB.
-        :param follower:
+        :param screen_name:
         :return:
         """
         # Friend
-        friend = self.get_friend(follower)
-        print(friend)
-        # Friend exists
-        if friend is not None:
-            if len(self._session.query(Follower).filter(Follower.follower_friend == friend.friend_id).all()) > 0:
-                return True
-            # end if
+        try:
+            friend = self.get_friend_by_name(screen_name)
+        except sqlalchemy.orm.exc.NoResultFound:
+            return False
+        # end try
+
+        # If link exists
+        if len(self._session.query(Follower).filter(Follower.follower_friend == friend.friend_id).all()) > 0:
+            return True
         # end if
         return False
     # end follower_exists
 
     # Following exists
-    def following_exists(self, following):
+    def following_exists(self, screen_name):
         """
         The following exists
-        :param following:
+        :param screen_name:
         :return:
         """
         # Friend
-        friend = self.get_friend(following)
+        try:
+            friend = self.get_friend_by_name(screen_name)
+        except sqlalchemy.orm.exc.NoResultFound:
+            return False
+        # end try
 
-        # Friend exists
-        if friend is not None:
-            if len(self._session.query(Following, Friend).filter(Following.following_friend == Friend.friend_id).all()) > 0:
-                return True
-            # end if
+        # If link exists
+        if len(self._session.query(Following, Friend).filter(Following.following_friend == friend.friend_id).all()) > 0:
+            return True
         # end if
         return False
     # end following_exists
 
     # Add a friend
-    def add_friend(self, friend):
+    def add_friend(self, screen_name, description, location, followers_count, friends_count, statuses_count):
         """
-        Add a friend to the db
-        :param friend: The friend to add as a Tweepy object.
-        :return: The new friend DB object.
+        Add a friend in the DB
+        :param screen_name:
+        :param description:
+        :param location:
+        :param followers_count:
+        :param friends_count:
+        :param statuses_count:
+        :return:
         """
-        if not self.exists(friend):
-            new_friend = Friend(friend_screen_name=friend.screen_name, friend_description=friend.description,
-                                friend_location=friend.location, friend_followers_count=friend.followers_count,
-                                friend_friends_count=friend.friends_count, friend_statuses_count=friend.statuses_count)
+        if not self.exists(screen_name):
+            new_friend = Friend(friend_screen_name=screen_name, friend_description=description,
+                                friend_location=location, friend_followers_count=followers_count,
+                                friend_friends_count=friends_count, friend_statuses_count=statuses_count)
             self._session.add(new_friend)
             return new_friend
         else:
-            return self.get_friend(friend)
+            return self.get_friend_by_name(screen_name)
         # end if
     # end add_friend
 
@@ -122,18 +142,19 @@ class FriendsManager(object):
         :param update_time: Date and time of the update
         :return:
         """
-        print("add follower")
-        print(follower)
-        # Add in friends database
-        friend = self.add_friend(follower)
+        # Add friend in database
+        friend = self.add_friend(follower.screen_name, follower.description, follower.location,
+                                 follower.followers_count, follower.friends_count, follower.statuses_count)
 
         # If follower doesn't exist
-        if not self.follower_exists(friend):
+        if not self.follower_exists(follower):
             new_follower = Follower(follower_friend=friend.friend_id, follower_last_update=update_time)
             self._session.add(new_follower)
+            return True
         else:
             update(Follower).where(Follower.follower_friend.friend_screen_name == follower.screen_name).\
                 values(follower_last_update=update_time)
+            return False
         # end if
     # end add_follower
 
@@ -152,6 +173,11 @@ class FriendsManager(object):
         if not self.following_exists():
             new_following = Following(following_friend=friend, following_last_update=update_time)
             self._session.add(new_following)
+            return True
+        else:
+            update(Following).where(Following.following_friend.friend_screen_name == following.screen_name). \
+                values(following_last_update=update_time)
+            return False
         # end if
     # end add_following
 
@@ -163,19 +189,21 @@ class FriendsManager(object):
         # Get follower cursor
         cursor = self._twitter_con.get_followers_cursor()
 
+        # Add count
+        add_count = 0
+
         # For each page
         for page in cursor:
             # For each follower
             for follower in page:
-                FriendsManager().add_follower(follower, update_time)
+                add_count += FriendsManager().add_follower(follower, update_time)
             # end for
             # Commit and wait
             self._session.commit()
             time.sleep(60)
         # end for
 
-        # Delete old
-        self._delete_follower(update_time)
+        return add_count
     # end update_followers
 
     # Update the list of following
@@ -187,19 +215,21 @@ class FriendsManager(object):
         # Get follower cursor
         cursor = self._twitter_con.get_followers_cursor()
 
+        # Add count
+        add_count = 0
+
         # For each page
         for page in cursor:
             # For each following
             for following in page:
-                FriendsManager().add_following(following, update_time)
+                add_count += FriendsManager().add_following(following, update_time)
             # end for
             # Commit and wait
             self._session.commit()
             time.sleep(60)
         # end for
 
-        # Delete old
-        self._delete_following(update_time)
+        return add_count
     # end update_following
 
     # Update followers and following
@@ -212,10 +242,16 @@ class FriendsManager(object):
         update_time = datetime.datetime.now()
 
         # Update followers
-        self.update_followers(update_time)
+        new_follower_count = self.update_followers(update_time)
 
         # Update following
-        self.update_following(update_time)
+        new_following_count = self.update_following(update_time)
+
+        # Delete old
+        self._delete_followers(update_time)
+        self._delete_following(update_time)
+
+        return new_follower_count, new_following_count
     # end update
 
     # Delete followers
