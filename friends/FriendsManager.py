@@ -31,7 +31,6 @@ class FriendsManager(object):
         :param friend: The friend to get as a Tweepy object.
         :return: The friend DB object.
         """
-        print(friend)
         return self._session.query(Friend).filter(Friend.friend_screen_name == friend.friend_screen_name).one()
     # end get_friend
 
@@ -67,7 +66,7 @@ class FriendsManager(object):
         """
         # Friend
         friend = self.get_friend(follower)
-
+        print(friend)
         # Friend exists
         if friend is not None:
             if len(self._session.query(Follower).filter(Follower.follower_friend == friend).all()) > 0:
