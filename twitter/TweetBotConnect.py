@@ -160,6 +160,7 @@ class TweetBotConnector(object):
             self._followers.append(follower)
         # end for
         self._current_follower = 0
+        time.sleep(60)
     # end load
 
     def next(self):
