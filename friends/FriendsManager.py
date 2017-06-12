@@ -9,6 +9,7 @@ from db.obj.Follower import Follower
 from db.obj.Following import Following
 from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
+from sqlalchemy import update
 
 
 @singleton
@@ -32,6 +33,16 @@ class FriendsManager(object):
         """
         return self._session.query(Friend).filter(Friend.friend_screen_name == friend.screen_name).one()
     # end get_friend
+
+    # Get a follower from the DB
+    def get_follower(self, screen_name):
+        """
+        Get a follower from the DB.
+        :param screen_name: Follower's screen name.
+        :return:
+        """
+        return self._session.query(Follower).filter(Follower.follower_friend.screen_name == screen_name).one()
+    # end get_follower
 
     # Friend exists
     def exists(self, friend):
@@ -79,7 +90,7 @@ class FriendsManager(object):
         if friend is not None:
             if len(self._session.query(Following).filter(Following.following_friend == friend).all()) > 0:
                 return True
-                # end if
+            # end if
         # end if
         return False
     # end following_exists
@@ -114,9 +125,12 @@ class FriendsManager(object):
         friend = self.add_friend(follower)
 
         # If follower doesn't exist
-        if not self.follower_exists():
+        if not self.follower_exists(friend):
             new_follower = Follower(follower_friend=friend, follower_last_update=update_time)
             self._session.add(new_follower)
+        else:
+            update(Follower).where(Follower.follower_friend.friend_screen_name == follower.screen_name).\
+                values(follower_last_update=update_time)
         # end if
     # end add_follower
 
