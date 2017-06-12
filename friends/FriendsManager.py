@@ -92,6 +92,7 @@ class FriendsManager(object):
                 return True
             # end if
         # end if
+
         return False
     # end following_exists
 
