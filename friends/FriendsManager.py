@@ -10,6 +10,7 @@ from db.obj.Following import Following
 from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import update, delete, select
+from sqlalchemy.orm import load_only
 import sqlalchemy.orm.exc
 import time
 
@@ -188,9 +189,11 @@ class FriendsManager(object):
 
         # Get current friends
         if follower:
-            friends = select(['friend_screen_name']).where(Friend.friend_follower)
+            #friends = select(['friend_screen_name']).where(Friend.friend_follower)
+            friends = self._session.query(Friend).options(load_only('friend_screen_name')).where(Friend.friend_follower)
         else:
-            friends = select(['friend_sceeen_name']).where(Friend.friend_following)
+            #friends = select(['friend_sceeen_name']).where(Friend.friend_following)
+            friends = self._session.query(Friend).options(load_only('friend_screen_name')).where(Friend.friend_following)
         # end if
         print(friends)
         exit()
