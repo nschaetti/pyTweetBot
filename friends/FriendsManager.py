@@ -96,7 +96,7 @@ class FriendsManager(object):
         new_follower_count = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
 
         # Update following
-        new_following_count = self._update_friends(self._twitter_con.get_following_cursor(), follower=True)
+        new_following_count = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
         return new_follower_count, new_following_count
     # end update
@@ -190,10 +190,12 @@ class FriendsManager(object):
         # Get current friends
         if follower:
             #friends = select(['friend_screen_name']).where(Friend.friend_follower)
-            friends = self._session.query(Friend).options(load_only('friend_screen_name')).filter(Friend.friend_follower)
+            friends = self._session.query(Friend).options(load_only('friend_screen_name'))\
+                .filter(Friend.friend_follower).all()
         else:
             #friends = select(['friend_sceeen_name']).where(Friend.friend_following)
-            friends = self._session.query(Friend).options(load_only('friend_screen_name')).filter(Friend.friend_following)
+            friends = self._session.query(Friend).options(load_only('friend_screen_name'))\
+                .filter(Friend.friend_following).all()
         # end if
         for friend in friends:
             print(friend)
