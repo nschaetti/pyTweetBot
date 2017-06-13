@@ -190,10 +190,10 @@ class FriendsManager(object):
         # Get current friends
         if follower:
             #friends = select(['friend_screen_name']).where(Friend.friend_follower)
-            friends = self._session.query(Friend).options(load_only('friend_screen_name')).where(Friend.friend_follower)
+            friends = self._session.query(Friend).options(load_only('friend_screen_name')).filter(Friend.friend_follower)
         else:
             #friends = select(['friend_sceeen_name']).where(Friend.friend_following)
-            friends = self._session.query(Friend).options(load_only('friend_screen_name')).where(Friend.friend_following)
+            friends = self._session.query(Friend).options(load_only('friend_screen_name')).filter(Friend.friend_following)
         # end if
         print(friends)
         exit()
