@@ -54,12 +54,6 @@ if __name__ == "__main__":
 
     # Connection to Twitter
     twitter_connector = TweetBotConnector(config)
-    #print(twitter_connector.get_followers(n_pages=1)[0])
-    """friends_manager = FriendsManager()
-    friends = friends_manager.get_followers()
-    for friend in friends:
-        print(friend.friend_screen_name)
-    # end for"""
 
     # Friends
     friends_manager = FriendsManager()
