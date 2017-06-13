@@ -195,11 +195,11 @@ class FriendsManager(object):
             #friends = select(['friend_sceeen_name']).where(Friend.friend_following)
             friends = self._session.query(Friend).filter(Friend.friend_following).all()
         # end if
-        print(friends)
+        """print(friends)
         for friend in friends:
             print(friend)
         # end for
-        exit()
+        exit()"""
 
         # For each page
         for page in cursor:
