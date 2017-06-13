@@ -188,7 +188,12 @@ class FriendsManager(object):
 
         # Get current friends
         if follower:
-            friends = self._session.query(Friend)
+            friends = select(['friend_screen_name']).where(friend_follower=True)
+        else:
+            friends = select(['friend_sceeen_name']).where(friend_following=True)
+        # end if
+        print(friends)
+        exit()
 
         # For each page
         for page in cursor:
