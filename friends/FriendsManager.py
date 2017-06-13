@@ -198,12 +198,10 @@ class FriendsManager(object):
         # end if
 
         # Get screen names
-        screen_names = list()
+        last_friends = list()
         for friend in friends:
-            screen_names.append(friend.friend_screen_name)
+            last_friends.append(friend.friend_screen_name)
         # end for
-        print(screen_names)
-        exit()
 
         # For each page
         for page in cursor:
@@ -212,18 +210,48 @@ class FriendsManager(object):
                 # Add this friend if necessary
                 self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
                                  twf.friends_count, twf.statuses_count)
+
                 # Update status type
                 if follower:
                     self._set_follower(twf.screen_name)
                 else:
                     self._set_following(twf.screen_name)
+
+                # Remove friend from list
+                last_friends.remove(twf.screen_name)
             # end for
             # Commit and wait
             self._session.commit()
             time.sleep(60)
         # end for
 
+        # Update status of friends not follower/following
+        # anymore
+        for name in last_friends:
+            if follower:
+                self._set_follower(screen_name=name, follower=False)
+            else:
+                self._set_following(screen_name=name, following=False)
+        # end for
+
+        # Delete old friend
+        self._clean_friendships()
+
+        # Commit
+        self._session.commit()
+
         return add_count
     # end update_friends
+
+    # Clean friendships
+    def _clean_friendships(self):
+        # Select friend with no links
+        no_links = self._session.query(Friend).where(not Friend.friend_follower and not Friend.friend_following).all()
+
+        # Delete
+        for no_link in no_links:
+            delete(Friend).where(Friend.friend_screen_name == no_link.friend_screen_name)
+        # end for
+    # end _clean_friendship
 
 # end FriendsManager
