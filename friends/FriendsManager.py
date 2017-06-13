@@ -218,7 +218,11 @@ class FriendsManager(object):
                     self._set_following(twf.screen_name)
 
                 # Remove friend from list
-                last_friends.remove(twf.screen_name)
+                try:
+                    last_friends.remove(twf.screen_name)
+                except ValueError:
+                    pass
+                # end try
             # end for
             # Commit and wait
             self._session.commit()
