@@ -13,6 +13,7 @@ from sqlalchemy import update, delete, select
 from sqlalchemy.orm import load_only
 import sqlalchemy.orm.exc
 import time
+import logging
 
 
 @singleton
@@ -25,6 +26,9 @@ class FriendsManager(object):
 
         # Twitter connection
         self._twitter_con = TweetBotConnector()
+
+        # Logger
+        self._logger = logging.getLogger(name="pyTweetBot")
     # end __init__
 
     ######################################################
@@ -89,16 +93,15 @@ class FriendsManager(object):
         Update followers and following
         :return:
         """
-        # Time of the update
-        update_time = datetime.datetime.now()
-
         # Update followers
-        new_follower_count = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
+        self._logger.info("Updating followers...")
+        n_follower, d_follower = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
 
         # Update following
-        new_following_count = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
+        self._logger.info("Updating followers...")
+        n_following, d_following = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
-        return new_follower_count, new_following_count
+        return n_follower, d_follower, n_following, d_following
     # end update
 
     ######################################################
@@ -125,9 +128,12 @@ class FriendsManager(object):
                                 friend_location=location, friend_followers_count=followers_count,
                                 friend_friends_count=friends_count, friend_statuses_count=statuses_count)
             self._session.add(new_friend)
+            self._logger.info("New friend %s" % screen_name)
+            return 1
         else:
             update(Friend).where(Friend.friend_screen_name == screen_name).\
                 values(friend_last_update=datetime.datetime.now())
+            return 0
         # end if
     # end add_friend
 
@@ -142,18 +148,29 @@ class FriendsManager(object):
         # Friend
         friend = self.get_friend_by_name(screen_name)
 
+        # Counter
+        if not friend.friend_follower and follower:
+            count = 1
+        else:
+            count = 0
+        # end if
+
+        # Log
+        if follower and not friend.friend_follower:
+            self._logger.info("New follower %s" % screen_name)
+        # end if
+
         # Update
-        #update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower=follower)
-        friend.friend_follower = True
+        friend.friend_follower = follower
 
         # Update follower time if necessary
         if not follower:
-            #update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower_date=None)
             friend.friend_follower_date = None
         elif friend.friend_follower_date is None:
             friend.friend_follower_date = datetime.datetime.now()
-            #update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower_date=datetime.datetime.now())
         # end if
+
+        return count
     # end _set_as_follower
 
     # Set this friend as following
@@ -167,16 +184,29 @@ class FriendsManager(object):
         # Friend
         friend = self.get_friend_by_name(screen_name)
 
+        # Counter
+        if not friend.friend_following and following:
+            count = 1
+        else:
+            count = 0
+        # end if
+
+        # Log
+        if following and not friend.friend_following:
+            self._logger.info("New following %s" % screen_name)
+        # end if
+
         # Update
-        update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_following=following)
+        friend.friend_following = following
 
         # Update follower time if necessary
         if not following:
-            update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_following_date=None)
+            friend.friend_follower_date = None
         elif friend.friend_follower_date is None:
-            update(Friend).where(Friend.friend_screen_name == screen_name).values(
-                friend_following_date=datetime.datetime.now())
+            friend.friend_follower_date = datetime.datetime.now()
         # end if
+
+        return count
     # end _set_as_follower
 
     # Update friends
@@ -187,15 +217,16 @@ class FriendsManager(object):
         :param follower: Update followers?
         :return: Number of new entries
         """
-        # Add count
-        add_count = 0
-
         # Get current friends.
         if follower:
             friends = self._session.query(Friend).options(load_only('friend_screen_name')).filter(Friend.friend_follower).all()
         else:
             friends = self._session.query(Friend).options(load_only('friend_screen_name')).filter(Friend.friend_following).all()
         # end if
+
+        # Counter
+        counter = 0
+        deleted = 0
 
         # Get screen names
         last_friends = list()
@@ -208,14 +239,14 @@ class FriendsManager(object):
             # For each follower
             for twf in page:
                 # Add this friend if necessary
-                self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
-                                 twf.friends_count, twf.statuses_count)
+                counter += self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
+                                            twf.friends_count, twf.statuses_count)
 
                 # Update status type
                 if follower:
-                    self._set_follower(twf.screen_name)
+                    counter += self._set_follower(twf.screen_name)
                 else:
-                    self._set_following(twf.screen_name)
+                    counter += self._set_following(twf.screen_name)
 
                 # Remove friend from list
                 try:
@@ -236,6 +267,8 @@ class FriendsManager(object):
                 self._set_follower(screen_name=name, follower=False)
             else:
                 self._set_following(screen_name=name, following=False)
+            # end if
+            deleted += 1
         # end for
 
         # Delete old friend
@@ -244,7 +277,7 @@ class FriendsManager(object):
         # Commit
         self._session.commit()
 
-        return add_count
+        return counter, deleted
     # end update_friends
 
     # Clean friendships

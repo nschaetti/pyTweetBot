@@ -24,9 +24,9 @@
 
 # Import
 import argparse
+import logging
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
-from friends.FriendsManager import FriendsManager
 from twitter.TweetBotConnect import TweetBotConnector
 from friends.FriendsManager import FriendsManager
 
@@ -42,7 +42,12 @@ if __name__ == "__main__":
     # Argument
     parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
+    parser.add_argument("--log-level", type=int, help="Log level", default=20)
     args = parser.parse_args()
+
+    # Logging
+    logging.basicConfig(level=args.log_level)
+    logger = logging.getLogger(name="pyTweetBot")
 
     # Load configuration file
     config = BotConfig.load(args.config)
@@ -57,6 +62,7 @@ if __name__ == "__main__":
 
     # Friends
     friends_manager = FriendsManager()
-    friends_manager.update()
+    n_follower, d_follower, n_following, d_following = friends_manager.update()
+    logger.info("%d new follower, %d unfollow, %d new following, %d unfollowing")
 
 # end if
