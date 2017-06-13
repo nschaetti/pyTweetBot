@@ -187,7 +187,7 @@ class FriendsManager(object):
         # Add count
         add_count = 0
 
-        # Get current friends
+        # Get current friends.
         if follower:
             #friends = select(['friend_screen_name']).where(Friend.friend_follower)
             friends = self._session.query(Friend).filter(Friend.friend_follower).all()
