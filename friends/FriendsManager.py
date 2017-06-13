@@ -191,11 +191,11 @@ class FriendsManager(object):
         if follower:
             #friends = select(['friend_screen_name']).where(Friend.friend_follower)
             friends = self._session.query(Friend).options(load_only('friend_screen_name'))\
-                .filter(Friend.friend_follower).all()
+                .filter(Friend.friend_follower == True).all()
         else:
             #friends = select(['friend_sceeen_name']).where(Friend.friend_following)
             friends = self._session.query(Friend).options(load_only('friend_screen_name'))\
-                .filter(Friend.friend_following).all()
+                .filter(Friend.friend_following == True).all()
         # end if
         print(friends)
         for friend in friends:
