@@ -197,6 +197,7 @@ class FriendsManager(object):
             friends = self._session.query(Friend).options(load_only('friend_screen_name'))\
                 .filter(Friend.friend_following).all()
         # end if
+        print(friends)
         for friend in friends:
             print(friend)
         # end for
