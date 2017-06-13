@@ -143,13 +143,16 @@ class FriendsManager(object):
         friend = self.get_friend_by_name(screen_name)
 
         # Update
-        update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower=follower)
+        #update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower=follower)
+        friend.friend_follower = True
 
         # Update follower time if necessary
         if not follower:
-            update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower_date=None)
+            #update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower_date=None)
+            friend.friend_follower_date = None
         elif friend.friend_follower_date is None:
-            update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower_date=datetime.datetime.now())
+            friend.friend_follower_date = datetime.datetime.now()
+            #update(Friend).where(Friend.friend_screen_name == screen_name).values(friend_follower_date=datetime.datetime.now())
         # end if
     # end _set_as_follower
 
