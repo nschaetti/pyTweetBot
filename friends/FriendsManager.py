@@ -15,6 +15,7 @@ import sqlalchemy.orm.exc
 import time
 import logging
 from datetime import timedelta
+import tweepy
 
 
 @singleton
@@ -260,30 +261,39 @@ class FriendsManager(object):
         # end for
 
         # For each page
-        for page in cursor:
-            # For each follower
-            for twf in page:
-                # Add this friend if necessary
-                counter += self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
-                                            twf.friends_count, twf.statuses_count)
+        finished = False
+        while not finished:
+            try:
+                for page in cursor:
+                    # For each follower
+                    for twf in page:
+                        # Add this friend if necessary
+                        counter += self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
+                                                    twf.friends_count, twf.statuses_count)
 
-                # Update status type
-                if follower:
-                    counter += self._set_follower(twf.screen_name)
-                else:
-                    counter += self._set_following(twf.screen_name)
+                        # Update status type
+                        if follower:
+                            counter += self._set_follower(twf.screen_name)
+                        else:
+                            counter += self._set_following(twf.screen_name)
 
-                # Remove friend from list
-                try:
-                    last_friends.remove(twf.screen_name)
-                except ValueError:
-                    pass
-                # end try
-            # end for
-            # Commit and wait
-            self._session.commit()
-            time.sleep(60)
-        # end for
+                        # Remove friend from list
+                        try:
+                            last_friends.remove(twf.screen_name)
+                        except ValueError:
+                            pass
+                        # end try
+                    # end for
+                    # Commit and wait
+                    self._session.commit()
+                    time.sleep(60)
+                # end for
+                finished = True
+            except tweepy.error.RateLimitError:
+                time.sleep(300)
+                pass
+            # end try
+        # end while
 
         # Update status of friends not follower/following
         # anymore
