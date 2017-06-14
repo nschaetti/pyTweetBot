@@ -283,7 +283,7 @@ class FriendsManager(object):
     # Clean friendships
     def _clean_friendships(self):
         # Select friend with no links
-        no_links = self._session.query(Friend).where(not Friend.friend_follower and not Friend.friend_following).all()
+        no_links = self._session.query(Friend).filter(not Friend.friend_follower and not Friend.friend_following).all()
 
         # Delete
         for no_link in no_links:
