@@ -98,7 +98,7 @@ class FriendsManager(object):
         #n_follower, d_follower = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
 
         # Update following
-        self._logger.info("Updating followers...")
+        self._logger.info("Updating followings...")
         n_following, d_following = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
         #return n_follower, d_follower, n_following, d_following
@@ -202,9 +202,9 @@ class FriendsManager(object):
 
         # Update follower time if necessary
         if not following:
-            friend.friend_follower_date = None
-        elif friend.friend_follower_date is None:
-            friend.friend_follower_date = datetime.datetime.now()
+            friend.friend_following_date = None
+        elif friend.friend_following_date is None:
+            friend.friend_following_date = datetime.datetime.now()
         # end if
 
         return count
