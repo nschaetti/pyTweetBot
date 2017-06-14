@@ -14,7 +14,7 @@ from sqlalchemy.orm import load_only
 import sqlalchemy.orm.exc
 import time
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 @singleton
@@ -59,7 +59,7 @@ class FriendsManager(object):
     # end is_following
 
     # Get obsolete friends
-    def get_obsolete_friends(self, datetime_diff):
+    def get_obsolete_friends(self, days):
         """
         Get obsolete friends
         :param datetime_diff:
@@ -71,7 +71,7 @@ class FriendsManager(object):
 
         # Transform back to date
         # Limit date
-        datetime_limit = datetime.datetime.now() - datetime_diff
+        datetime_limit = datetime.datetime.today() - timedelta(days=days)
 
         # Get all
         return self._session.query(Friend).filter(Friend.friend_following and not Friend.friend_follower and
