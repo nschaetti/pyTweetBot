@@ -14,7 +14,7 @@ from sqlalchemy.orm import load_only
 import sqlalchemy.orm.exc
 import time
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 
 @singleton
@@ -62,7 +62,7 @@ class FriendsManager(object):
     def get_obsolete_friends(self, days):
         """
         Get obsolete friends
-        :param datetime_diff:
+        :param days:
         :return:
         """
         # Get limit time in timestamp
