@@ -14,6 +14,7 @@ from sqlalchemy.orm import load_only
 import sqlalchemy.orm.exc
 import time
 import logging
+from datetime import datetime
 
 
 @singleton
@@ -57,6 +58,26 @@ class FriendsManager(object):
         return len(self._session.query(Friend).filter(Friend.friend_screen_name == screen_name and Friend.friend_following)) > 0
     # end is_following
 
+    # Get obsolete friends
+    def get_obsolete_friends(self, datetime_diff):
+        """
+        Get obsolete friends
+        :param datetime_diff:
+        :return:
+        """
+        # Get limit time in timestamp
+        #timestamp_now = (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds()
+        #timestamp_limit = timestamp_now - diff_in_seconds
+
+        # Transform back to date
+        # Limit date
+        datetime_limit = datetime.datetime.now() - datetime_diff
+
+        # Get all
+        return self._session.query(Friend).filter(Friend.friend_following and not Friend.friend_follower and
+                                                  Friend.friend_following_date <= datetime_limit).all()
+    # end get_obsolete_friends
+
     # Get a friend from the DB
     def get_friend_by_id(self, friend_id):
         """
@@ -94,15 +115,14 @@ class FriendsManager(object):
         :return:
         """
         # Update followers
-        #self._logger.info("Updating followers...")
-        #n_follower, d_follower = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
+        self._logger.info("Updating followers...")
+        n_follower, d_follower = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
 
         # Update following
         self._logger.info("Updating followings...")
         n_following, d_following = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
-        #return n_follower, d_follower, n_following, d_following
-        return n_following, d_following
+        return n_follower, d_follower, n_following, d_following
     # end update
 
     ######################################################
