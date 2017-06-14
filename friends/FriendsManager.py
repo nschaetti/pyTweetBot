@@ -149,20 +149,18 @@ class FriendsManager(object):
         # Friend
         friend = self.get_friend_by_name(screen_name)
 
-        # Counter
-        if not friend.friend_follower and follower:
-            count = 1
-        else:
-            count = 0
-        # end if
-
         # Log
         if follower and not friend.friend_follower:
             self._logger.info("New follower %s" % screen_name)
         # end if
 
-        # Update
-        friend.friend_follower = follower
+        # Counter and update
+        if not friend.friend_follower and follower:
+            count = 1
+            friend.friend_follower = follower
+        else:
+            count = 0
+        # end if
 
         # Update follower time if necessary
         if not follower:
@@ -185,7 +183,7 @@ class FriendsManager(object):
         # Friend
         friend = self.get_friend_by_name(screen_name)
 
-        # Counter
+        # Counter and change
         if not friend.friend_following and following:
             count = 1
         else:
@@ -198,7 +196,14 @@ class FriendsManager(object):
         # end if
 
         # Update
-        friend.friend_following = following
+
+        # Counter and change
+        if not friend.friend_following and following:
+            friend.friend_following = following
+            count = 1
+        else:
+            count = 0
+            # end if
 
         # Update follower time if necessary
         if not following:
