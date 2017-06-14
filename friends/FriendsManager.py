@@ -101,7 +101,8 @@ class FriendsManager(object):
         self._logger.info("Updating followers...")
         n_following, d_following = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
-        return n_follower, d_follower, n_following, d_following
+        #return n_follower, d_follower, n_following, d_following
+        return n_following, d_following
     # end update
 
     ######################################################
