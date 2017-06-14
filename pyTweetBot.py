@@ -69,6 +69,7 @@ if __name__ == "__main__":
     logger.info("Obsolete friends : ")
     for friend in obsolete_friends:
         print(friend.friend_screen_name)
+        print(friend.friend_following_date)
     # end for
 
 # end if

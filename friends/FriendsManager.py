@@ -74,8 +74,7 @@ class FriendsManager(object):
         datetime_limit = datetime.datetime.today() - timedelta(days=days)
 
         # Get all
-        return self._session.query(Friend).filter(Friend.friend_following and not Friend.friend_follower and
-                                                  Friend.friend_following_date <= datetime_limit).all()
+        return self._session.query(Friend).filter(Friend.friend_following and not Friend.friend_follower).all()
     # end get_obsolete_friends
 
     # Get a friend from the DB
