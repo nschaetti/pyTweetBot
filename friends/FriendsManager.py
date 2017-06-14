@@ -94,8 +94,8 @@ class FriendsManager(object):
         :return:
         """
         # Update followers
-        self._logger.info("Updating followers...")
-        n_follower, d_follower = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
+        #self._logger.info("Updating followers...")
+        #n_follower, d_follower = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
 
         # Update following
         self._logger.info("Updating followers...")
