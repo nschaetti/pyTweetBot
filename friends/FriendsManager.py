@@ -21,9 +21,15 @@ import tweepy
 
 @singleton
 class FriendsManager(object):
+    """
+    Class to manager friendships
+    """
 
     # Constructor
     def __init__(self):
+        """
+        Constructor
+        """
         # DB session
         self._session = DBConnector().get_session()
 
@@ -44,8 +50,8 @@ class FriendsManager(object):
     def is_follower(self, screen_name):
         """
         Is friend a follower?
-        :param screen_name:
-        :return:
+        :param screen_name: Friend's screen name
+        :return: True or False
         """
         return len(self._session.query(Friend).filter(Friend.friend_screen_name == screen_name and Friend.friend_follower)) > 0
     # end is_follower
@@ -54,8 +60,8 @@ class FriendsManager(object):
     def is_following(self, screen_name):
         """
         Am I following this friend?
-        :param screen_name:
-        :return:
+        :param screen_name: Friend's screen name
+        :return: True or False
         """
         return len(self._session.query(Friend).filter(Friend.friend_screen_name == screen_name and Friend.friend_following)) > 0
     # end is_following
@@ -64,13 +70,9 @@ class FriendsManager(object):
     def get_obsolete_friends(self, days):
         """
         Get obsolete friends
-        :param days:
-        :return:
+        :param days: Number of days to be obsolete.
+        :return: The list of obsolete friends.
         """
-        # Get limit time in timestamp
-        #timestamp_now = (datetime.datetime.now() - datetime.datetime(1970, 1, 1)).total_seconds()
-        #timestamp_limit = timestamp_now - diff_in_seconds
-
         # Transform back to date
         # Limit date
         datetime_limit = datetime.datetime.utcnow() - timedelta(days=days)
@@ -104,18 +106,38 @@ class FriendsManager(object):
     # Friend exists
     def exists(self, screen_name):
         """
-        Follower exists.
-        :param screen_name:
-        :return:
+        Check if we are followed by a Twitter account.
+        :param screen_name: Account's screen name
+        :return: True or False
         """
         return len(self._session.query(Friend).filter(Friend.friend_screen_name == screen_name).all()) > 0
     # end exists
+
+    # Follow a Twitter account
+    def follow(self, screen_name):
+        """
+        Follow a Twitter account
+        :param screen_name: User's screen name
+        :return: True or False if succeeded
+        """
+        pass
+    # end follow
+
+    # Unfollow a Twitter account
+    def unfollow(self, screen_name):
+        """
+        Unfollow a Twitter account
+        :param screen_name: User's scree name
+        :return: True of False if succeeded
+        """
+        pass
+    # end unfollow
 
     # Update followers and following
     def update(self):
         """
         Update followers and following
-        :return:
+        :return: New follower count, Lost follower count, New following count, Lost following count
         """
         # Update followers
         self._logger.info("Updating followers...")
@@ -138,14 +160,14 @@ class FriendsManager(object):
     def _add_friend(self, screen_name, description, location, followers_count, friends_count,
                     statuses_count):
         """
-        Add a friend in the DB
-        :param screen_name:
-        :param description:
-        :param location:
-        :param followers_count:
-        :param friends_count:
-        :param statuses_count:
-        :return:
+        Add a friend in the MySQL database.
+        :param screen_name: The Twitter account's screen name.
+        :param description: The Twitter account's description.
+        :param location: Twitter account's geographical location.
+        :param followers_count: Twitter account's followers count.
+        :param friends_count: Twitter account's friends count.
+        :param statuses_count: Twitter account's statuses count.
+        :return: 1 if a new friends created, 0 if updated only.
         """
         if not self.exists(screen_name):
             new_friend = Friend(friend_screen_name=screen_name, friend_description=description,
