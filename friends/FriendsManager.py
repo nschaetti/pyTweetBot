@@ -72,13 +72,13 @@ class FriendsManager(object):
 
         # Transform back to date
         # Limit date
-        datetime_limit = datetime.datetime.today() - timedelta(days=days)
+        datetime_limit = datetime.datetime.utcnow() - timedelta(days=days)
         print(datetime_limit)
 
         # Get all
         return self._session.query(Friend).filter(Friend.friend_following == True
                                                   and not Friend.friend_follower == False
-                                                  and Friend.friend_following_date <= datetime_limit).all()
+                                                  and Friend.friend_following_date < datetime_limit).all()
     # end get_obsolete_friends
 
     # Get a friend from the DB
