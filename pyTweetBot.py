@@ -63,13 +63,13 @@ if __name__ == "__main__":
 
     # Friends
     friends_manager = FriendsManager()
-    n_follower, d_follower, n_following, d_following = friends_manager.update()
-    logger.info("%d new follower, %d unfollow, %d new following, %d unfollowing")
-    """obsolete_friends = friends_manager.get_obsolete_friends(days=14)
+    #n_follower, d_follower, n_following, d_following = friends_manager.update()
+    #logger.info("%d new follower, %d unfollow, %d new following, %d unfollowing")
+    obsolete_friends = friends_manager.get_obsolete_friends(days=14)
     logger.info("Obsolete friends : ")
     for friend in obsolete_friends:
         print(friend.friend_screen_name)
         print(friend.friend_following_date)
-    # end for"""
+    # end for
 
 # end if
