@@ -74,7 +74,6 @@ class FriendsManager(object):
         # Transform back to date
         # Limit date
         datetime_limit = datetime.datetime.utcnow() - timedelta(days=days)
-        print(datetime_limit)
 
         # Get all
         return self._session.query(Friend).filter(and_(Friend.friend_following == True,
