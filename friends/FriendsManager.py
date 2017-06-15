@@ -77,7 +77,7 @@ class FriendsManager(object):
 
         # Get all
         return self._session.query(Friend).filter(Friend.friend_following == True
-                                                  and not Friend.friend_follower == False
+                                                  and (not Friend.friend_follower == False)
                                                   and Friend.friend_following_date > datetime_limit).all()
     # end get_obsolete_friends
 
