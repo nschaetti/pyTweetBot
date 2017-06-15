@@ -11,6 +11,7 @@ from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import update, delete, select
 from sqlalchemy.orm import load_only
+from sqlalchemy import or_, and_, not_
 import sqlalchemy.orm.exc
 import time
 import logging
@@ -76,9 +77,9 @@ class FriendsManager(object):
         print(datetime_limit)
 
         # Get all
-        return self._session.query(Friend).filter(Friend.friend_following == True
-                                                  and (not Friend.friend_follower == False)
-                                                  and Friend.friend_following_date == datetime_limit).all()
+        return self._session.query(Friend).filter(and_(Friend.friend_following == True,
+                                                  not_(Friend.friend_follower == False),
+                                                  Friend.friend_following_date <= datetime_limit)).all()
     # end get_obsolete_friends
 
     # Get a friend from the DB
