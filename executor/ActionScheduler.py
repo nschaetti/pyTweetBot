@@ -29,6 +29,7 @@ from db.obj.Action import Action
 from db.DBConnector import DBConnector
 from sqlalchemy import desc
 from sqlalchemy import or_, and_, not_
+from sqlalchemy import update, delete, select
 
 
 # Reservoir full exception
@@ -170,6 +171,26 @@ class ActionScheduler(object):
             return False
         # end try
     # end exists
+
+    # Delete an action
+    def detete(self, action):
+        """
+        Delete an action
+        :param action: Action to delete.
+        """
+        delete(Action).where(Action.action_id == action.action_id)
+    # end delete
+
+    # Get action to execute
+    def get_exec_action(self):
+        """
+        Get all action to execute
+        :return:
+        """
+        # Get all actions
+        exec_actions = self._session.query(Action).filter(Action.action_exec_date <= datetime.datetime.utcnow()).all()
+        print(exec_actions)
+    # end get_exec_action
 
     ##############################################
     #
