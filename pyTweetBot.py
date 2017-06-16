@@ -75,13 +75,16 @@ if __name__ == "__main__":
 
     # Action scheduler
     action_scheduler = ActionScheduler()
-    action_scheduler.add_follow(1)
-    try:
-        action_scheduler.add_follow(1)
-    except ActionAlreadyExists:
-        pass
-    # end
-    action_scheduler.add_retweet(1)
-    action_scheduler.add_retweet(1)
+
+    # Add until reservoir is full
+    index = 0
+    while True:
+        try:
+            action_scheduler.add_follow(index)
+        except ActionAlreadyExists:
+            break
+        # end tryp
+        index += 1
+    # end while
 
 # end if
