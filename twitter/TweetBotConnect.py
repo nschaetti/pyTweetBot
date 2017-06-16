@@ -66,7 +66,11 @@ class TweetBotConnector(object):
         Send a Tweet
         :param text: Tweet's text.
         """
-        self._api.update_status(status=text)
+        try:
+            self._api.update_status(status=text)
+        except tweepy.error.TweepError:
+            pass
+        # end try
     # end tweet
 
     # Unfollow

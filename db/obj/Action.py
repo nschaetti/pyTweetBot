@@ -26,6 +26,7 @@
 import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
+from twitter.TweetBotConnect import TweetBotConnector
 
 
 # Action
@@ -40,7 +41,33 @@ class Action(Base):
     # Fields
     action_id = Column(BigInteger, primary_key=True)
     action_type = Column(Enum('Tweet', 'Retweet', 'Like', 'DirectMessage', 'Follow', 'Unfollow'), nullable=False)
-    action_tweet_id = Column(BigInteger, nullable=False)
+    action_tweet_id = Column(BigInteger, nullable=True)
     action_tweet_text = Column(String(5000), nullable=True)
     action_exec_date = Column(DateTime, nullable=False, default=datetime.datetime.utcnow())
+
+    ############################################
+    #
+    # Public Functions
+    #
+    ############################################
+
+    # Execute the action
+    def execute(self):
+        """
+        Execute the action
+        :return:
+        """
+        if self.action_type == "Follow":
+            TweetBotConnector().follow(self.action_tweet_id)
+        elif self.action_type == "Unfollow":
+            TweetBotConnector().unfollow(self.action_tweet_id)
+        elif self.action_type == "Like":
+            TweetBotConnector().like(self.action_tweet_id)
+        elif self.action_type == "Tweet":
+            TweetBotConnector().tweet(self.action_tweet_text)
+        elif self.action_type == "Retweet":
+            TweetBotConnector().retweet(self.action_tweet_id)
+        # end if
+    # end
+
 # end Action

@@ -30,6 +30,7 @@ from db.DBConnector import DBConnector
 from sqlalchemy import desc
 from sqlalchemy import or_, and_, not_
 from sqlalchemy import update, delete, select
+import logging
 
 
 # Reservoir full exception
@@ -39,6 +40,7 @@ class ActionReservoirFullError(Exception):
     """
     pass
 # end ActionReservoirFullError
+
 
 # Action already in the DB
 class ActionAlreadyExists(Exception):
@@ -128,7 +130,7 @@ class ActionScheduler(object):
         Add a tweet actio in the DB
         :param tweet_text: Text of the Tweet
         """
-        pass
+        self._add_text_action("Tweet", tweet_text)
     # end add_tweet
 
     # Add a "Retweet" action in the DB
@@ -173,30 +175,59 @@ class ActionScheduler(object):
     # end exists
 
     # Delete an action
-    def detete(self, action):
+    def delete(self, action):
         """
         Delete an action
         :param action: Action to delete.
         """
-        delete(Action).where(Action.action_id == action.action_id)
+        self._session.query(Action).filter(Action.action_id == action.action_id).delete()
+        self._session.commit()
     # end delete
 
-    # Get action to execute
-    def get_exec_action(self):
+    # Execute
+    def __call__(self):
         """
-        Get all action to execute
+        Execute action
         :return:
         """
-        # Get all actions
-        exec_actions = self._session.query(Action).filter(Action.action_exec_date <= datetime.datetime.utcnow()).all()
-        print(exec_actions)
-    # end get_exec_action
+        # Get actions to be executed
+        for action in self._get_exec_action():
+            action.execute()
+            self.delete(action)
+        # end for
+    # end __call__
+
+    # Is reservoir empty
+    def is_reservoir_empty(self, action_type):
+        """
+        Is the reservoir empty?
+        :param action_type: Action type
+        :return: True or False
+        """
+        # Last date
+        last_date = self._last_actions_date[action_type]
+
+        # Last date > (now + 3days) => full
+        return last_date <= datetime.datetime.utcnow()
+    # end if
 
     ##############################################
     #
     # Private functions
     #
     ##############################################
+
+    # Get action to execute
+    def _get_exec_action(self):
+        """
+        Get all action to execute
+        :return:
+        """
+        # Get all actions
+        exec_actions = self._session.query(Action).filter(
+            Action.action_exec_date <= datetime.datetime.utcnow()).all()
+        return exec_actions
+    # end _get_exec_action
 
     # Add action with id
     def _add_id_action(self, action_type, the_id):
@@ -209,6 +240,8 @@ class ActionScheduler(object):
             action = Action(action_type=action_type, action_tweet_id=the_id)
             self.add(action)
         else:
+            logging.getLogger("pyTweetBot").warning("{} action for friend/tweet {} already in database"
+                                                    .format(action_type, the_id))
             raise ActionAlreadyExists("{} action for friend/tweet {} already in database".format(action_type, the_id))
         # end if
     # end _add_id_action
@@ -221,9 +254,11 @@ class ActionScheduler(object):
         :param the_text: Action's text.
         """
         if not self.exists(action_type=action_type, action_tweet_text=the_text):
-            action = Action(action_tweet_text=the_text)
+            action = Action(action_type=action_type, action_tweet_text=the_text)
             self.add(action)
         else:
+            logging.getLogger("pyTweetBot").warning("{} action for text {} already in database"
+                                                    .format(action_type, the_text))
             raise ActionAlreadyExists("{} action for text {} already in database".format(action_type, the_text))
         # end if
     # end _add_text_action
@@ -265,10 +300,14 @@ class ActionScheduler(object):
         """
         # Try to get the date
         try:
-            last_actions = self._session.query(Action).filter(Action.action_type == action_type)\
-                    .order_by(desc(Action.action_exec_date)).all()
-            print(last_actions[0])
-            last_action = last_actions[0]
+            # Get last action for this type
+            last_action = self._session.query(Action).filter(Action.action_type == action_type)\
+                    .order_by(desc(Action.action_exec_date)).first()
+
+            # Check if no result
+            if last_action is None:
+                return datetime.datetime.utcnow()
+            # end if
         except sqlalchemy.orm.exc.NoResultFound:
             # Do not exists
             return datetime.datetime.utcnow()

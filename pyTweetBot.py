@@ -77,15 +77,20 @@ if __name__ == "__main__":
     action_scheduler = ActionScheduler()
 
     # Add until reservoir is full
-    """index = 0
+    """index = 462
     while True:
         try:
             action_scheduler.add_follow(index)
-        except ActionAlreadyExists:
+        except ActionAlreadyExists as e:
+            print(e)
             break
         # end tryp
         index += 1
     # end while"""
-    action_scheduler.get_exec_action()
+    """for action in action_scheduler.get_exec_action():
+        action.execute()
+    # end for"""
+    #action_scheduler.add_tweet("http://www.nilsschaetti.com")
+    action_scheduler()
 
 # end if
