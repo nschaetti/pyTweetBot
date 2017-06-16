@@ -266,7 +266,8 @@ class ActionScheduler(object):
         # Try to get the date
         try:
             last_action = self._session.query(Action).filter(Action.action_type == action_type)\
-                    .order_by(desc(Action.action_exec_date)).all()[0]
+                    .order_by(desc(Action.action_exec_date)).all()
+            print(last_action)
         except sqlalchemy.orm.exc.NoResultFound:
             # Do not exists
             return datetime.datetime.utcnow()
