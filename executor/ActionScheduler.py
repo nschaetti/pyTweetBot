@@ -30,6 +30,12 @@ from db.DBConnector import DBConnector
 from sqlalchemy import desc
 
 
+# Reservoir full exception
+class ActionReservoirFullError(Exception):
+    pass
+# end ActionReservoirFullError
+
+
 # Manage bot's action
 class ActionScheduler(object):
 
@@ -40,6 +46,9 @@ class ActionScheduler(object):
 
         # Get last information
         self._last_actions_date = self._get_last_date()
+
+        # Action delay
+        self_action_delays = {'Follow': 10, 'Unfollow' : 10, 'Tweet' : 10, 'Retweet': 10, 'Like': 10}
     # end __init__
 
     ##############################################
@@ -50,19 +59,70 @@ class ActionScheduler(object):
 
     # Add an action to the DB
     def add(self, action):
+        """
+        Add an action to the DB
+        :param action:
+        :return:
+        """
         # Check that the reservoir is not full
         if not self._is_reservoir_full(action.action_type):
-            pass
+            # Change date
+            action.action_exec_date = self._get_next_available_date(action.action_type)
+            self._last_actions_date[action.action_type] = action.action_exec_date
+
             # Add action
+            self._session.add(action)
+        else:
+            raise ActionReservoirFullError("To many action in the reservoir to add a new one")
         # end if
-        return False
     # end add
+
+    # Add a follow action in the DB
+    def add_follow(self, friend_id):
+        """
+        Add a "follow" action in the DB:
+        :param friend_id:
+        :return:
+        """
+        action = Action(action_tweet_id=friend_id)
+        self.add(action)
+    # end add_follow
+
+    # Add an unfollow action in the DB
+    def add_unfollow(self, friend_id):
+        """
+        Add an "unfollow" action in the DB:
+        :param friend_id: Twitter account0's ID.
+        """
+        action = Action(action_tweet_id=friend_id)
+        self.add(action)
+    # end add_unfollow
+
+    # Add a like action in the DB
+    def add_like(self, tweet_id):
+        """
+        Add a "like" action in the DB.
+        :param tweet_id: Tweet's ID.
+        """
+        action = Action(action_tweet_id=tweet_id)
+        self.add(action)
+    # end add_like
 
     ##############################################
     #
     # Private functions
     #
     ##############################################
+
+    # Get next available date
+    def _get_next_available_date(self, action_type):
+        """
+        Get the next available date for an action type.
+        :param action_type: The kind of action.
+        :return: Next available date
+        """
+        return self._last_actions_date[action_type] + timedelta(minutes=self._action_delays[action_type])
+    # end _get_next_available_date
 
     # Check if the actions reservoir is full.
     def _is_reservoir_full(self, action_type):

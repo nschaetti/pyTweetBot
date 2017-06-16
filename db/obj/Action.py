@@ -23,6 +23,7 @@
 #
 
 # Import
+import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
 
@@ -40,6 +41,6 @@ class Action(Base):
     action_id = Column(BigInteger, primary_key=True)
     action_type = Column(Enum('Tweet', 'Retweet', 'Like', 'DirectMessage', 'Follow', 'Unfollow'), nullable=False)
     action_tweet_id = Column(BigInteger, nullable=False)
-    action_tweet_text = Column(String(5000), nullable=False)
-    action_exec_date = Column(DateTime, nullable=False)
+    action_tweet_text = Column(String(5000), nullable=True)
+    action_exec_date = Column(DateTime, nullable=False, default=datetime.datetime.utcnow())
 # end Action
