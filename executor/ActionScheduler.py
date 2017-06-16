@@ -185,7 +185,7 @@ class ActionScheduler(object):
         :param the_id: Action's ID
         """
         if not self.exists(action_type, the_id):
-            action = Action(action_tweet_id=the_id)
+            action = Action(action_type=action_type, action_tweet_id=the_id)
             self.add(action)
         else:
             raise ActionAlreadyExists("{} action for friend/tweet {} already in database".format(action_type, the_id))
