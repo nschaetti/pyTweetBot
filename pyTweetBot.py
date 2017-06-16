@@ -76,5 +76,8 @@ if __name__ == "__main__":
     # Action scheduler
     action_scheduler = ActionScheduler()
     action_scheduler.add_follow(1)
+    action_scheduler.add_follow(1)
+    action_scheduler.add_retweet(1)
+    action_scheduler.add_retweet(1)
 
 # end if

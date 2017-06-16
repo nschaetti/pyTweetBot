@@ -28,12 +28,24 @@ from datetime import timedelta
 from db.obj.Action import Action
 from db.DBConnector import DBConnector
 from sqlalchemy import desc
+from sqlalchemy import or_, and_, not_
 
 
 # Reservoir full exception
 class ActionReservoirFullError(Exception):
+    """
+    Reservoir is full
+    """
     pass
 # end ActionReservoirFullError
+
+# Action already in the DB
+class ActionAlreadyExists(Exception):
+    """
+    The action is already registered in the DB
+    """
+    pass
+# end ActionAlreadyExists
 
 
 # Manage bot's action
@@ -66,6 +78,7 @@ class ActionScheduler(object):
         """
         # Check that the reservoir is not full
         if not self._is_reservoir_full(action.action_type):
+            # Check if action already exists
             # Change date
             action.action_exec_date = self._get_next_available_date(action.action_type)
             self._last_actions_date[action.action_type] = action.action_exec_date
@@ -87,8 +100,7 @@ class ActionScheduler(object):
         :param friend_id:
         :return:
         """
-        action = Action(action_type='Follow', action_tweet_id=friend_id)
-        self.add(action)
+        self._add_id_action("Follow", friend_id)
     # end add_follow
 
     # Add an unfollow action in the DB
@@ -97,8 +109,7 @@ class ActionScheduler(object):
         Add an "unfollow" action in the DB:
         :param friend_id: Twitter account0's ID.
         """
-        action = Action(action_tweet_id=friend_id)
-        self.add(action)
+        self._add_id_action("Unfollow", friend_id)
     # end add_unfollow
 
     # Add a like action in the DB
@@ -107,15 +118,94 @@ class ActionScheduler(object):
         Add a "like" action in the DB.
         :param tweet_id: Tweet's ID.
         """
-        action = Action(action_tweet_id=tweet_id)
-        self.add(action)
+        self._add_id_action("Like", tweet_id)
     # end add_like
+
+    # Add a tweet action in the DB
+    def add_tweet(self, tweet_text):
+        """
+        Add a tweet actio in the DB
+        :param tweet_text: Text of the Tweet
+        """
+        pass
+    # end add_tweet
+
+    # Add a "Retweet" action in the DB
+    def add_retweet(self, tweet_id):
+        """
+        Add a "retweet" action in the DB
+        :param tweet_id: Tweet's ID
+        """
+        self._add_id_action("Retweet", tweet_id)
+    # end add_retweet
+
+    # Does an action already exists in the DB?
+    def exists(self, action_type, action_tweet_id=None, action_tweet_text=None):
+        """
+        Does an action already exists in the DB?
+        :param action_type: Type of action
+        :param action_tweet_id: Tweet's ID (can be None)
+        :param action_tweet_text: Tweet's text (can be None)
+        :return: True or False
+        """
+        try:
+            if action_tweet_id is None and action_tweet_text is None:
+                self._session.query(Action).filter(Action.action_type == action_type).one()
+                return True
+            elif action_tweet_id is not None and action_tweet_text is None:
+                self._session.query(Action).filter(
+                    and_(Action.action_type == action_type, Action.action_tweet_id == action_tweet_id)).one()
+                return True
+            elif action_tweet_id is None and action_tweet_text is not None:
+                self._session.query(Action).filter(
+                    and_(Action.action_type == action_type, Action.action_tweet_text == action_tweet_text)).one()
+                return True
+            else:
+                self._session.query(Action).filter(
+                    and_(Action.action_type == action_type, Action.action_tweet_id == action_tweet_id,
+                         Action.action_tweet_text == action_tweet_text)).one()
+                return True
+            # end if
+        except sqlalchemy.orm.exc.NoResultFound:
+            return False
+        # end try
+    # end exists
 
     ##############################################
     #
     # Private functions
     #
     ##############################################
+
+    # Add action with id
+    def _add_id_action(self, action_type, the_id):
+        """
+        Add action with id
+        :param action_type: Type of action
+        :param the_id: Action's ID
+        """
+        if not self.exists(action_type, the_id):
+            action = Action(action_tweet_id=the_id)
+            self.add(action)
+        else:
+            raise ActionAlreadyExists("{} action for friend/tweet {} already in database".format(action_type, the_id))
+        # end if
+    # end _add_id_action
+
+    # Add action with text
+    def _add_text_action(self, action_type, the_text):
+        """
+        Add action with text.
+        :param action_type: Type of action
+        :param the_text: Action's text.
+        """
+        if not self.exists(action_type=action_type, action_tweet_text=the_text):
+            action = Action(action_tweet_text=the_text)
+            self.add(action)
+        else:
+            raise ActionAlreadyExists("{} action for text {} already in database".format(action_type, the_text))
+        # end if
+    # end _add_text_action
 
     # Get next available date
     def _get_next_available_date(self, action_type):
