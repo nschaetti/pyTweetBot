@@ -30,7 +30,7 @@ from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from twitter.TweetBotConnect import TweetBotConnector
 from friends.FriendsManager import FriendsManager
-from executor.ActionScheduler import ActionScheduler
+from executor.ActionScheduler import ActionScheduler, ActionAlreadyExists
 
 ####################################################
 # Main function
@@ -76,7 +76,11 @@ if __name__ == "__main__":
     # Action scheduler
     action_scheduler = ActionScheduler()
     action_scheduler.add_follow(1)
-    action_scheduler.add_follow(1)
+    try:
+        action_scheduler.add_follow(1)
+    except ActionAlreadyExists:
+        pass
+    # end
     action_scheduler.add_retweet(1)
     action_scheduler.add_retweet(1)
 
