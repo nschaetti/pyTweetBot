@@ -48,7 +48,7 @@ class ActionScheduler(object):
         self._last_actions_date = self._get_last_date()
 
         # Action delay
-        self_action_delays = {'Follow': 10, 'Unfollow' : 10, 'Tweet' : 10, 'Retweet': 10, 'Like': 10}
+        self._action_delays = {'Follow': 10, 'Unfollow' : 10, 'Tweet' : 10, 'Retweet': 10, 'Like': 10}
     # end __init__
 
     ##############################################
