@@ -84,7 +84,7 @@ class ActionScheduler(object):
         :param friend_id:
         :return:
         """
-        action = Action(action_tweet_id=friend_id)
+        action = Action(action_type='Follow', action_tweet_id=friend_id)
         self.add(action)
     # end add_follow
 
