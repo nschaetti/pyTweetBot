@@ -133,6 +133,7 @@ class ActionScheduler(object):
         :return:
         """
         # Last date
+        print(action_type)
         last_date = self._last_actions_date[action_type]
 
         # Current time + delay
