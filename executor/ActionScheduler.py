@@ -143,13 +143,22 @@ class ActionScheduler(object):
     # end _is_reservoir_full
 
     # Return default last action date
-    def _get_default_last_action_date(self, action):
+    def _get_default_last_action_date(self, action_type):
         """
         Return default last action date
         :param action:
         :return:
         """
-        return action.action_exec_date if action is not None else datetime.datetime.utcnow()
+        # Try to get the date
+        try:
+            last_action = self._session.query(Action).filter(Action.action_type == action_type)\
+                    .order_by(desc(Action.action_exec_date)).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            # Do not exists
+            return datetime.datetime.utcnow()
+        # end try
+
+        return last_action.action_exec_date
     # end _get_default_last_action_date
 
     # Get the date of the last actions
@@ -158,25 +167,16 @@ class ActionScheduler(object):
         Get the date of the last actions in the DB
         :return:
         """
-        # Last actions
-        last_follow_action = self._session.query(Action).filter(Action.action_type == 'Follow')\
-            .order_by(desc(Action.action_exec_date)).one()
-        last_unfollow_action = self._session.query(Action).filter(Action.action_type == 'Unfollow')\
-            .order_by(desc(Action.action_exec_date)).one()
-        last_tweet_action = self._session.query(Action).filter(Action.action_type == 'Tweet')\
-            .order_by(desc(Action.action_exec_date)).one()
-        last_retweet_action = self._session.query(Action).filter(Action.action_type == 'Retweet')\
-            .order_by(desc(Action.action_exec_date)).one()
-
         # Last actions date
-        last_follow_date = self._get_default_last_action_date(last_follow_action)
-        last_unfollow_date = self._get_default_last_action_date(last_unfollow_action)
-        last_tweet_date = self._get_default_last_action_date(last_tweet_action)
-        last_retweet_date = self._get_default_last_action_date(last_retweet_action)
+        last_follow_date = self._get_default_last_action_date('Follow')
+        last_unfollow_date = self._get_default_last_action_date('Unfollow')
+        last_tweet_date = self._get_default_last_action_date('Tweet')
+        last_retweet_date = self._get_default_last_action_date('Retweet')
+        last_like_date = self._get_default_last_action_date('Like')
 
         # Return
         return {'Follow': last_follow_date, 'Unfollow': last_unfollow_date, 'Tweet': last_tweet_date,
-                'Retweet' : last_retweet_date}
+                'Retweet' : last_retweet_date, 'Like': last_like_date}
     # end _get_last_date
 
 # end ActionScheduler
