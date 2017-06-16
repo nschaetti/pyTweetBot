@@ -72,6 +72,9 @@ class ActionScheduler(object):
 
             # Add action
             self._session.add(action)
+
+            # Commit
+            self._session.commit()
         else:
             raise ActionReservoirFullError("To many action in the reservoir to add a new one")
         # end if
