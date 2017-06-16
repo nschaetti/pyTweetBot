@@ -30,6 +30,7 @@ from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from twitter.TweetBotConnect import TweetBotConnector
 from friends.FriendsManager import FriendsManager
+from executor.ActionScheduler import ActionScheduler
 
 ####################################################
 # Main function
@@ -65,11 +66,15 @@ if __name__ == "__main__":
     friends_manager = FriendsManager()
     #n_follower, d_follower, n_following, d_following = friends_manager.update()
     #logger.info("%d new follower, %d unfollow, %d new following, %d unfollowing")
-    obsolete_friends = friends_manager.get_obsolete_friends(days=14)
+    """obsolete_friends = friends_manager.get_obsolete_friends(days=14)
     logger.info("Obsolete friends : ")
     for friend in obsolete_friends:
         print(friend.friend_screen_name)
         print(friend.friend_following_date)
-    # end for
+    # end for"""
+
+    # Action scheduler
+    action_scheduler = ActionScheduler()
+    action_scheduler.add_follow(1)
 
 # end if
