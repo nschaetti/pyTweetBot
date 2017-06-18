@@ -24,6 +24,7 @@
 
 # Import
 import datetime
+import logging
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
 from twitter.TweetBotConnect import TweetBotConnector
@@ -43,7 +44,7 @@ class Action(Base):
     action_type = Column(Enum('Tweet', 'Retweet', 'Like', 'DirectMessage', 'Follow', 'Unfollow'), nullable=False)
     action_tweet_id = Column(BigInteger, nullable=True)
     action_tweet_text = Column(String(5000), nullable=True)
-    action_exec_date = Column(DateTime, nullable=False, default=datetime.datetime.utcnow())
+    action_date = Column(DateTime, nullable=False, default=datetime.datetime.utcnow())
 
     ############################################
     #

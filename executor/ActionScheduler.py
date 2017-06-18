@@ -55,15 +55,20 @@ class ActionAlreadyExists(Exception):
 class ActionScheduler(object):
 
     # Constructor
-    def __init__(self):
+    def __init__(self, n_actions, reservoir_size=timedelta(days=3), purge_delay=timedelta(weeks=2)):
+        """
+        Constructor
+        :param n_exec:
+        :param purge_delay:
+        """
         # Properties
         self._session = DBConnector().get_session()
+        self._n_actions = n_actions
+        self._purge_delay = purge_delay
+        self._reservoir_size = reservoir_size
 
-        # Get last information
-        self._last_actions_date = self._get_last_date()
-
-        # Action delay
-        self._action_delays = {'Follow': 10, 'Unfollow' : 10, 'Tweet' : 10, 'Retweet': 10, 'Like': 10}
+        # Purge the reservoir
+        self._purge_delay()
     # end __init__
 
     ##############################################
@@ -80,12 +85,7 @@ class ActionScheduler(object):
         :return:
         """
         # Check that the reservoir is not full
-        if not self._is_reservoir_full(action.action_type):
-            # Check if action already exists
-            # Change date
-            action.action_exec_date = self._get_next_available_date(action.action_type)
-            self._last_actions_date[action.action_type] = action.action_exec_date
-
+        if not self.is_reservoir_full(action.action_type):
             # Add action
             self._session.add(action)
 
@@ -190,10 +190,13 @@ class ActionScheduler(object):
         Execute action
         :return:
         """
-        # Get actions to be executed
-        for action in self._get_exec_action():
-            action.execute()
-            self.delete(action)
+        # Level per action
+        for action_type in ["Follow", "Unfollow", "Like", "Tweet", "Retweet"]:
+            # Get actions to be executed
+            for action in self._get_exec_action(action_type):
+                action.execute()
+                self.delete(action)
+            # end for
         # end for
     # end __call__
 
@@ -204,12 +207,26 @@ class ActionScheduler(object):
         :param action_type: Action type
         :return: True or False
         """
-        # Last date
-        last_date = self._last_actions_date[action_type]
-
-        # Last date > (now + 3days) => full
-        return last_date <= datetime.datetime.utcnow()
+        return self._get_reservoir_level(action_type) == 0
     # end if
+
+    # Check if the actions reservoir is full.
+    def is_reservoir_full(self, action_type):
+        """
+        Check if the actions reservoir is full for this
+        kind of action.
+        :param action_type: The kind of action
+        :return:
+        """
+        # Get reservoir level
+        reservoir_level = self._get_reservoir_level(action_type)
+
+        # Max number of actions
+        max_n_action = int(self._reservoir_size.total_seconds() / self._n_actions[action_type])
+
+        # reservoir_level >= max_n_action => full
+        return reservoir_level >= max_n_action
+    # end _is_reservoir_full
 
     ##############################################
     #
@@ -217,16 +234,49 @@ class ActionScheduler(object):
     #
     ##############################################
 
+    # Purge reservoir
+    def _purge_reservoir(self):
+        """
+        Purge the reservoir
+        :return:
+        """
+        self._session.query(Action).filter(Action.action_date <= datetime.datetime.utcnow() - self._purge_delay)
+    # end _purge_reservoir
+
+    # Get reservoir levels
+    def _get_reservoir_levels(self):
+        """
+        Get reservoir levels.
+        :return:
+        """
+        result = dict()
+        # Level per action
+        for action_type in ["Follow", "Unfollow", "Like", "Tweet", "Retweet"]:
+            result[action_type] = self._get_reservoir_level(action_type)
+        # end for
+        return result
+    # end _get_reservoir_level
+
+    # Get reservoir level
+    def _get_reservoir_level(self, action_type):
+        """
+        Get reservoir level for a action type.
+        :param action_type: Action's type.
+        :return: Level
+        """
+        return len(self._session.query(Action).filter(Action.action_type == action_type).all())
+    # end _get_reservoir_level
+
     # Get action to execute
-    def _get_exec_action(self):
+    def _get_exec_action(self, action_type):
         """
         Get all action to execute
         :return:
         """
         # Get all actions
-        exec_actions = self._session.query(Action).filter(
-            Action.action_exec_date <= datetime.datetime.utcnow()).all()
-        return exec_actions
+        exec_actions = self._session.query(Action).filter(Action.action_type == action_type)\
+            .order_by(Action.action_id).all()
+        return exec_actions[:self._n_actions[action_type]]
     # end _get_exec_action
 
     # Add action with id
@@ -262,34 +312,6 @@ class ActionScheduler(object):
             raise ActionAlreadyExists("{} action for text {} already in database".format(action_type, the_text))
         # end if
     # end _add_text_action
-
-    # Get next available date
-    def _get_next_available_date(self, action_type):
-        """
-        Get the next available date for an action type.
-        :param action_type: The kind of action.
-        :return: Next available date
-        """
-        return self._last_actions_date[action_type] + timedelta(minutes=self._action_delays[action_type])
-    # end _get_next_available_date
-
-    # Check if the actions reservoir is full.
-    def _is_reservoir_full(self, action_type):
-        """
-        Check if the actions reservoir is full for this
-        kind of action.
-        :param action_type: The kind of action
-        :return:
-        """
-        # Last date
-        last_date = self._last_actions_date[action_type]
-
-        # Current time + delay
-        delay = datetime.datetime.utcnow() + timedelta(days=3)
-
-        # Last date > (now + 3days) => full
-        return last_date > delay
-    # end _is_reservoir_full
 
     # Return default last action date
     def _get_default_last_action_date(self, action_type):

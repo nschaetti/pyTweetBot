@@ -24,6 +24,7 @@
 
 import tweepy
 import time
+import logging
 from patterns.singleton import singleton
 
 
@@ -57,6 +58,7 @@ class TweetBotConnector(object):
         Retweet
         :param tweet_id: Tweet's ID.
         """
+        logging.info("Retweeting {}".format(tweet_id))
         self._api.retweet(tweet_id)
     # end retweet
 
@@ -67,6 +69,7 @@ class TweetBotConnector(object):
         :param text: Tweet's text.
         """
         try:
+            logging.info("Tweeting \"{}\"".format(text))
             self._api.update_status(status=text)
         except tweepy.error.TweepError:
             pass
@@ -79,6 +82,7 @@ class TweetBotConnector(object):
         Unfollow
         :param user_id: Twitter user's ID to follow.
         """
+        logging.info("Unfollowing Twitter username {}".format(user_id))
         self._api.destroy_friendship(user_id)
     # end unfollow
 
@@ -88,6 +92,7 @@ class TweetBotConnector(object):
         Follow a user.
         :param user_id:
         """
+        logging.info("Following Twitter username {}".format(user_id))
         self._api.create_friendship(user_id)
     # end follow
 
@@ -97,6 +102,7 @@ class TweetBotConnector(object):
         Like a tweet.
         :param tweet_id: Tweet's ID.
         """
+        logging.info("Liking Tweet {}".format(tweet_id))
         self._api.create_favorite(tweet_id)
     # end like
 
@@ -107,6 +113,7 @@ class TweetBotConnector(object):
         :param user_id: Receipe user's ID.
         :param text: Message's text.
         """
+        logging.info("Sending message \"{}\" to {}".format(text, user_id))
         self._api.send_direct_message(user_id=user_id, text=text)
     # end send_direct_message
 
