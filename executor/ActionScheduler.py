@@ -55,7 +55,8 @@ class ActionAlreadyExists(Exception):
 class ActionScheduler(object):
 
     # Constructor
-    def __init__(self, n_actions, reservoir_size=timedelta(days=3), purge_delay=timedelta(weeks=2)):
+    def __init__(self, n_actions=None, update_delay=timedelta(minutes=10), reservoir_size=timedelta(days=3),
+                 purge_delay=timedelta(weeks=2)):
         """
         Constructor
         :param n_exec:
@@ -63,9 +64,13 @@ class ActionScheduler(object):
         """
         # Properties
         self._session = DBConnector().get_session()
-        self._n_actions = n_actions
+        if n_actions == None:
+            self._n_actions = {"Follow": 1, "Unfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
+        else:
+            self._n_actions = n_actions
         self._purge_delay = purge_delay
         self._reservoir_size = reservoir_size
+        self._update_delay = update_delay
 
         # Purge the reservoir
         self._purge_delay()
@@ -222,7 +227,8 @@ class ActionScheduler(object):
         reservoir_level = self._get_reservoir_level(action_type)
 
         # Max number of actions
-        max_n_action = int(self._reservoir_size.total_seconds() / self._n_actions[action_type])
+        max_n_action = int(self._reservoir_size.total_seconds() / self._update_delay.total_seconds()
+                           * self._n_actions[action_type])
 
         # reservoir_level >= max_n_action => full
         return reservoir_level >= max_n_action
