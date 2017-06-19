@@ -11,7 +11,10 @@ class RSSHunter(object):
 
     # Parse
     def parse(self):
-        print(feedparser.parse(self._feed_url))
+        for entry in feedparser.parse(self._feed_url)['entries']:
+            print(entry['summary_detail']['value'])
+            print("")
+        # end for
     # end parse
 
 # end RSSHunter
