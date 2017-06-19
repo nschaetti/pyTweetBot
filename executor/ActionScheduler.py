@@ -28,8 +28,7 @@ from datetime import timedelta
 from db.obj.Action import Action
 from db.DBConnector import DBConnector
 from sqlalchemy import desc
-from sqlalchemy import or_, and_, not_
-from sqlalchemy import update, delete, select
+from sqlalchemy import and_
 import logging
 
 
@@ -90,7 +89,7 @@ class ActionScheduler(object):
         :return:
         """
         # Check that the reservoir is not full
-        if not self.is_reservoir_full(action.action_type):
+        if not self.full(action.action_type):
             # Add action
             self._session.add(action)
 
@@ -206,7 +205,7 @@ class ActionScheduler(object):
     # end __call__
 
     # Is reservoir empty
-    def is_reservoir_empty(self, action_type):
+    def empty(self, action_type):
         """
         Is the reservoir empty?
         :param action_type: Action type
@@ -216,7 +215,7 @@ class ActionScheduler(object):
     # end if
 
     # Check if the actions reservoir is full.
-    def is_reservoir_full(self, action_type):
+    def full(self, action_type):
         """
         Check if the actions reservoir is full for this
         kind of action.
@@ -247,8 +246,7 @@ class ActionScheduler(object):
     # Purge reservoir
     def _purge_reservoir(self):
         """
-        Purge the reservoir
-        :return:
+        Purge the reservoir of obsolete actions.
         """
         self._session.query(Action).filter(Action.action_date <= datetime.datetime.utcnow() - self._purge_delay)
     # end _purge_reservoir
@@ -256,8 +254,8 @@ class ActionScheduler(object):
     # Get reservoir levels
     def _get_reservoir_levels(self):
         """
-        Get reservoir levels.
-        :return:
+        Get the number of actions in the reservoir.
+        :return: The number of action as a dict()
         """
         result = dict()
         # Level per action
@@ -270,9 +268,9 @@ class ActionScheduler(object):
     # Get reservoir level
     def _get_reservoir_level(self, action_type):
         """
-        Get reservoir level for a action type.
+        Get the number of action for a action type.
         :param action_type: Action's type.
-        :return: Level
+        :return: Reservoir level for this action
         """
         return len(self._session.query(Action).filter(Action.action_type == action_type).all())
     # end _get_reservoir_level
@@ -281,7 +279,7 @@ class ActionScheduler(object):
     def _get_exec_action(self, action_type):
         """
         Get all action to execute
-        :return:
+        :return: Action to execute as a list()
         """
         # Get all actions
         exec_actions = self._session.query(Action).filter(Action.action_type == action_type)\
@@ -292,7 +290,7 @@ class ActionScheduler(object):
     # Add action with id
     def _add_id_action(self, action_type, the_id):
         """
-        Add action with id
+        Add action with a id argument.
         :param action_type: Type of action
         :param the_id: Action's ID
         """
@@ -322,48 +320,5 @@ class ActionScheduler(object):
             raise ActionAlreadyExists("{} action for text {} already in database".format(action_type, the_text))
         # end if
     # end _add_text_action
-
-    # Return default last action date
-    def _get_default_last_action_date(self, action_type):
-        """
-        Return default last action date
-        :param action:
-        :return:
-        """
-        # Try to get the date
-        try:
-            # Get last action for this type
-            last_action = self._session.query(Action).filter(Action.action_type == action_type)\
-                    .order_by(desc(Action.action_exec_date)).first()
-
-            # Check if no result
-            if last_action is None:
-                return datetime.datetime.utcnow()
-            # end if
-        except sqlalchemy.orm.exc.NoResultFound:
-            # Do not exists
-            return datetime.datetime.utcnow()
-        # end try
-
-        return last_action.action_exec_date
-    # end _get_default_last_action_date
-
-    # Get the date of the last actions
-    def _get_last_date(self):
-        """
-        Get the date of the last actions in the DB
-        :return:
-        """
-        # Last actions date
-        last_follow_date = self._get_default_last_action_date('Follow')
-        last_unfollow_date = self._get_default_last_action_date('Unfollow')
-        last_tweet_date = self._get_default_last_action_date('Tweet')
-        last_retweet_date = self._get_default_last_action_date('Retweet')
-        last_like_date = self._get_default_last_action_date('Like')
-
-        # Return
-        return {'Follow': last_follow_date, 'Unfollow': last_unfollow_date, 'Tweet': last_tweet_date,
-                'Retweet' : last_retweet_date, 'Like': last_like_date}
-    # end _get_last_date
 
 # end ActionScheduler
