@@ -230,6 +230,10 @@ class ActionScheduler(object):
         max_n_action = int(self._reservoir_size.total_seconds() / self._update_delay.total_seconds()
                            * self._n_actions[action_type])
 
+        # Log
+        logging.debug("is_reservoir_full: {} in the reservoir for a max value of {}".format(reservoir_level,
+                                                                                            max_n_action))
+
         # reservoir_level >= max_n_action => full
         return reservoir_level >= max_n_action
     # end _is_reservoir_full
