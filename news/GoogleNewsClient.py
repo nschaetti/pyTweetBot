@@ -10,6 +10,7 @@ import numpy as np
 import time
 import random
 from .NewsParser import NewsParser
+import logging
 
 
 #
@@ -43,30 +44,24 @@ class GoogleNewsClient(object):
     ###############################################
 
     # Get news
-    def get_news(self, start=0, end=0):
+    def get_news(self, page=0):
         """
         Get news
-        :param start: Start page
-        :param end: End page
+        :param page:
         :return: Array of news
         """
         # Init
         news = []
 
-        # For each page
-        for page in np.arange(start, end + 1):
+        # Logging
+        logging.debug(u"Getting page {}".format(page))
 
-            print u'[' + unicode(time.strftime("%Y-%m-%d %H:%M")) + u'] Getting page ' + str(page)
+        # Add page's news
+        news += self._get_page(page)
 
-            # Add page's news
-            try:
-                news += self._get_page(page)
-            except:
-                continue
+        # Wait for random time
+        time.sleep(random.randint(15, 35))
 
-            # Wait for random time
-            time.sleep(random.randint(15, 35))
-        # return
         return news
     # end get_news
 
@@ -88,7 +83,7 @@ class GoogleNewsClient(object):
         pars = HTMLParser()
 
         # Get URL's content
-        soup = BeautifulSoup(urllib2.urlopen(url, timeout=10000))
+        soup = BeautifulSoup(urllib2.urlopen(url, timeout=10000), "lxml")
 
         # Clean strange characters
         new_title = unicode(soup.title.string.strip())

@@ -5,6 +5,7 @@
 # Import
 from .Hunter import Hunter
 from news.GoogleNewsClient import GoogleNewsClient
+from .Tweet import Tweet
 
 
 # Hunter for Google News
@@ -41,7 +42,24 @@ class GoogleNewsHunter(Hunter):
 
     # Next element
     def next(self):
+        """
+        Next element
+        :return:
+        """
+        if len(self._news) == 0:
+            self._current_page += 1
+            if self._current_page > self._n_pages:
+                raise StopIteration
+            # end if
+            self._news = self._google_news_client.get_news(page=self._current_page-1)
+        # end if
 
+        # Current news
+        current_news = self._news[0]
+        self._news.remove(current_news)
+
+        # Return
+        return Tweet(text=current_news[1], url=current_news[0])
     # end next
 
 # end GoogleNewsHunter

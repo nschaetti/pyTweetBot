@@ -31,9 +31,11 @@ from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler
 from friends.FriendsManager import FriendsManager
 from tweet.RSSHunter import RSSHunter
+from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
 from twitter.TweetGenerator import TweetGenerator
+from tweet.TweetPreparator import TweetPreparator
 
 ####################################################
 # Main function
@@ -107,10 +109,14 @@ if __name__ == "__main__":
     tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/startups"))
     tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/fundings-exits"))
     tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/social"))
+    tweet_finder.add(GoogleNewsHunter(search_term="machine learning", lang="en", country="us"))
+
+    # Tweet preparator
+    tweet_preparator = TweetPreparator(config.get_hashtags())
 
     # For each tweet
     for tweet in tweet_finder:
-        print(tweet)
+        print(unicode(tweet_preparator(tweet)))
     # end for
 
 # end if

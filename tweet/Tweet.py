@@ -35,6 +35,16 @@ class Tweet(object):
         return self._text
     # end get_text
 
+    # Set Tweet's text
+    def set_text(self, text):
+        """
+        Set Tweet's text
+        :param text:
+        :return:
+        """
+        self._text = text
+    # end set_text
+
     # Get Tweet's URL
     def get_url(self):
         """
@@ -43,5 +53,35 @@ class Tweet(object):
         """
         return self._url
     # end get_url
+
+    # Set Tweet's URL
+    def set_url(self, url):
+        """
+        Set Tweet's URL
+        :param url:
+        :return:
+        """
+        self._url = url
+    # end set_url
+
+    # To string
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        #print(self._text)
+        return "Tweet(text={}, url={})".format(self._text, self._url)
+    # end __str__
+
+    # To unicode string
+    def __unicode__(self):
+        """
+        To unicode string
+        :return:
+        """
+        # print(self._text)
+        return u"Tweet(text={}, url={})".format(self._text, self._url)
+    # end __unicode__
 
 # end Tweet
