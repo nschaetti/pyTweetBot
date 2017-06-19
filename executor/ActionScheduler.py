@@ -73,7 +73,7 @@ class ActionScheduler(object):
         self._update_delay = update_delay
 
         # Purge the reservoir
-        self._purge_delay()
+        self._purge_reservoir()
     # end __init__
 
     ##############################################
