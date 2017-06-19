@@ -147,7 +147,7 @@ class FriendsManager(object):
         n_following, d_following = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
         # Insert a statistic
-        self.insert_statistic()
+        self.update_statistics()
 
         return n_follower, d_follower, n_following, d_following
     # end update
@@ -158,7 +158,7 @@ class FriendsManager(object):
         Get the nunber of followers.
         :return: The number of followers.
         """
-        return self._session.query(Friend).filter(Friend.friend_follower == True).count()
+        return TweetBotConnector().get_user().followers_count
     # end n_followers
 
     # Get the number of following
@@ -167,7 +167,7 @@ class FriendsManager(object):
         Get the nunber of following.
         :return: The number of following.
         """
-        return self._session.query(Friend).filter(Friend.friend_following == True).count()
+        return TweetBotConnector().get_user().friends_count
     # end n_followers
 
     ######################################################
@@ -177,7 +177,7 @@ class FriendsManager(object):
     ######################################################
 
     # Insert a value in the statistics table
-    def insert_statistic(self):
+    def update_statistics(self):
         """
         Insert a value in the statistics table.
         """

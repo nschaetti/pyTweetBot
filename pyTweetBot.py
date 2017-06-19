@@ -94,6 +94,6 @@ if __name__ == "__main__":
     #action_scheduler.add_tweet("This is a test for #pyTweetBot https://github.com/nschaetti/pyTweetBot")
     #action_scheduler()
 
-    friends_manager.insert_statistic()
+    friends_manager.update_statistics()
 
 # end if
