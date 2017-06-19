@@ -181,7 +181,7 @@ class FriendsManager(object):
         """
         Insert a value in the statistics table.
         """
-        statistic = Statistic(statistic_friend_count=self.n_following(), statistic_followers_count=self.n_followers(),
+        statistic = Statistic(statistic_following_count=self.n_following(), statistic_followers_count=self.n_followers(),
                               statistic_statuses_count=ActionScheduler().n_statuses())
         self._session.add(statistic)
         self._session.commit()
