@@ -77,7 +77,7 @@ if __name__ == "__main__":
     action_scheduler = ActionScheduler()
 
     # Add until reservoir is full
-    index = 462
+    index = 433
     while True:
         try:
             action_scheduler.add_follow(index)
