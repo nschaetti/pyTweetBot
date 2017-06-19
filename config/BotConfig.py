@@ -39,6 +39,7 @@ class BotConfig(object):
         self._news_settings = data['news_settings']
         self._news = data['news']
         self._retweet = data['retweet']
+        self._hashtags = data['hashtags']
     # end __init__
 
     # Load configuration file.
@@ -81,6 +82,15 @@ class BotConfig(object):
         """
         return self._friends
     # end get_friends_config
+
+    # Get hashtags
+    def get_hashtags(self):
+        """
+        Get hashtags
+        :return:
+        """
+        return self._hashtags
+    # end get_hashtags
 
     # Get Direct Message config
     def get_direct_message_config(self):

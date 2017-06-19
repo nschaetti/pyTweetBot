@@ -25,13 +25,15 @@
 # Import
 import argparse
 import logging
-import datetime
+
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
-from twitter.TweetBotConnect import TweetBotConnector
+from executor.ActionScheduler import ActionScheduler
 from friends.FriendsManager import FriendsManager
-from executor.ActionScheduler import ActionScheduler, ActionAlreadyExists
-from data.RSSHunter import RSSHunter
+from tweet.RSSHunter import RSSHunter
+from tweet.TweetFinder import TweetFinder
+from twitter.TweetBotConnect import TweetBotConnector
+from twitter.TweetGenerator import TweetGenerator
 
 ####################################################
 # Main function
@@ -97,7 +99,18 @@ if __name__ == "__main__":
 
     #friends_manager.update_statistics()
 
-    hunter = RSSHunter("http://feeds.feedburner.com/TechCrunch/fundings-exits")
-    hunter.parse()
+    # Tweet generator
+    tweet_generator = TweetGenerator(config)
+
+    # Tweet finder
+    tweet_finder = TweetFinder()
+    tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/startups"))
+    tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/fundings-exits"))
+    tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/social"))
+
+    # For each tweet
+    for tweet in tweet_finder:
+        print(tweet)
+    # end for
 
 # end if

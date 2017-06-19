@@ -31,6 +31,7 @@ from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import desc
 from sqlalchemy import and_
 import logging
+from patterns.singleton import singleton
 
 
 # Reservoir full exception
@@ -52,6 +53,7 @@ class ActionAlreadyExists(Exception):
 
 
 # Manage bot's action
+@singleton
 class ActionScheduler(object):
 
     # Constructor

@@ -4,84 +4,93 @@ import sys
 import urllib2
 import re
 from HTMLParser import HTMLParser
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 import numpy as np
 import time
 import random
 
-##########################################################################
-# CLASSES
-##########################################################################
 
 #
 # This is a class parsing HTML from Google news.
 # It returns an array containing the URLs.
 #
 class NewsParser(HTMLParser):
-	
-	# handle_starttag
-	def handle_starttag(self, tag, attrs):
-		
-		# Init
-		try:
-			self.news
-		except:
-			self.news = []
-			pass
-		
-		# We're searching a tags
-		if tag == "a":
-			for attr in attrs:
-				if attr[0] == "href":
-					if "/url?q=" in attr[1]:
-						
-						# URL
-						url = attr[1]
-						
-						# Substring
-						self.news.append(url[url.find("http"):url.rfind("&sa=")])
-	#end handle_starttag
-	
-	# getNews
-	def getNews(self):
-		return self.news
+    """
+    This is a class parsing HTML from Google news.
+    It returns an array containing the URLs.
+    """
+
+    # handle_starttag
+    def handle_starttag(self, tag, attrs):
+
+        # Init
+        try:
+            self.news
+        except:
+            self.news = []
+            pass
+
+        # We're searching a tags
+        if tag == "a":
+            for attr in attrs:
+                if attr[0] == "href":
+                    if "/url?q=" in attr[1]:
+
+                        # URL
+                        url = attr[1]
+
+                        # Substring
+                        self.news.append(url[url.find("http"):url.rfind("&sa=")])
+                    # end if
+                # end if
+            # end for
+        # end if
+    # end handle_starttag
+
+    # Get news
+    def getNews(self):
+        return self.news
+    # end getNews
+
+# end getNews
+
 
 #
 # This is a Google News client
 # Which return an array containing the urls and titles
 #
-class GoogleNewsClient():
-	
-	# constructor
-	def __init__(self, keyword, lang, country):
-		# Parameters
-		self.keyword = keyword
-		self.lang = lang
-		self.country = country
-	#end constructor
-	
-	# _getNewsTitle
-	def getNewsTitle(self,url):
-		
-		# HTML parser
-		pars = HTMLParser()
-		
-		# Get URL's content
-		soup = BeautifulSoup(urllib2.urlopen(url,timeout=10000))
-		
-		# Clean strange characters
-		new_title = unicode(soup.title.string.strip())
-		new_title = new_title.replace(u'\n',u'').replace(u'\t',u'').replace(u"'",u"\'").replace(u"&amp;",u"&").replace(u'\r',u'')
-		new_title = new_title.replace(u'â&euro;&trade;',u"\'").replace(u'&#8217;',u"\'").replace(u'&#39;',u"\'").replace(u'&#039;',u"\'")
-		new_title = new_title.replace(u'&#x27;',u'\\').replace(u'&rsquo;',u"\'").replace(u"  ",u" ")
-		new_title = pars.unescape(new_title)
-		
-		# Return
-		return new_title
-	#end _getNewsTitle
-	
-	# _getPage(self,url,page)
-	def getPage(self,page):
+class GoogleNewsClient(object):
+
+    # constructor
+    def __init__(self, keyword, lang, country):
+        # Parameters
+        self.keyword = keyword
+        self.lang = lang
+        self.country = country
+    # end constructor
+
+    # _getNewsTitle
+    def getNewsTitle(self,url):
+
+        # HTML parser
+        pars = HTMLParser()
+
+        # Get URL's content
+        soup = BeautifulSoup(urllib2.urlopen(url,timeout=10000))
+
+        # Clean strange characters
+        new_title = unicode(soup.title.string.strip())
+        new_title = new_title.replace(u'\n',u'').replace(u'\t',u'').replace(u"'",u"\'").replace(u"&amp;",u"&").replace(u'\r',u'')
+        new_title = new_title.replace(u'â&euro;&trade;',u"\'").replace(u'&#8217;',u"\'").replace(u'&#39;',u"\'").replace(u'&#039;',u"\'")
+        new_title = new_title.replace(u'&#x27;',u'\\').replace(u'&rsquo;',u"\'").replace(u"  ",u" ")
+        new_title = pars.unescape(new_title)
+
+        # Return
+        return new_title
+    # end _getNewsTitle
+
+    # _getPage(self,url,page)
+    def getPage(self,page):
 		
 		# Init
 		news = []

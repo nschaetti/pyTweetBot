@@ -6,6 +6,9 @@
 		"password" : "",
 		"database" : ""
 	},
+	"hashtags":
+	[
+	],
 	"twitter" :
 	{
 		"auth_token1" : "",
