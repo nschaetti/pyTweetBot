@@ -4,15 +4,14 @@
 
 import datetime
 from db.DBConnector import DBConnector
+from executor.ActionScheduler import ActionScheduler
 from db.obj.Friend import Friend
-from db.obj.Follower import Follower
-from db.obj.Following import Following
+from db.obj.Statistic import Statistic
 from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import update, delete, select
 from sqlalchemy.orm import load_only
 from sqlalchemy import or_, and_, not_
-import sqlalchemy.orm.exc
 import time
 import logging
 from datetime import timedelta
@@ -147,14 +146,46 @@ class FriendsManager(object):
         self._logger.info("Updating followings...")
         n_following, d_following = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
+        # Insert a statistic
+        self._insert_statistic()
+
         return n_follower, d_follower, n_following, d_following
     # end update
+
+    # Get the number of followers
+    def n_followers(self):
+        """
+        Get the nunber of followers.
+        :return: The number of followers.
+        """
+        return self._session.query(Friend).filter(Friend.friend_follower == True).count()
+    # end n_followers
+
+    # Get the number of following
+    def n_following(self):
+        """
+        Get the nunber of following.
+        :return: The number of following.
+        """
+        return self._session.query(Friend).filter(Friend.friend_following == True).count()
+    # end n_followers
 
     ######################################################
     #
     # PRIVATE FUNCTIONS
     #
     ######################################################
+
+    # Insert a value in the statistics table
+    def _insert_statistic(self):
+        """
+        Insert a value in the statistics table.
+        """
+        statistic = Statistic(statistic_friend_count=self.n_following(), statistic_followers_count=self.n_followers(),
+                              statistic_statuses_count=ActionScheduler().n_statuses())
+        self._session.add(statistic)
+        self._session.commit()
+    # end _insert_statistic
 
     # Add a friend
     def _add_friend(self, screen_name, description, location, followers_count, friends_count,
@@ -342,6 +373,10 @@ class FriendsManager(object):
 
     # Clean friendships
     def _clean_friendships(self):
+        """
+        Remove all friendships with no links
+        :return:
+        """
         # Select friend with no links
         no_links = self._session.query(Friend).filter(not Friend.friend_follower and not Friend.friend_following).all()
 

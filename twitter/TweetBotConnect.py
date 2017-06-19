@@ -50,6 +50,7 @@ class TweetBotConnector(object):
         self._page = None
         self._followers = list()
         self._current_follower = 0
+        self._config = config
     # end __init__
 
     # Retweet
@@ -203,5 +204,14 @@ class TweetBotConnector(object):
         """
         return tweepy.Cursor(self._api.friends).pages()
     # end get_followers_cursor
+
+    # Get the user
+    def get_user(self):
+        """
+        Get the user
+        :return: The Twitter user object.
+        """
+        return self._api.get_user(self._config['user'])
+    # end get_user
 
 # end TweetBotConnector

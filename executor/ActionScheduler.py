@@ -27,6 +27,7 @@ import datetime
 from datetime import timedelta
 from db.obj.Action import Action
 from db.DBConnector import DBConnector
+from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import desc
 from sqlalchemy import and_
 import logging
@@ -236,6 +237,15 @@ class ActionScheduler(object):
         # reservoir_level >= max_n_action => full
         return reservoir_level >= max_n_action
     # end _is_reservoir_full
+
+    # Get the number of statuses
+    def n_statuses(self):
+        """
+        Get the number of statuses
+        :return: The number of statuses
+        """
+        return TweetBotConnector().get_user().n_statuses
+    # end n_statuses
 
     ##############################################
     #
