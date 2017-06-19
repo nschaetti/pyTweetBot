@@ -39,7 +39,7 @@ class Statistic(Base):
 
     # Fields
     statistic_id = Column(BigInteger, primary_key=True, autoincrement=True)
-    statistic_fiends_count = Column(Integer, nullable=False, default=0)
+    statistic_friends_count = Column(Integer, nullable=False, default=0)
     statistic_followers_count = Column(Integer, nullable=False, default=0)
     statistic_statuses_count = Column(Integer, nullable=False, default=0)
     statistic_date = Column(DateTime, nullable=False, default=datetime.datetime.now())
