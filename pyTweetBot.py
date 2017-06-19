@@ -90,8 +90,8 @@ if __name__ == "__main__":
     """for action in action_scheduler.get_exec_action():
         action.execute()
     # end for"""
-    action_scheduler.add_tweet("http://www.nilsschaetti.com")
-    action_scheduler.add_tweet("This is a test for #pyTweetBot https://github.com/nschaetti/pyTweetBot")
+    #action_scheduler.add_tweet("http://www.nilsschaetti.com")
+    #action_scheduler.add_tweet("This is a test for #pyTweetBot https://github.com/nschaetti/pyTweetBot")
     action_scheduler()
 
 # end if
