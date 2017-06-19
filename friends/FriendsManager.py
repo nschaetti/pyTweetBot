@@ -147,7 +147,7 @@ class FriendsManager(object):
         n_following, d_following = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
         # Insert a statistic
-        self._insert_statistic()
+        self.insert_statistic()
 
         return n_follower, d_follower, n_following, d_following
     # end update
@@ -177,7 +177,7 @@ class FriendsManager(object):
     ######################################################
 
     # Insert a value in the statistics table
-    def _insert_statistic(self):
+    def insert_statistic(self):
         """
         Insert a value in the statistics table.
         """
