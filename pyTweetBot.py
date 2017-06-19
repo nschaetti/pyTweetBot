@@ -31,6 +31,7 @@ from db.DBConnector import DBConnector
 from twitter.TweetBotConnect import TweetBotConnector
 from friends.FriendsManager import FriendsManager
 from executor.ActionScheduler import ActionScheduler, ActionAlreadyExists
+from data.RSSHunter import RSSHunter
 
 ####################################################
 # Main function
@@ -94,6 +95,9 @@ if __name__ == "__main__":
     #action_scheduler.add_tweet("This is a test for #pyTweetBot https://github.com/nschaetti/pyTweetBot")
     #action_scheduler()
 
-    friends_manager.update_statistics()
+    #friends_manager.update_statistics()
+
+    hunter = RSSHunter("http://feeds.feedburner.com/TechCrunch/fundings-exits")
+    hunter.parse()
 
 # end if
