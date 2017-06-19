@@ -244,7 +244,7 @@ class ActionScheduler(object):
         Get the number of statuses
         :return: The number of statuses
         """
-        return TweetBotConnector().get_user().n_statuses
+        return TweetBotConnector().get_user().statuses_count
     # end n_statuses
 
     ##############################################
