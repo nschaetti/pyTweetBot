@@ -106,13 +106,13 @@ if __name__ == "__main__":
 
     # Tweet finder
     tweet_finder = TweetFinder()
-    #tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/startups"))
-    #tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/fundings-exits"))
-    #tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/social"))
+    tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/startups"))
+    tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/fundings-exits"))
+    tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/social"))
     tweet_finder.add(GoogleNewsHunter(search_term="machine learning", lang="en", country="us"))
 
     # Tweet preparator
-    tweet_preparator = TweetPreparator(config.get_hashtags())
+    #tweet_preparator = TweetPreparator(config.get_hashtags())
 
     # For each tweet
     for tweet in tweet_finder:

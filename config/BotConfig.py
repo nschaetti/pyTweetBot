@@ -23,23 +23,29 @@
 #
 
 import json
+from patterns.singleton import singleton
 
 
+# Bot configuration object
+@singleton
 class BotConfig(object):
 
-    def __init__(self, data):
+    # Constructor
+    def __init__(self, data=None):
         """
         Constructor.
         :param data:
         """
-        self._database = data['database']
-        self._twitter = data['twitter']
-        self._friends = data['friends']
-        self._direct_message = data['direct_message']
-        self._news_settings = data['news_settings']
-        self._news = data['news']
-        self._retweet = data['retweet']
-        self._hashtags = data['hashtags']
+        if data is not None:
+            self._database = data['database']
+            self._twitter = data['twitter']
+            self._friends = data['friends']
+            self._direct_message = data['direct_message']
+            self._news_settings = data['news_settings']
+            self._news = data['news']
+            self._retweet = data['retweet']
+            self._hashtags = data['hashtags']
+        # end if
     # end __init__
 
     # Load configuration file.

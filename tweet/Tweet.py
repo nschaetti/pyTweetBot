@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
+
+# Imports
+from .TweetFactory import TweetFactory
+from config.BotConfig import BotConfig
 
 
 # Object representing a Tweet
@@ -63,6 +66,19 @@ class Tweet(object):
         """
         self._url = url
     # end set_url
+
+    # Get Tweet
+    def get_tweet(self):
+        """
+        Get Tweet
+        :return: Complete Tweet's text
+        """
+        # Tweet Factory
+        factory = TweetFactory(BotConfig().get_hashtags())
+
+        # Create and return
+        return factory(self)
+    # end get_tweet
 
     # To string
     def __str__(self):

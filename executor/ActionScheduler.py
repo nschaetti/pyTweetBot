@@ -141,7 +141,8 @@ class ActionScheduler(object):
         if tweet is unicode or tweet is str:
             self._add_text_action("Tweet", tweet)
         elif tweet is Tweet:
-            self._add_text_action("Tweet", tweet.get_text())
+            self._add_text_action("Tweet", tweet.get_tweet())
+        # end if
     # end add_tweet
 
     # Add a "Retweet" action in the DB
