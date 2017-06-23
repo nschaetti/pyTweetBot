@@ -53,6 +53,15 @@ class ActionAlreadyExists(Exception):
 # end ActionAlreadyExists
 
 
+# No factory set
+class NoFactory(Exception):
+    """
+    No factory to create Tweets
+    """
+    pass
+# end NoFactory
+
+
 # Manage bot's action
 @singleton
 class ActionScheduler(object):
@@ -74,6 +83,7 @@ class ActionScheduler(object):
         self._purge_delay = purge_delay
         self._reservoir_size = reservoir_size
         self._update_delay = update_delay
+        self._factory = None
 
         # Purge the reservoir
         self._purge_reservoir()
@@ -136,12 +146,14 @@ class ActionScheduler(object):
     def add_tweet(self, tweet):
         """
         Add a tweet actio in the DB
-        :param tweet_text: Text of the Tweet
+        :param tweet: Text of the Tweet or Tweet object.
         """
         if tweet is unicode or tweet is str:
             self._add_text_action("Tweet", tweet)
-        elif tweet is Tweet:
+        elif tweet is Tweet and self._factory is not None:
             self._add_text_action("Tweet", tweet.get_tweet())
+        else:
+            raise NoFactory("No factory given to create Tweets")
         # end if
     # end add_tweet
 
@@ -253,6 +265,16 @@ class ActionScheduler(object):
         """
         return TweetBotConnector().get_user().statuses_count
     # end n_statuses
+
+    # Set Tweet factory object
+    def set_factory(self, factory):
+        """
+        Set Tweet factory object
+        :param factory:
+        :return:
+        """
+        self._factory = factory
+    # end set_factory
 
     ##############################################
     #

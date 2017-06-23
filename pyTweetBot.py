@@ -35,7 +35,7 @@ from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
 from twitter.TweetGenerator import TweetGenerator
-from tweet.TweetPreparator import TweetPreparator
+from tweet.TweetFactory import TweetFactory
 
 ####################################################
 # Main function
@@ -102,7 +102,8 @@ if __name__ == "__main__":
     #friends_manager.update_statistics()
 
     # Tweet generator
-    tweet_generator = TweetGenerator(config)
+    tweet_factory = TweetFactory(config.get_hashtags())
+    action_scheduler.set_factory(tweet_factory)
 
     # Tweet finder
     tweet_finder = TweetFinder()
