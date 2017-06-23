@@ -32,6 +32,7 @@ from sqlalchemy import desc
 from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
+from tweet.Tweet import Tweet
 
 
 # Reservoir full exception
@@ -132,14 +133,15 @@ class ActionScheduler(object):
     # end add_like
 
     # Add a tweet action in the DB
-    def add_tweet(self, tweet_text):
+    def add_tweet(self, tweet):
         """
         Add a tweet actio in the DB
         :param tweet_text: Text of the Tweet
         """
-        print(type(tweet_text))
-        exit()
-        self._add_text_action("Tweet", tweet_text)
+        if tweet is unicode or tweet is str:
+            self._add_text_action("Tweet", tweet)
+        elif tweet is Tweet:
+            self._add_text_action("Tweet", tweet.get_text())
     # end add_tweet
 
     # Add a "Retweet" action in the DB
