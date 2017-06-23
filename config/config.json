@@ -37,6 +37,11 @@
 			"hashtags" : []
 		}
 	],
+	"rss" :
+	[
+		"http://feeds.feedburner.com/TechCrunch/startups",
+		"http://feeds.feedburner.com/TechCrunch/fundings-exits"
+	],
 	"retweet" :
 	{
 		"interval_days" : 1,
