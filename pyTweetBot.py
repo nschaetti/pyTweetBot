@@ -118,7 +118,7 @@ if __name__ == "__main__":
     # For each tweet
     for tweet in tweet_finder:
         #action_scheduler.add_tweet(tweet)
-        print(tweet_factory(tweet).encode('ascii', errors='ignore'))
+        print(unicode(tweet_factory(tweet)).encode('ascii', errors='ignore'))
     # end for
 
 # end if
