@@ -116,7 +116,8 @@ if __name__ == "__main__":
 
     # For each tweet
     for tweet in tweet_finder:
-        print(unicode(tweet_preparator(tweet)))
+        action_scheduler.add_tweet(tweet)
+        #print(unicode(tweet_preparator(tweet)))
     # end for
 
 # end if

@@ -137,6 +137,8 @@ class ActionScheduler(object):
         Add a tweet actio in the DB
         :param tweet_text: Text of the Tweet
         """
+        print(type(tweet_text))
+        exit()
         self._add_text_action("Tweet", tweet_text)
     # end add_tweet
 
