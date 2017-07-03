@@ -82,13 +82,33 @@ class Tweet(object):
         return factory(self)
     # end get_tweet
 
+    # Get length
+    def get_length(self):
+        """
+        Get Tweet length
+        :return:
+        """
+        length = len(self._text)
+        if self._url != "":
+            length += 24
+        # end if
+        for hashtag in self._hashtags:
+            length += len(hashtag)
+        # end for
+        if self._via != "":
+            length += 5 + len(self._via)
+        # end if
+        return length
+    # end get_length
+
     # To string
     def __str__(self):
         """
         To string
         :return:
         """
-        return "Tweet(text={}, url={}, hashtags={}, via={})".format(self._text, self._url, self._hashtags, self._via)
+        return "Tweet(text={}, url={}, hashtags={}, via={}, length={})".format(self._text, self._url, self._hashtags,
+                                                                               self._via, self.get_length())
     # end __str__
 
     # To unicode string
@@ -98,7 +118,8 @@ class Tweet(object):
         :return:
         """
         # print(self._text)
-        return u"Tweet(text={}, url={}, hashtags={}, via={})".format(self._text, self._url, self._hashtags, self._via)
+        return u"Tweet(text={}, url={}, hashtags={}, via={}, length={})".format(self._text, self._url, self._hashtags,
+                                                                                self._via, self.get_length())
     # end __unicode__
 
 # end Tweet
