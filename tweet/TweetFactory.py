@@ -47,7 +47,7 @@ class TweetFactory(object):
     ##########################################
 
     # Replace a word by a hashtag
-    def _word_to_hashtag(self, word, hashtag, text):
+    def _word_to_hashtag(self, word, hashtag, prefix, suffix, text):
         """
         Replace a word by a hashtag
         :param word:
@@ -55,9 +55,9 @@ class TweetFactory(object):
         :param text:
         :return:
         """
-        text = text.replace(word, hashtag)
-        text = text.replace(word.lower(), hashtag)
-        text = text.replace(word.upper(), hashtag)
+        text = text.replace(prefix + word + suffix, prefix + hashtag + suffix)
+        text = text.replace(prefix + word.lower() + suffix, prefix + hashtag + suffix)
+        text = text.replace(prefix + word.upper() + suffix, prefix + hashtag + suffix)
         return text
     # end _word_to_hashtag
 
@@ -70,10 +70,10 @@ class TweetFactory(object):
         """
         for hashtag in self._hashtags:
             # Normal, Lower, Upper
-            text = self._word_to_hashtag(word=hashtag['from'] + u' ', hashtag=hashtag['to'], text=text)
-            text = self._word_to_hashtag(word=u' ' + hashtag['from'], hashtag=hashtag['to'], text=text)
-            text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u'') + u' ', hashtag=hashtag['to'], text=text)
-            text = self._word_to_hashtag(word=u' ' + hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], text=text)
+            text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u' ', suffix=u'', text=text)
+            text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u'', suffix=u' ', text=text)
+            text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], prefix=u' ', suffix=u'', text=text)
+            text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], prefix=u'', suffix=u' ', text=text)
         # end for
         return text.replace(u"##", u"#").replace(u"##", u"#")
     # end replace_hashtags
