@@ -79,7 +79,7 @@ class Tweet(object):
         length = self.get_length()
 
         # Basic Tweet
-        if length <= 140
+        if length <= 140:
             final_tweet = self._text
         else:
             final_tweet = self._text[:140-length-3] + "..."
