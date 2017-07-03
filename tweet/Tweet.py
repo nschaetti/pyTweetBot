@@ -75,8 +75,15 @@ class Tweet(object):
         Get Tweet
         :return: Complete Tweet's text
         """
+        # Current length
+        length = self.get_length()
+
         # Basic Tweet
-        final_tweet = self._text
+        if length <= 140
+            final_tweet = self._text
+        else:
+            final_tweet = self._text[:140-length-3] + "..."
+        # end if
 
         # Add via
         final_tweet += " via " + self._via
