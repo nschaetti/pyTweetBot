@@ -47,7 +47,7 @@ class TweetFactory(object):
     ##########################################
 
     # Replace a word by a hashtag
-    def _word_to_hashtag(self, word, hashtag, prefix, suffix, text):
+    def _word_to_hashtag(self, word, hashtag, prefix, suffix, text, case_sensitive=False):
         """
         Replace a word by a hashtag
         :param word:
@@ -57,8 +57,10 @@ class TweetFactory(object):
         """
         if hashtag not in text:
             text = text.replace(prefix + word + suffix, prefix + hashtag + suffix)
-            text = text.replace(prefix + word.lower() + suffix, prefix + hashtag + suffix)
-            text = text.replace(prefix + word.upper() + suffix, prefix + hashtag + suffix)
+            if not case_sensitive:
+                text = text.replace(prefix + word.lower() + suffix, prefix + hashtag + suffix)
+                text = text.replace(prefix + word.upper() + suffix, prefix + hashtag + suffix)
+            # end if
         # end if
         return text
     # end _word_to_hashtag
@@ -71,10 +73,18 @@ class TweetFactory(object):
         :return:
         """
         for hashtag in self._hashtags:
-            text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u' ', suffix=u'', text=text)
-            text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u'', suffix=u' ', text=text)
-            text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], prefix=u' ', suffix=u'', text=text)
-            text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], prefix=u'', suffix=u' ', text=text)
+            # Case sensitive
+            case_sensitive = hashtag['case_sensitive'] if 'case_sensitive' in hashtag.keys() else False
+
+            # Replace
+            text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u' ', suffix=u'',
+                                         text=text, case_sensitive=case_sensitive)
+            text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u'', suffix=u' ',
+                                         text=text, case_sensitive=case_sensitive)
+            text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], prefix=u' ',
+                                         suffix=u'', text=text, case_sensitive=case_sensitive)
+            text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], prefix=u'',
+                                         suffix=u' ', text=text, case_sensitive=case_sensitive)
         # end for
         return text.replace(u"##", u"#").replace(u"##", u"#")
     # end replace_hashtags
