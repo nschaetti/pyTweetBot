@@ -98,7 +98,7 @@ class Tweet(object):
         :return:
         """
         # print(self._text)
-        return u"Tweet(text={}, url={})".format(self._text, self._url)
+        return u"Tweet(text={}, url={}, hashtags={}, via={})".format(self._text, self._url, self._hashtags, self._via)
     # end __unicode__
 
 # end Tweet
