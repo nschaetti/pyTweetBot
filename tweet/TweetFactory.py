@@ -46,6 +46,21 @@ class TweetFactory(object):
     #
     ##########################################
 
+    # Replace a word by a hashtag
+    def _word_to_hashtag(self, word, hashtag, text):
+        """
+        Replace a word by a hashtag
+        :param word:
+        :param hashtag:
+        :param text:
+        :return:
+        """
+        text = text.replace(word, hashtag)
+        text = text.replace(word.lower(), hashtag)
+        text = text.replace(word.upper(), hashtag)
+        return text
+    # end _word_to_hashtag
+
     # Replace hashtags
     def _replace_hashtags(self, text):
         """
@@ -55,14 +70,10 @@ class TweetFactory(object):
         """
         for hashtag in self._hashtags:
             # Normal, Lower, Upper
-            text = text.replace(hashtag['from'], hashtag['to'])
-            text = text.replace(hashtag['from'].lower(), hashtag['to'])
-            text = text.replace(hashtag['from'].upper(), hashtag['to'])
-
-            # Without space
-            text = text.replace(hashtag['from'].replace(u' ', u''), hashtag['to'])
-            text = text.replace(hashtag['from'].lower().replace(u' ', u''), hashtag['to'])
-            text = text.replace(hashtag['from'].upper().replace(u' ', u''), hashtag['to'])
+            text = self._word_to_hashtag(word=hashtag['from'] + u' ', hashtag=hashtag['to'], text=text)
+            text = self._word_to_hashtag(word=u' ' + hashtag['from'], hashtag=hashtag['to'], text=text)
+            text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u'') + u' ', hashtag=hashtag['to'], text=text)
+            text = self._word_to_hashtag(word=u' ' + hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], text=text)
         # end for
         return text.replace(u"##", u"#").replace(u"##", u"#")
     # end replace_hashtags
