@@ -13,7 +13,7 @@ class Tweet(object):
     """
 
     # Constructor
-    def __init__(self, text, url):
+    def __init__(self, text, url, hashtags=None, via=None):
         """
         Constructor
         :param text: Tweet's text
@@ -21,6 +21,8 @@ class Tweet(object):
         """
         self._text = text
         self._url = url
+        self._hashtags = hashtags if hashtags is not None else list()
+        self._via = via if via is not None else ""
     # end __init__
 
     ######################################
@@ -86,8 +88,7 @@ class Tweet(object):
         To string
         :return:
         """
-        #print(self._text)
-        return "Tweet(text={}, url={})".format(self._text, self._url)
+        return "Tweet(text={}, url={}, hashtags={}, via={})".format(self._text, self._url, self._hashtags, self._via)
     # end __str__
 
     # To unicode string

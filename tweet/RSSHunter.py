@@ -12,9 +12,12 @@ from .Tweet import Tweet
 class RSSHunter(Hunter):
 
     # Constructor
-    def __init__(self, url):
-        self._feed_url = url
-        self._entries = feedparser.parse(self._feed_url)['entries']
+    def __init__(self, stream):
+        self._stream = stream
+        self._stream_url = stream['url']
+        self._entries = feedparser.parse(self._stream_url)['entries']
+        self._hashtags = stream['hashtags'] if 'hashtags' in stream else list()
+        self._via = stream['via'] if 'via' in stream else None
         self._current = 0
     # end __init__
 
@@ -42,7 +45,7 @@ class RSSHunter(Hunter):
         # Tweet generator
         #generator = TweetGenerator()
         #return generator(current_entry['title'], current_entry['links'][0]['href'])
-        return Tweet(current_entry['title'], current_entry['links'][0]['href'])
+        return Tweet(current_entry['title'], current_entry['links'][0]['href'], self._hashtags, self._via)
     # end next
 
 # end RSSHunter

@@ -42,6 +42,7 @@ class BotConfig(object):
         self._news = data['news']
         self._retweet = data['retweet']
         self._hashtags = data['hashtags']
+        self._rss = data['rss']
     # end __init__
 
     # Load configuration file.
@@ -111,6 +112,15 @@ class BotConfig(object):
         """
         return self._news_settings
     # end get_news_settings
+
+    # Get RSS streams
+    def get_rss_streams(self):
+        """
+        Get RSS stream
+        :return:
+        """
+        return self._rss
+    # end get_rss_streams
 
     # Get news config
     def get_news_config(self):
