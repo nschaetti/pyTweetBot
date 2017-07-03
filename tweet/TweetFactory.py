@@ -25,6 +25,11 @@ class TweetFactory(object):
 
     # Create tweet text
     def __call__(self, tweet):
+        """
+        Create tweet text.
+        :param tweet:
+        :return:
+        """
         # Introduce hashtags
         hashtags_text = self._replace_hashtags(tweet.get_text())
 
