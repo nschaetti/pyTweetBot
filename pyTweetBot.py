@@ -122,6 +122,9 @@ if __name__ == "__main__":
     for tweet in tweet_finder:
         #action_scheduler.add_tweet(tweet)
         print(unicode(tweet_factory(tweet)).encode('ascii', errors='ignore'))
+        if tweet.get_length() > 140:
+            print(unicode(tweet.get_tweet()).encode('ascii', errors='ignore'))
+        # end if
     # end for
 
 # end if

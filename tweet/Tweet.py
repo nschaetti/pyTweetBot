@@ -75,11 +75,22 @@ class Tweet(object):
         Get Tweet
         :return: Complete Tweet's text
         """
-        # Tweet Factory
-        factory = TweetFactory(BotConfig().get_hashtags())
+        # Basic Tweet
+        final_tweet = self._text
+
+        # Add via
+        final_tweet += " via " + self._via
+
+        # Add hashtags
+        for hashtag in self._hashtags:
+            final_tweet += " " + hashtag
+        # end for
+
+        # Add URL
+        final_tweet += " " + self._url
 
         # Create and return
-        return factory(self)
+        return final_tweet
     # end get_tweet
 
     # Get length
