@@ -55,9 +55,11 @@ class TweetFactory(object):
         :param text:
         :return:
         """
-        text = text.replace(prefix + word + suffix, prefix + hashtag + suffix)
-        text = text.replace(prefix + word.lower() + suffix, prefix + hashtag + suffix)
-        text = text.replace(prefix + word.upper() + suffix, prefix + hashtag + suffix)
+        if hashtag not in text:
+            text = text.replace(prefix + word + suffix, prefix + hashtag + suffix)
+            text = text.replace(prefix + word.lower() + suffix, prefix + hashtag + suffix)
+            text = text.replace(prefix + word.upper() + suffix, prefix + hashtag + suffix)
+        # end if
         return text
     # end _word_to_hashtag
 
@@ -69,7 +71,6 @@ class TweetFactory(object):
         :return:
         """
         for hashtag in self._hashtags:
-            # Normal, Lower, Upper
             text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u' ', suffix=u'', text=text)
             text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u'', suffix=u' ', text=text)
             text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], prefix=u' ', suffix=u'', text=text)
