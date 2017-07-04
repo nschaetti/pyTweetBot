@@ -354,7 +354,7 @@ class ActionScheduler(object):
             action = Action(action_type=action_type, action_tweet_text=the_text)
             self.add(action)
         else:
-            logging.getLogger("pyTweetBot").warning("{} action for text {} already in database"
+            logging.getLogger("pyTweetBot").warning(u"{} action for text {} already in database"
                                                     .format(action_type, the_text))
             raise ActionAlreadyExists("{} action for text {} already in database".format(action_type, the_text))
         # end if
