@@ -23,7 +23,8 @@
 #
 
 # Imports
-from .Model import Model
+from .Model import Model, ModelNotFoundException
+from db.obj.Model import Model as DbModel
 
 
 # A statistical model for text classification
@@ -31,6 +32,20 @@ class StatisticalModel(Model):
     """
     A statistical model for text classification
     """
+
+    # Constructor
+    def __init__(self, name, n_classes, tokens_prob):
+        """
+        Constructor
+        :param name: Model's name
+        :param n_classes: Class count
+        :param tokens_prob: Array of dictionaries of tokens probabilities
+        """
+        # Properties
+        self._name = name
+        self._n_classes = n_classes
+        self.tokens_prob = tokens_prob
+    # end __init__
 
     # Train the model
     def train(self, text, c):
@@ -60,7 +75,18 @@ class StatisticalModel(Model):
         :param opt: Loading option
         :return: The model class
         """
+        # Get from DB
+        model = DbModel.get_by_name(opt)
 
+        # Check if exists
+        if model is not None:
+            # Get tokens probs
+
+
+            return StatisticalModel(model.model_name, model.model_n_classes, dict())
+        else:
+            raise ModelNotFoundException(u"Statistical model {} not found in the database".format(opt))
+        # end if
     # end load
 
 # end StatisticalModel

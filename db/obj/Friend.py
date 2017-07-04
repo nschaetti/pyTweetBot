@@ -52,4 +52,5 @@ class Friend(Base):
     friend_statuses_count = Column(Integer, nullable=False, default=0)
     friend_special = Column(Boolean, nullable=False, default=False)
     friend_last_update = Column(DateTime, nullable=False, default=datetime.datetime.now())
+
 # end Friend

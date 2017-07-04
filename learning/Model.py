@@ -23,6 +23,15 @@
 #
 
 
+# Model not found exception
+class ModelNotFoundException(Exception):
+    """
+    Model is not found.
+    """
+    pass
+# end ModelNotFoundException
+
+
 # Learning model abstract class
 class Model(object):
     """

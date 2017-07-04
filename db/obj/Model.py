@@ -27,6 +27,7 @@ import datetime
 from sqlalchemy import Column, BigInteger, String, DateTime, Integer
 from .Base import Base
 from sqlalchemy.types import Enum
+from db.DBConnector import DBConnector
 
 
 # Model description
@@ -44,5 +45,29 @@ class Model(Base):
     model_type = Column(Enum('Tweet', 'Retweet', 'Follow', 'Message'), nullable=False)
     model_n_classes = Column(Integer, nullable=False, default=2)
     model_last_update = Column(DateTime, nullable=False, default=datetime.datetime.now())
+
+    ##################################################
+    # Functions
+    ##################################################
+
+    # Get a model by name
+    def get_by_name(self, name):
+        """
+        Get a model by its name
+        :param name: Model's name
+        :return: Model DB object
+        """
+        return DBConnector().get_session().query(Model).filter(Model.name == name).one()
+    # end get_by_name
+
+    # Model exists?
+    def exists(self, name):
+        """
+        Does a model exists?
+        :param name: Model's name
+        :return: True or False
+        """
+        return DBConnector().get_session().query(Model).filter(Model.name == name).count() > 0
+    # end exists
 
 # end Statistic

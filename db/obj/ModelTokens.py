@@ -27,6 +27,7 @@ from sqlalchemy import Column, BigInteger, String, Float, ForeignKey, Integer
 from .Base import Base
 from sqlalchemy.orm import relationship
 from .Model import Model
+from db.DBConnector import DBConnector
 
 
 # Model's tokens
@@ -47,5 +48,20 @@ class ModelToken(Base):
 
     # Relationships
     model = relationship(Model)
+
+    ##################################################
+    # Functions
+    ##################################################
+
+    # Get token probabilities for a model
+    @staticmethod
+    def get_tokens_probabilities(model_name):
+        """
+        Get token probs for a model
+        :param model_name: Model's name
+        :return:
+        """
+        return DBConnector().get_session().query(Model).filter(ModelToken.token_model.model_name == model_name).all()
+    # end get_tokens_probabilities
 
 # end Statistic
