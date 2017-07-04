@@ -123,7 +123,7 @@ if __name__ == "__main__":
         #action_scheduler.add_tweet(tweet)
         print(unicode(tweet_factory(tweet)).encode('ascii', errors='ignore'))
         print(unicode(tweet.get_tweet()).encode('ascii', errors='ignore'))
-        print(len(tweet.get_tweet()))
+        print(len(tweet.get_tweet()) + 24)
         print("")
     # end for
 

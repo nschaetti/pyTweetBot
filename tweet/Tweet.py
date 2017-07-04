@@ -110,7 +110,7 @@ class Tweet(object):
         # end for
 
         # Add URL
-        final_text += " " + self._url
+        #final_text += " " + self._url
 
         # Create and return
         return final_text
