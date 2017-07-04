@@ -49,59 +49,6 @@ class TweetFactory(object):
     #
     ##########################################
 
-    # Add via
-    def _add_via(self, text, via):
-        """
-        Add via information
-        :param text:
-        :param via:
-        :return:
-        """
-        return text + u" via " + via
-    # end _add_via
-
-    # Reduce text
-    def _reduce_tweet(self, text, url_present):
-        """
-        Reduce text
-        :param tweet:
-        :return:
-        """
-        if url_present:
-            return text[:140-24-3] + u"..."
-        else:
-            return text[:140-3] + u"..."
-        # end if
-    # end if
-
-    # Check Tweet length
-    def _check_length(self, tweet):
-        """
-        Check Tweet length
-        :param text:
-        :return:
-        """
-        if tweet.get_url() != "":
-            return len(tweet.get_text()) + 24 <= 140
-        else:
-            return len(tweet.get_text()) <= 140
-        # end if
-    # end _check_length
-
-    # Check Tweet length
-    def _check_text_length(self, text, url_present):
-        """
-        Check Tweet length
-        :param text:
-        :return:
-        """
-        if url_present:
-            return len(text) + 24 <= 140
-        else:
-            return len(text) <= 140
-        # end if
-    # end _check_length
-
     # Replace a word by a hashtag
     def _word_to_hashtag(self, word, hashtag, prefix, suffix, text, case_sensitive=False):
         """
