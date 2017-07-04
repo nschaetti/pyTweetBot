@@ -32,7 +32,7 @@ from sqlalchemy import desc
 from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
-from tweet.Tweet import Tweet
+import tweet.Tweet as tw
 
 
 # Reservoir full exception
@@ -149,11 +149,11 @@ class ActionScheduler(object):
         :param tweet: Text of the Tweet or Tweet object.
         """
         print(type(tweet))
-        print(tweet is Tweet)
+        print(tweet is tw.Tweet)
         print(self._factory is not None)
         if tweet is unicode or tweet is str:
             self._add_text_action("Tweet", tweet)
-        elif tweet is Tweet and self._factory is not None:
+        elif tweet is tw.Tweet and self._factory is not None:
             self._add_text_action("Tweet", tweet.get_tweet())
         else:
             raise NoFactory("No factory given to create Tweets")
