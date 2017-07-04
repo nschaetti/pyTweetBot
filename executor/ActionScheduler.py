@@ -148,6 +148,7 @@ class ActionScheduler(object):
         Add a tweet action in the DB
         :param tweet: Text of the Tweet or Tweet object.
         """
+        print(type(tweet))
         print(tweet is Tweet)
         print(self._factory is not None)
         if tweet is unicode or tweet is str:
