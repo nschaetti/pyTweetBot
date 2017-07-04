@@ -44,7 +44,8 @@ class ModelToken(Base):
     token_model = Column(BigInteger, ForeignKey('pytwb_models.model_id'), nullable=False)
     token_text = Column(String(100), nullable=False)
     token_class = Column(Integer, nullable=False)
-    token_prob = Column(Float, nullable=False, default=0.0)
+    token_count = Column(Float, nullable=False, default=0)
+    token_total = Column(Integer, nullable=False, default=0)
 
     # Relationships
     model = relationship(Model)
@@ -61,7 +62,7 @@ class ModelToken(Base):
         :param model_name: Model's name
         :return:
         """
-        return DBConnector().get_session().query(Model).filter(ModelToken.token_model.model_name == model_name).all()
+        return DBConnector().get_session().query(ModelToken).filter(ModelToken.token_model.model_name == model_name).all()
     # end get_tokens_probabilities
 
 # end Statistic
