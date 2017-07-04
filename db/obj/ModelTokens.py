@@ -57,19 +57,19 @@ class ModelToken(Base):
 
     # Get token probabilities for a model
     @staticmethod
-    def get_tokens(model_name, c=None):
+    def get_tokens(model, c=None):
         """
         Get token probs for a model
-        :param model_name: Model's name
+        :param model: Model's name
         :param c: Class
         :return:
         """
         if c is None:
             return DBConnector().get_session().query(ModelToken).filter(
-                ModelToken.token_model.model_name == model_name).all()
+                ModelToken.token_model == model).all()
         else:
             return DBConnector().get_session().query(ModelToken).filter(
-                and_(ModelToken.token_model.model_name == model_name, ModelToken.token_class == c)).all()
+                and_(ModelToken.token_model == model, ModelToken.token_class == c)).all()
         # end if
     # end get_tokens
 

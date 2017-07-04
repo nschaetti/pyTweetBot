@@ -99,7 +99,7 @@ class StatisticalModel(Model):
 
             # For each classes
             for i in range(model.model_n_classes):
-                class_tokens.append(ModelToken.get_tokens(opt, i))
+                class_tokens.append(ModelToken.get_tokens(model=model, c=i))
             # end for
 
             return StatisticalModel(model.model_name, model.model_n_classes, class_tokens)
