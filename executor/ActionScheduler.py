@@ -149,6 +149,7 @@ class ActionScheduler(object):
         :param tweet: Text of the Tweet or Tweet object.
         """
         print(self._factory)
+        print(tweet)
         if tweet is unicode or tweet is str:
             self._add_text_action("Tweet", tweet)
         elif tweet is Tweet and self._factory is not None:
