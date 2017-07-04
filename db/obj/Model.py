@@ -63,7 +63,7 @@ class Model(Base):
 
     # Model exists?
     @staticmethod
-    def exists(self, name):
+    def exists(name):
         """
         Does a model exists?
         :param name: Model's name
