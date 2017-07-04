@@ -96,7 +96,7 @@ class Tweet(object):
         # end if
 
         # Add via
-        if total_length + 5 + len(self._via) <= 140:
+        if total_length + 5 + len(self._via) <= 140 and self._via != "":
             final_text += " via " + self._via
             total_length += 5 + len(self._via)
         # end if
