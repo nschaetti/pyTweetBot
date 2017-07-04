@@ -24,7 +24,7 @@
 
 # Import
 import datetime
-from sqlalchemy import Column, BigInteger, String, DateTime
+from sqlalchemy import Column, BigInteger, String, DateTime, Integer
 from .Base import Base
 from sqlalchemy.types import Enum
 
@@ -42,6 +42,7 @@ class Model(Base):
     model_id = Column(BigInteger, primary_key=True, autoincrement=True)
     model_name = Column(String(100), nullable=False)
     model_type = Column(Enum('Tweet', 'Retweet', 'Follow', 'Message'), nullable=False)
+    model_n_classes = Column(Integer, nullable=False, default=2)
     model_last_update = Column(DateTime, nullable=False, default=datetime.datetime.now())
 
 # end Statistic

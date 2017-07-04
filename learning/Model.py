@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : Friend.py
-# Description : pyTweetBot statistic class in the DB.
+# File : Model.py
+# Description : pyTweetBot learning model abstract céass
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -22,30 +22,42 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Import
-from sqlalchemy import Column, BigInteger, String, Float, ForeignKey, Integer
-from .Base import Base
-from sqlalchemy.orm import relationship
-from .Model import Model
 
-
-# Model's tokens
-class ModelToken(Base):
+# Learning model abstract class
+class Model(object):
     """
-    Model's tokens
+    Learning model abstract class
     """
 
-    # Table name
-    __tablename__ = "pytwb_model_tokens"
+    # Train the model
+    def train(self, text, c):
+        """
+        Train the model
+        :param text: Training text
+        :param c: Text's class
+        """
+        pass
+    # end train
 
-    # Fields
-    token_id = Column(BigInteger, primary_key=True, autoincrement=True)
-    token_model = Column(BigInteger, ForeignKey('pytwb_models.model_id'), nullable=False)
-    token_text = Column(String(100), nullable=False)
-    token_class = Column(Integer, nullable=False)
-    token_prob = Column(Float, nullable=False, default=0.0)
+    # Call the model
+    def __call__(self, text):
+        """
+        Call the model to classify new text
+        :param text: Text to classify
+        :return: Resulting class number
+        """
+        pass
+    # end __call__
 
-    # Relationships
-    model = relationship(Model)
+    # Load the model
+    @staticmethod
+    def load(opt):
+        """
+        Load the model from DB or file
+        :param opt: Loading option
+        :return: The model class
+        """
+        pass
+    # end load
 
-# end Statistic
+# end Model
