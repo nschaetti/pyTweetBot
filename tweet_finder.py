@@ -28,7 +28,7 @@ import logging
 
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
-from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError
+from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
 from friends.FriendsManager import FriendsManager
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
@@ -102,6 +102,9 @@ if __name__ == "__main__":
             action_scheduler.add_tweet(tweet)
         except ActionReservoirFullError:
             logging.info(u"Reservoir full for Tweet action")
+            pass
+        except ActionAlreadyExists:
+            logging.debug(u"Tweet \"{}\" already exists in the database".format(tweet.get_tweet().encode('ascii', errors='ignore')))
             pass
         # end try
     # end for
