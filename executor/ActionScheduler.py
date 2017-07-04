@@ -153,7 +153,7 @@ class ActionScheduler(object):
         print(self._factory is not None)
         if tweet is unicode or tweet is str:
             self._add_text_action("Tweet", tweet)
-        elif tweet is tw.Tweet and self._factory is not None:
+        elif self._factory is not None:
             self._add_text_action("Tweet", tweet.get_tweet())
         else:
             raise NoFactory("No factory given to create Tweets")
