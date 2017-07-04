@@ -52,7 +52,7 @@ class Model(Base):
 
     # Get a model by name
     @staticmethod
-    def get_by_name(self, name):
+    def get_by_name(name):
         """
         Get a model by its name
         :param name: Model's name
