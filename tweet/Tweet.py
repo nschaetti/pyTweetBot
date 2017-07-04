@@ -75,29 +75,45 @@ class Tweet(object):
         Get Tweet
         :return: Complete Tweet's text
         """
-        # Current length
-        length = self.get_length()
+        # Text length
+        text_length = len(self._text)
 
-        # Basic Tweet
-        if length <= 140:
-            final_tweet = self._text
+        # URL length
+        url_length = 24
+        if self._url == "":
+            url_length = 0
+        # end if
+
+        # Total length
+        total_length = text_length + url_length
+
+        # Restrict text
+        if total_length <= 140:
+            final_text = self._text
         else:
-            final_tweet = self._text[:140-length-3] + "..."
+            final_text = self._text[:140-total_length-3] + "..."
+            total_length = len(final_text) + url_length
         # end if
 
         # Add via
-        final_tweet += " via " + self._via
+        if total_length + 5 + len(self._via) <= 140:
+            final_text += " via " + self._via
+            total_length += 5 + len(self._via)
+        # end if
 
         # Add hashtags
         for hashtag in self._hashtags:
-            final_tweet += " " + hashtag
+            if total_length + len(hashtag) <= 140:
+                final_text += " " + hashtag
+                total_length += len(hashtag)
+            # end if
         # end for
 
         # Add URL
-        final_tweet += " " + self._url
+        final_text += " " + self._url
 
         # Create and return
-        return final_tweet
+        return final_text
     # end get_tweet
 
     # Get length

@@ -34,20 +34,8 @@ class TweetFactory(object):
         # Clean
         cleaned_text = tweet.get_text().replace(u'\n', '').replace(u'\r', '')
 
-        # Check tweet length
-        #if not self._check_text_length(cleaned_text):
-        #    cleaned_text = self._reduce_tweet(cleaned_text)
-        # end if
-
         # Replace words by hashtags
         hashtags_text = self._replace_hashtags(cleaned_text)
-
-        # Add via if possible
-        #if self._via is not None and self._check_text_length(hashtags_text + u" via " + self._via):
-        #    via_text = self._add_via(hashtags_text, self._via)
-        #else
-        #    via_text = hashtags_text
-        # end if
 
         # Change
         tweet.set_text(hashtags_text)
