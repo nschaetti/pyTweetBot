@@ -58,7 +58,7 @@ class Model(Base):
         :param name: Model's name
         :return: Model DB object
         """
-        return DBConnector().get_session().query(Model).filter(Model.name == name).one()
+        return DBConnector().get_session().query(Model).filter(Model.model_name == name).one()
     # end get_by_name
 
     # Model exists?
