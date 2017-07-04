@@ -36,6 +36,8 @@ from tweet.TweetFinder import TweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
 from twitter.TweetGenerator import TweetGenerator
 from tweet.TweetFactory import TweetFactory
+from learning.Model import Model
+from learning.StatisticalModel import StatisticalModel
 
 ####################################################
 # Main function
@@ -80,8 +82,17 @@ if __name__ == "__main__":
     # Tweet finder
     tweet_finder = TweetFinder()
 
+    # Create or get model
+    if not Model.exists("stats_model_for_tweet"):
+        model = StatisticalModel.create("stats_model_for_tweet", 2)
+    else:
+        model = StatisticalModel.load("stats_model_for_tweet")
+    # end if
+
+    print(model)
+
     # Add RSS streams
-    for rss_stream in config.get_rss_streams():
+    """for rss_stream in config.get_rss_streams():
         tweet_finder.add(RSSHunter(rss_stream))
     # end for
 
@@ -97,6 +108,6 @@ if __name__ == "__main__":
     # For each tweet
     for tweet in tweet_finder:
 
-    # end for
+    # end for"""
 
 # end if

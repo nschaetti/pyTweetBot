@@ -28,6 +28,7 @@ from .Base import Base
 from sqlalchemy.orm import relationship
 from .Model import Model
 from db.DBConnector import DBConnector
+from sqlalchemy import and_
 
 
 # Model's tokens
@@ -56,13 +57,20 @@ class ModelToken(Base):
 
     # Get token probabilities for a model
     @staticmethod
-    def get_tokens_probabilities(model_name):
+    def get_tokens(model_name, c=None):
         """
         Get token probs for a model
         :param model_name: Model's name
+        :param c: Class
         :return:
         """
-        return DBConnector().get_session().query(ModelToken).filter(ModelToken.token_model.model_name == model_name).all()
-    # end get_tokens_probabilities
+        if c is None:
+            return DBConnector().get_session().query(ModelToken).filter(
+                ModelToken.token_model.model_name == model_name).all()
+        else:
+            return DBConnector().get_session().query(ModelToken).filter(
+                and_(ModelToken.token_model.model_name == model_name, ModelToken.token_class == c)).all()
+        # end if
+    # end get_tokens
 
 # end Statistic

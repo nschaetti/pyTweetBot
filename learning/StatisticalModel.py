@@ -23,8 +23,11 @@
 #
 
 # Imports
-from .Model import Model, ModelNotFoundException
+from .Model import Model, ModelNotFoundException, ModelAlreadyExistsException
 from db.obj.Model import Model as DbModel
+from db.obj.ModelTokens import ModelToken
+import spacy
+from db.DBConnector import DBConnector
 
 
 # A statistical model for text classification
@@ -34,7 +37,7 @@ class StatisticalModel(Model):
     """
 
     # Constructor
-    def __init__(self, name, n_classes, tokens_prob):
+    def __init__(self, name, n_classes, tokens_probs, last_update):
         """
         Constructor
         :param name: Model's name
@@ -44,7 +47,8 @@ class StatisticalModel(Model):
         # Properties
         self._name = name
         self._n_classes = n_classes
-        self.tokens_prob = tokens_prob
+        self._tokens_probs = tokens_probs
+        self._last_update = last_update
     # end __init__
 
     # Train the model
@@ -67,6 +71,16 @@ class StatisticalModel(Model):
         pass
     # end __call__
 
+    # To String
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        return "StatisticalModel(name={}, n_classes={}, last_training={}".format(self._name, self._n_classes,
+                                                                                 self._last_update)
+    # end __str__
+
     # Load the model
     @staticmethod
     def load(opt):
@@ -80,13 +94,49 @@ class StatisticalModel(Model):
 
         # Check if exists
         if model is not None:
-            # Get tokens probs
+            # Array with an entry for each class
+            class_tokens = list()
 
+            # For each classes
+            for i in range(model.model_n_classes):
+                class_tokens.append(ModelToken.get_tokens(opt, i))
+            # end for
 
-            return StatisticalModel(model.model_name, model.model_n_classes, dict())
+            return StatisticalModel(model.model_name, model.model_n_classes, class_tokens)
         else:
             raise ModelNotFoundException(u"Statistical model {} not found in the database".format(opt))
         # end if
     # end load
+
+    # create a new model
+    @staticmethod
+    def create(opt, n_classes=None):
+        """
+        create a new model in db or file
+        :param opt: model options
+        :param n_classes: Number of classes to classify.
+        :return: the newly created model
+        """
+        # Check if model already exists
+        if not DbModel.exists(opt):
+            model = DbModel(model_name=opt, model_n_classes=n_classes)
+            DBConnector().get_session().add(model)
+            DBConnector().get_session().commit()
+        else:
+            raise ModelAlreadyExistsException("This model's name already exists in the database!")
+        # end if
+    # end create
+
+        # Model exists?
+
+    @staticmethod
+    def exists(name):
+        """
+        Does a model exists?
+        :param name: Model's name
+        :return: True or False
+        """
+        return DbModel.exists(name)
+    # end exists
 
 # end StatisticalModel

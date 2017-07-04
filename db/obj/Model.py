@@ -51,6 +51,7 @@ class Model(Base):
     ##################################################
 
     # Get a model by name
+    @staticmethod
     def get_by_name(self, name):
         """
         Get a model by its name
@@ -61,6 +62,7 @@ class Model(Base):
     # end get_by_name
 
     # Model exists?
+    @staticmethod
     def exists(self, name):
         """
         Does a model exists?

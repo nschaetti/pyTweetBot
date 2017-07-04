@@ -22,6 +22,9 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Imports
+from db.obj.Model import Model as DbModel
+
 
 # Model not found exception
 class ModelNotFoundException(Exception):
@@ -30,6 +33,15 @@ class ModelNotFoundException(Exception):
     """
     pass
 # end ModelNotFoundException
+
+
+# Model already exists exception
+class ModelAlreadyExistsException(Exception):
+    """
+    Model already exists.
+    """
+    pass
+# end ModelAlreadyExistsException
 
 
 # Learning model abstract class
@@ -68,5 +80,27 @@ class Model(object):
         """
         pass
     # end load
+
+    # Create a new model
+    @staticmethod
+    def create(opt, n_classes=None):
+        """
+        Create a new model in DB or file
+        :param opt: Model options
+        :param n_classes: Classes count if classification model.
+        :return: The newly created model
+        """
+        pass
+    # end create
+
+    @staticmethod
+    def exists(name):
+        """
+        Does a model exists?
+        :param name: Model's name
+        :return: True or False
+        """
+        return DbModel.exists(name)
+    # end exists
 
 # end Model
