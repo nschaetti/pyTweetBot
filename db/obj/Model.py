@@ -69,7 +69,7 @@ class Model(Base):
         :param name: Model's name
         :return: True or False
         """
-        return DBConnector().get_session().query(Model).filter(Model.name == name).count() > 0
+        return DBConnector().get_session().query(Model).filter(Model.model_name == name).count() > 0
     # end exists
 
 # end Statistic
