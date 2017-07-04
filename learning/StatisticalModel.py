@@ -125,6 +125,8 @@ class StatisticalModel(Model):
         else:
             raise ModelAlreadyExistsException("This model's name already exists in the database!")
         # end if
+
+        return model
     # end create
 
         # Model exists?
