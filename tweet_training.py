@@ -25,7 +25,10 @@
 # Import
 import argparse
 import logging
-
+import os
+import datetime
+import nltk
+from urllib import urlopen
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
@@ -49,8 +52,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
 
     # Argument
-    parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
+    parser.add_argument("--model", type=str, help="Model file", required=True)
+    parser.add_argument("--test", action='store_true', default=False)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     args = parser.parse_args()
 
@@ -83,16 +87,22 @@ if __name__ == "__main__":
     tweet_finder = TweetFinder()
 
     # Create or get model
-    if not Model.exists("stats_model_for_tweet"):
+    """if not Model.exists("stats_model_for_tweet"):
         model = StatisticalModel.create("stats_model_for_tweet", 2)
     else:
         model = StatisticalModel.load("stats_model_for_tweet")
+    # end if"""
+
+    # Create or get model
+    if os.path.exists(args.model):
+        model = StatisticalModel.load_from_file(args.model)
+    else:
+        model = StatisticalModel(name="stats_model_for_tweet", classes=["tweet", "skip"], tokens_probs=None,
+                                 last_update=datetime.datetime.utcnow())
     # end if
 
-    print(model)
-
     # Add RSS streams
-    """for rss_stream in config.get_rss_streams():
+    for rss_stream in config.get_rss_streams():
         tweet_finder.add(RSSHunter(rss_stream))
     # end for
 
@@ -105,9 +115,55 @@ if __name__ == "__main__":
         # end for
     # end for
 
+    # Init test stats
+    if args.test:
+        total = 0
+        success = 0
+    # end if
+
     # For each tweet
     for tweet in tweet_finder:
+        # Get URL's text
+        text = nltk.clean_html(urlopen(tweet.get_url()).read())
 
-    # end for"""
+        # Ask
+        print(tweet.get_text())
+        print(tweet.get_url())
+        observed = raw_input("Tweet or Skip (t/S/e)? ").lower()
+
+        # Train or test
+        if not args.test:
+            # Add as example
+            if observed == "e":
+                break
+            elif observed == "s":
+                model.train(text, "skip")
+            elif observed == "t":
+                model.train(text, "tweet")
+            # end if
+        else:
+            # Predict
+            predicted = model(text)
+
+            # Test
+            if observed == "e" or observed == "":
+                break
+            elif observed == "s" and predicted == "skip":
+                success += 1.0
+            elif observed == "t" and predicted == "tweet":
+                success += 1.0
+            # end if
+
+            # Add counter
+            total += 1.0
+    # end for
+
+    # Dislay stats
+    if args.test:
+        logging.info("Test success rate : {}".format(success / total * 100.0))
+    # end if
+
+    # Save the model
+    model.save()
 
 # end if

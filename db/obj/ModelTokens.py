@@ -68,8 +68,7 @@ class ModelToken(Base):
             return DBConnector().get_session().query(ModelToken).filter(
                 ModelToken.token_model == model).all()
         else:
-            return DBConnector().get_session().query(ModelToken).filter(
-                and_(ModelToken.token_model == model, ModelToken.token_class == c)).all()
+            return DBConnector().get_session().query(ModelToken).join(ModelToken.token_model).filter(ModelToken.token_class == c).all()
         # end if
     # end get_tokens
 

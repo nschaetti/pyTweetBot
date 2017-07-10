@@ -27,6 +27,8 @@ from .Model import Model, ModelNotFoundException, ModelAlreadyExistsException
 from db.obj.Model import Model as DbModel
 from db.obj.ModelTokens import ModelToken
 import spacy
+import pickle
+import decimal
 from db.DBConnector import DBConnector
 
 
@@ -37,7 +39,7 @@ class StatisticalModel(Model):
     """
 
     # Constructor
-    def __init__(self, name, n_classes, tokens_probs, last_update):
+    def __init__(self, name, classes, tokens_probs, last_update):
         """
         Constructor
         :param name: Model's name
@@ -46,9 +48,15 @@ class StatisticalModel(Model):
         """
         # Properties
         self._name = name
-        self._n_classes = n_classes
+        self._classes = classes
+        self._n_classes = len(classes)
         self._tokens_probs = tokens_probs
         self._last_update = last_update
+        self._nlp = spacy.load('en')
+
+        # Init dicionaries
+        self._token_counters = dict()
+        self._class_counters = dict()
     # end __init__
 
     # Train the model
@@ -58,7 +66,30 @@ class StatisticalModel(Model):
         :param text: Training text
         :param c: Text's class
         """
-        pass
+        # Tokens
+        tokens = self._nlp(text)
+
+        # For each token
+        for token in tokens:
+            # Token counters
+            if token in self._token_counters.keys():
+                self._token_counters[token.text] += decimal.Decimal(1.0)
+            else:
+                self._token_counters[token.text] = decimal.Decimal(1.0)
+            # end if
+
+            # Create entry in class counter
+            if token not in self._class_counters.keys():
+                self._class_counters[token] = dict()
+            # end if
+
+            # Class counters
+            if c in self._class_counters[token].keys():
+                self._class_counters[token][c] += decimal.Decimal(1.0)
+            else:
+                self._class_counters[token][c] = decimal.Decimal(1.0)
+            # end if
+        # end token
     # end train
 
     # Call the model
@@ -68,8 +99,61 @@ class StatisticalModel(Model):
         :param text: Text to classify
         :return: Resulting class number
         """
-        pass
+        # Text's probabilities
+        text_probs = list()
+
+        # Init
+        for c in range(self._n_classes):
+            text_probs[c] = decimal.Decimal(1.0)
+        # end for
+
+        # Parse text
+        tokens = self._nlp(text)
+
+        # For each token
+        for token in tokens:
+            # Get token probs for each class
+            token_probs = self[token]
+
+            # For each class
+            for c in self._classes:
+                text_probs[c] *= token_probs[c]
+            # end for
+        # end for
+
+        # Get highest prob
+        max = decimal.Decimal(0.0)
+        result_class = ""
+        for c in self._classes:
+            if text_probs[c] > max:
+                max = text_probs[c]
+                result_class = c
+            # end if
+        # end for
+
+        return result_class
     # end __call__
+
+    # Get token probability
+    def __getitem__(self, item):
+        # Exists
+        if item in self._class_counters:
+            probs = self._class_counters[item]
+        else:
+            probs = dict()
+        # end if
+
+        # Set default
+        for c in self._classes:
+            if c not in probs:
+                probs[c] = decimal.Decimal(0.0)
+            else:
+                probs[c] = probs[c] / self._token_counters[item]
+            # end if
+        # end for
+
+        return probs
+    # end __getitem__
 
     # To String
     def __str__(self):
@@ -80,6 +164,18 @@ class StatisticalModel(Model):
         return "StatisticalModel(name={}, n_classes={}, last_training={}".format(self._name, self._n_classes,
                                                                                  self._last_update)
     # end __str__
+
+    # Save the model
+    def save(self, filename):
+        """
+        Save the model to a Pickle file
+        :param filename:
+        :return:
+        """
+        with open(filename, 'w') as f:
+            pickle.dump(self, f)
+        # end with
+    # end save
 
     # Load the model
     @staticmethod
@@ -107,6 +203,19 @@ class StatisticalModel(Model):
             raise ModelNotFoundException(u"Statistical model {} not found in the database".format(opt))
         # end if
     # end load
+
+    # Load the model from file
+    @staticmethod
+    def load_from_file(filename):
+        """
+        Load the model from a Pickle file
+        :param filename: Pickle file
+        :return: The loaded class
+        """
+        with open(filename, 'r') as f:
+            return pickle.load(f)
+        # end with
+    # end load_from_file
 
     # create a new model
     @staticmethod
