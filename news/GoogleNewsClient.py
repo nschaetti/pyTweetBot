@@ -137,5 +137,4 @@ class GoogleNewsClient(object):
             # end try
         return news
     # end _get_page
-
 # end GoogleNewsClient
