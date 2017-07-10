@@ -67,8 +67,6 @@ if __name__ == "__main__":
                 week_day_stats[tweet.created_at.weekday(), tweet.created_at.hour] += 1
             # end if
         # end for
-        plt.imshow(week_day_stats)
-        plt.show()
 
         # Wait
         time.sleep(60)
