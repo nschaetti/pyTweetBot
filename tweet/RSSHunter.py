@@ -3,7 +3,6 @@
 #
 
 import feedparser
-
 from tweet.Hunter import Hunter
 from twitter.TweetGenerator import TweetGenerator
 from .Tweet import Tweet

@@ -52,7 +52,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
 
     # Argument
-    parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--model", type=str, help="Model file", required=True)
     parser.add_argument("--test", action='store_true', default=False)
