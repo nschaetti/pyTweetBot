@@ -28,8 +28,10 @@ import logging
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-from config.BotConfig import BotConfig
 from twitter.TweetBotConnect import TweetBotConnector
+from db.obj.ImpactStatistics import ImpactStatistic
+from config.BotConfig import BotConfig
+from db.DBConnector import DBConnector
 
 ####################################################
 # Main function
@@ -53,6 +55,11 @@ if __name__ == "__main__":
     # Load configuration file
     config = BotConfig.load(args.config)
 
+    # Connection to MySQL
+    dbc = config.get_database_config()
+    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
+                                  db_name=dbc["database"])
+
     # Connection to Twitter
     twitter_connector = TweetBotConnector(config)
 
@@ -66,6 +73,20 @@ if __name__ == "__main__":
             if not tweet.retweeted:
                 week_day_stats[tweet.created_at.weekday(), tweet.created_at.hour] += 1
             # end if
+        # end for
+
+        # Update DB
+        for week_day in range(7):
+            for hour in range(24):
+                count = week_day_stats[week_day, hour]
+                if ImpactStatistic.exists(week_day, hour):
+                    ImpactStatistic.update(week_day, hour, count)
+                else:
+                    impact_stat = ImpactStatistic(impact_statistic_week_day=week_day, impact_statistic_hour=hour,
+                                                  impact_statistic_count=count)
+                    DBConnector().get_session().add(impact_stat)
+                # end if
+            # end for
         # end for
 
         # Wait

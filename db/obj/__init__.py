@@ -11,3 +11,4 @@ from .Friend import Friend
 from .Model import Model
 from .ModelTokens import ModelToken
 from .Statistic import Statistic
+from .ImpactStatistics import ImpactStatistic
