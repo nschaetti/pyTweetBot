@@ -125,8 +125,17 @@ class TweetBotConnector(object):
         :param n_pages:
         :return:
         """
-        print("ok"  )
-        return tweepy.Cursor(self._api.home_timeline).pages(limit=n_pages)
+        return tweepy.Cursor(self._api.home_timeline, screen_name='nschaetti').pages(limit=n_pages)
+    # end get_time_line
+
+    # Get user timeline
+    def get_user_timeline(self, screen_name, n_pages):
+        """
+        Get time line.
+        :param n_pages:
+        :return:
+        """
+        return tweepy.Cursor(self._api.user_timeline, screen_name=screen_name).pages(limit=n_pages)
     # end get_time_line
 
     # Get followers

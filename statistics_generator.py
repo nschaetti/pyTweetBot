@@ -25,6 +25,7 @@
 # Import
 import argparse
 import logging
+import time
 from config.BotConfig import BotConfig
 from twitter.TweetBotConnect import TweetBotConnector
 
@@ -54,12 +55,17 @@ if __name__ == "__main__":
     twitter_connector = TweetBotConnector(config)
 
     # For each of my tweets
-    for page in twitter_connector.get_time_line(n_pages=args.n_pages):
+    for page in twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages):
         # For each tweet
         for tweet in page:
-            print(tweet.retweet_count)
-            exit()
+            if not tweet.retweeted:
+                print(tweet.retweet_count * 2 + tweet.favorite_count)
+                print("")
+            # end if
         # end for
+
+        # Wait
+        time.sleep(60)
     # end for
 
 # end if
