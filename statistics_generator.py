@@ -27,6 +27,7 @@ import argparse
 import logging
 import time
 import numpy as np
+import matplotlib.pyplot as plt
 from config.BotConfig import BotConfig
 from twitter.TweetBotConnect import TweetBotConnector
 
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     # Argument
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--n_pages", type=int, help="Number of page to take into account", default=100)
+    parser.add_argument("--n_pages", type=int, help="Number of page to take into account", default=1000)
     args = parser.parse_args()
 
     # Logging
@@ -56,20 +57,18 @@ if __name__ == "__main__":
     twitter_connector = TweetBotConnector(config)
 
     # Stats for each day of the week
-    week_day_stats = dict()
+    week_day_stats = np.zeros((7, 24))
 
     # For each of my tweets
     for page in twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages):
         # For each tweet
         for tweet in page:
             if not tweet.retweeted:
-                if tweet.created_at.weekday() not in week_day_stats:
-                    week_day_stats[tweet.created_at.weekday()] = np.zeros(24)
-                # end if
-                week_day_stats[tweet.created_at.weekday()][tweet.created_at.hour] += 1
+                week_day_stats[tweet.created_at.weekday(), tweet.created_at.hour] += 1
             # end if
         # end for
-        print(week_day_stats)
+        plt.imshow(week_day_stats)
+        plt.show()
 
         # Wait
         time.sleep(60)
