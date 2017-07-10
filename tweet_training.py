@@ -55,6 +55,7 @@ if __name__ == "__main__":
     parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--model", type=str, help="Model file", required=True)
+    parser.add_argument("--test", action='store_true', default=False)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     args = parser.parse_args()
 
@@ -115,6 +116,12 @@ if __name__ == "__main__":
         # end for
     # end for
 
+    # Init test stats
+    if args.test:
+        total = 0
+        success = 0
+    # end if
+
     # For each tweet
     for tweet in tweet_finder:
         # Get URL's text
@@ -123,15 +130,39 @@ if __name__ == "__main__":
         # Ask
         print(tweet.get_text())
         print(tweet.get_url())
-        observed = raw_input("Tweet or Skip (t/S)? ")
+        observed = raw_input("Tweet or Skip (t/S/e)? ").lower()
 
-        # Add as example
-        if observed == "S" or observed == "s" or observed == "":
-            model.train(text, "skip")
+        # Train or test
+        if not args.test:
+            # Add as example
+            if observed == "e":
+                break
+            elif observed == "s":
+                model.train(text, "skip")
+            elif observed == "t":
+                model.train(text, "tweet")
+            # end if
         else:
-            model.train(text, "tweet")
-        # end if
+            # Predict
+            predicted = model(text)
+
+            # Test
+            if observed == "e" or observed == "":
+                break
+            elif observed == "s" and predicted == "skip":
+                success += 1.0
+            elif observed == "t" and predicted == "tweet":
+                success += 1.0
+            # end if
+
+            # Add counter
+            total += 1.0
     # end for
+
+    # Dislay stats
+    if args.test:
+        logging.info("Test success rate : {}".format(success / total * 100.0))
+    # end if
 
     # Save the model
     model.save()
