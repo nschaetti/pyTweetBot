@@ -54,11 +54,15 @@ if __name__ == "__main__":
     # Connection to Twitter
     twitter_connector = TweetBotConnector(config)
 
+    # Stats for each day of the week
+    week_day_stats = dict()
+
     # For each of my tweets
     for page in twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages):
         # For each tweet
         for tweet in page:
             if not tweet.retweeted:
+                print(tweet.created_date)
                 print(tweet.retweet_count * 2 + tweet.favorite_count)
                 print("")
             # end if
