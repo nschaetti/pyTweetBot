@@ -25,7 +25,10 @@
 # Import
 import argparse
 import logging
-
+import os
+import datetime
+import nltk
+from urllib import urlopen
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
@@ -51,6 +54,7 @@ if __name__ == "__main__":
     # Argument
     parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
+    parser.add_argument("--model", type=str, help="Model file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     args = parser.parse_args()
 
@@ -83,16 +87,22 @@ if __name__ == "__main__":
     tweet_finder = TweetFinder()
 
     # Create or get model
-    if not Model.exists("stats_model_for_tweet"):
+    """if not Model.exists("stats_model_for_tweet"):
         model = StatisticalModel.create("stats_model_for_tweet", 2)
     else:
         model = StatisticalModel.load("stats_model_for_tweet")
+    # end if"""
+
+    # Create or get model
+    if os.path.exists(args.model):
+        model = StatisticalModel.load_from_file(args.model)
+    else:
+        model = StatisticalModel(name="stats_model_for_tweet", classes=["tweet", "skip"], tokens_probs=None,
+                                 last_update=datetime.datetime.utcnow())
     # end if
 
-    print(model)
-
     # Add RSS streams
-    """for rss_stream in config.get_rss_streams():
+    for rss_stream in config.get_rss_streams():
         tweet_finder.add(RSSHunter(rss_stream))
     # end for
 
@@ -107,7 +117,23 @@ if __name__ == "__main__":
 
     # For each tweet
     for tweet in tweet_finder:
+        # Get URL's text
+        text = nltk.clean_html(urlopen(tweet.get_url()).read())
 
-    # end for"""
+        # Ask
+        print(tweet.get_text())
+        print(tweet.get_url())
+        observed = raw_input("Tweet or Skip (t/S)? ")
+
+        # Add as example
+        if observed == "S" or observed == "s" or observed == "":
+            model.train(text, "skip")
+        else:
+            model.train(text, "tweet")
+        # end if
+    # end for
+
+    # Save the model
+    model.save()
 
 # end if
