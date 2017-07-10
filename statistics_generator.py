@@ -62,8 +62,7 @@ if __name__ == "__main__":
         # For each tweet
         for tweet in page:
             if not tweet.retweeted:
-                print(tweet)
-                print(tweet.created_at)
+                print(type(tweet.created_at))
                 print(tweet.retweet_count * 2 + tweet.favorite_count)
                 print("")
             # end if
