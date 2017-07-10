@@ -26,6 +26,7 @@
 import argparse
 import logging
 import time
+import numpy as np
 from config.BotConfig import BotConfig
 from twitter.TweetBotConnect import TweetBotConnector
 
@@ -62,11 +63,13 @@ if __name__ == "__main__":
         # For each tweet
         for tweet in page:
             if not tweet.retweeted:
-                print(type(tweet.created_at))
-                print(tweet.retweet_count * 2 + tweet.favorite_count)
-                print("")
+                if tweet.created_at.weekday() not in week_day_stats:
+                    week_day_stats[tweet.created_at.weekday()] = np.zeros(24)
+                # end if
+                week_day_stats[tweet.created_at.weekday()][tweet.created_at.hour] += 1
             # end if
         # end for
+        print(week_day_stats)
 
         # Wait
         time.sleep(60)
