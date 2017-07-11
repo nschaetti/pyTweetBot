@@ -73,9 +73,9 @@ class ImpactStatistic(Base):
         :param count:
         :return:
         """
-        DBConnector().get_session().update(ImpactStatistic).where(
+        DBConnector().get_session().query(ImpactStatistic).filter(
             and_(ImpactStatistic.impact_statistic_week_day == week_day,
-                 ImpactStatistic.impact_statistic_hour == hour)).values(impact_statistic_count=count)
+                 ImpactStatistic.impact_statistic_hour == hour)).update({"impact_statistic_count": count})
     # end update
 
 # end Statistic

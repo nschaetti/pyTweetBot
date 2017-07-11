@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # Argument
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--n_pages", type=int, help="Number of page to take into account", default=1000)
+    parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=1000)
     args = parser.parse_args()
 
     # Logging
@@ -65,6 +65,7 @@ if __name__ == "__main__":
 
     # Stats for each day of the week
     week_day_stats = np.zeros((7, 24))
+    week_to_string = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     # For each of my tweets
     for page in twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages):
@@ -79,15 +80,20 @@ if __name__ == "__main__":
         for week_day in range(7):
             for hour in range(24):
                 count = week_day_stats[week_day, hour]
-                if ImpactStatistic.exists(week_day, hour):
-                    ImpactStatistic.update(week_day, hour, count)
+                the_week_day = week_to_string[week_day]
+                if ImpactStatistic.exists(the_week_day, hour):
+                    ImpactStatistic.update(the_week_day, hour, count)
                 else:
-                    impact_stat = ImpactStatistic(impact_statistic_week_day=week_day, impact_statistic_hour=hour,
+                    impact_stat = ImpactStatistic(impact_statistic_week_day=the_week_day,
+                                                  impact_statistic_hour=hour,
                                                   impact_statistic_count=count)
                     DBConnector().get_session().add(impact_stat)
                 # end if
             # end for
         # end for
+
+        # Commit
+        DBConnector().get_session().commit()
 
         # Wait
         time.sleep(60)
