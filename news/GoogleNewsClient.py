@@ -112,11 +112,10 @@ class GoogleNewsClient(object):
 
         # Call URL
         headers = {
-            'User-Agent': "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3"}
+            u'User-Agent': u"Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3"}
         request = urllib2.Request(
-            "https://www.google.ch/search?hl=" + self.lang + "&gl=" + self.country + "&q=" + self.keyword.replace(" ",
-                                                                                                                  "+") + "&tbm=nws&start=" + str(
-                page * 10), None, headers)
+            u"https://www.google.ch/search?hl=" + self.lang + u"&gl=" + self.country + u"&q=" + unicode(
+                self.keyword.replace(u" ", u"+")) + u"&tbm=nws&start=" + unicode(page * 10), None, headers)
         html = urllib2.urlopen(request, timeout=5).read()
 
         # instantiate the parser and fed it some HTML

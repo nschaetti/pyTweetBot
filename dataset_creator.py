@@ -123,12 +123,12 @@ if __name__ == "__main__":
 
             # Add tweet
             texts.append(tweet.get_text())
+
+            # Save dataset
+            with open(args.dataset, 'w') as f:
+                pickle.dump((urls, texts), f)
+            # end with
         # end if
     # end for
-
-    # Save dataset
-    with open(args.dataset, 'w') as f:
-        pickle.dump((urls, texts), f)
-    # end with
 
 # end if
