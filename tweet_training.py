@@ -87,13 +87,6 @@ if __name__ == "__main__":
     tweet_finder = TweetFinder()
 
     # Create or get model
-    """if not Model.exists("stats_model_for_tweet"):
-        model = StatisticalModel.create("stats_model_for_tweet", 2)
-    else:
-        model = StatisticalModel.load("stats_model_for_tweet")
-    # end if"""
-
-    # Create or get model
     if os.path.exists(args.model):
         model = StatisticalModel.load_from_file(args.model)
     else:
