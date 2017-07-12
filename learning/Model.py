@@ -70,6 +70,16 @@ class Model(object):
         pass
     # end __call__
 
+    # Save the model
+    def save(self, filename):
+        """
+        Save the model to a Pickle file
+        :param filename:
+        :return:
+        """
+        pass
+    # end save
+
     # Load the model
     @staticmethod
     def load(opt):

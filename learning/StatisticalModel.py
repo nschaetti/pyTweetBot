@@ -39,7 +39,7 @@ class StatisticalModel(Model):
     """
 
     # Constructor
-    def __init__(self, name, classes, tokens_probs, last_update):
+    def __init__(self, name, classes, tokens_probs, last_update, mu):
         """
         Constructor
         :param name: Model's name
@@ -52,7 +52,7 @@ class StatisticalModel(Model):
         self._n_classes = len(classes)
         self._tokens_probs = tokens_probs
         self._last_update = last_update
-        self._nlp = spacy.load('en')
+        self._mu = mu
 
         # Init dicionaries
         self._token_counters = dict()
@@ -67,27 +67,27 @@ class StatisticalModel(Model):
         :param c: Text's class
         """
         # Tokens
-        tokens = self._nlp(text)
+        tokens = spacy.load('en')(text)
 
         # For each token
         for token in tokens:
             # Token counters
-            if token in self._token_counters.keys():
+            if token.text in self._token_counters.keys():
                 self._token_counters[token.text] += decimal.Decimal(1.0)
             else:
                 self._token_counters[token.text] = decimal.Decimal(1.0)
             # end if
 
             # Create entry in class counter
-            if token not in self._class_counters.keys():
-                self._class_counters[token] = dict()
+            if token.text not in self._class_counters.keys():
+                self._class_counters[token.text] = dict()
             # end if
 
             # Class counters
-            if c in self._class_counters[token].keys():
-                self._class_counters[token][c] += decimal.Decimal(1.0)
+            if c in self._class_counters[token.text].keys():
+                self._class_counters[token.text][c] += decimal.Decimal(1.0)
             else:
-                self._class_counters[token][c] = decimal.Decimal(1.0)
+                self._class_counters[token.text][c] = decimal.Decimal(1.0)
             # end if
         # end token
     # end train
@@ -108,16 +108,23 @@ class StatisticalModel(Model):
         # end for
 
         # Parse text
-        tokens = self._nlp(text)
+        text_tokens = spacy.load('en')(text)
+
+        # Get all tokens
+        tokens = list()
+        for token in text_tokens:
+            tokens.append(token)
+        # end for
 
         # For each token
         for token in tokens:
             # Get token probs for each class
-            token_probs = self[token]
+            token_probs = self[token.text]
 
             # For each class
             for c in self._classes:
-                text_probs[c] *= token_probs[c]
+                text_probs[c] *= decimal.Decimal(
+                    StatisticalModel.smooth(token_probs[c], self._token_counters[token], len(tokens), mu=self._mu))
             # end for
         # end for
 
@@ -249,5 +256,12 @@ class StatisticalModel(Model):
         """
         return DbModel.exists(name)
     # end exists
+
+    # Smooth function
+    @staticmethod
+    def smooth(doc_prob, col_prob, doc_length, mu):
+        return (float(doc_length) / (float(doc_length) + float(mu))) * doc_prob + \
+               (float(mu) / (float(mu) + float(doc_length))) * col_prob
+    # end smooth
 
 # end StatisticalModel

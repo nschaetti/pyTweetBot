@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     # For each of my tweets
     for index, page in enumerate(twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages)):
-        logging.info(u"Analyzing page number {}".format(index))
+        logger.info(u"Analyzing page number {}".format(index))
 
         # For each tweet
         for tweet in page:

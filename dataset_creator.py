@@ -43,6 +43,7 @@ from learning.Model import Model
 from learning.StatisticalModel import StatisticalModel
 from bs4 import BeautifulSoup
 import urllib
+import pickle
 
 ####################################################
 # Main function
@@ -55,9 +56,9 @@ if __name__ == "__main__":
 
     # Argument
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--model", type=str, help="Model file", required=True)
-    parser.add_argument("--test", action='store_true', default=False)
+    parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
+    parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
     args = parser.parse_args()
 
     # Logging
@@ -78,14 +79,6 @@ if __name__ == "__main__":
     # Tweet finder
     tweet_finder = TweetFinder()
 
-    # Create or get model
-    if os.path.exists(args.model):
-        model = StatisticalModel.load_from_file(args.model)
-    else:
-        model = StatisticalModel(name="stats_model_for_tweet", classes=["tweet", "skip"], tokens_probs=None,
-                                 last_update=datetime.datetime.utcnow(), mu=0.05)
-    # end if
-
     # Add RSS streams
     for rss_stream in config.get_rss_streams():
         tweet_finder.add(RSSHunter(rss_stream))
@@ -96,14 +89,20 @@ if __name__ == "__main__":
         for language in news['languages']:
             for country in news['countries']:
                 tweet_finder.add(
-                    GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=10))
+                    GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=args.n_pages))
             # end for
         # end for
     # end for
 
-    # Check URLs doublon
-    urls = dict()
-    texts = list()
+    # Load or create dataset
+    if os.path.exists(args.dataset):
+        with open(args.dataset, 'r') as f:
+            (urls, texts) = pickle.load(f)
+        # end with
+    else:
+        urls = dict()
+        texts = list()
+    # end if
 
     # For each tweet
     for tweet in tweet_finder:
@@ -113,16 +112,13 @@ if __name__ == "__main__":
             print(tweet.get_url())
             observed = raw_input("Tweet or Skip (t/S/e)? ").lower()
 
-            # Train or test
-            if not args.test:
-                # Add as example
-                if observed == "e":
-                    break
-                elif observed == "t":
-                    urls[tweet.get_url()] = "tweet"
-                else:
-                    urls[tweet.get_url()] = "skip"
-                # end if
+            # Add as example
+            if observed == "e":
+                break
+            elif observed == "t":
+                urls[tweet.get_url()] = "tweet"
+            else:
+                urls[tweet.get_url()] = "skip"
             # end if
 
             # Add tweet
@@ -130,51 +126,9 @@ if __name__ == "__main__":
         # end if
     # end for
 
-    # Dislay stats
-    if not args.test:
-        # For each url
-        for url in urls.keys():
-            logger.info(u"Training from example {}".format(url))
-
-            # Get URL's text
-            html = urllib.urlopen(url).read()
-            soup = BeautifulSoup(html, "lxml")
-            text = soup.get_text()
-
-            # train
-            model.train(text, urls[url])
-        # end for
-    else:
-        # Init
-        total = 0
-        success = 0
-
-        # For each url
-        for url in urls.keys():
-            logger.info(u"Training from example {}".format(url))
-
-            # Get URL's text
-            html = urllib.urlopen(url).read()
-            soup = BeautifulSoup(html, "lxml")
-            text = soup.get_text()
-
-            # Predict
-            predicted = model(text)
-
-            # Test
-            if predicted == urls[url]:
-                success += 1.0
-            # end if
-
-            # Add counter
-            total += 1.0
-        # end for
-
-        logger.info(u"Test success rate : {}".format(success / total * 100.0))
-    # end if
-
-    # Save the model
-    logger.info(u"Saving model to {}".format(args.model))
-    model.save(args.model)
+    # Save dataset
+    with open(args.dataset, 'w') as f:
+        pickle.dump((urls, texts), f)
+    # end with
 
 # end if

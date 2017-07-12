@@ -135,6 +135,7 @@ class TweetBotConnector(object):
         :param n_pages:
         :return:
         """
+        print(n_pages)
         if n_pages == -1:
             return tweepy.Cursor(self._api.user_timeline, screen_name=screen_name).pages()
         else:

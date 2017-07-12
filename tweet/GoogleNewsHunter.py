@@ -4,7 +4,7 @@
 
 # Import
 from .Hunter import Hunter
-from news.googlenewsclient import GoogleNewsClient
+from news.GoogleNewsClient import GoogleNewsClient
 from .Tweet import Tweet
 
 
