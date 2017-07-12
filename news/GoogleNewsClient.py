@@ -47,7 +47,7 @@ class GoogleNewsClient(object):
     def get_news(self, page=0):
         """
         Get news
-        :param page:
+        :param page: Page to get
         :return: Array of news
         """
         # Init
