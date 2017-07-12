@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # Argument
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=2000)
+    parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
     args = parser.parse_args()
 
     # Logging
