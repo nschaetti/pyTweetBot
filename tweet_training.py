@@ -70,8 +70,7 @@ if __name__ == "__main__":
     mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
                                   db_name=dbc["database"])
 
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
+    # Connection to Twitter     twitter_connector = TweetBotConnector(config)
 
     # Friends
     friends_manager = FriendsManager()
