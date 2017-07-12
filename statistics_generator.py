@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # Argument
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=1000)
+    parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=2000)
     args = parser.parse_args()
 
     # Logging
@@ -68,7 +68,9 @@ if __name__ == "__main__":
     week_to_string = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     # For each of my tweets
-    for page in twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages):
+    for index, page in enumerate(twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages)):
+        logging.info(u"Analyzing page number {}".format(index))
+
         # For each tweet
         for tweet in page:
             if not tweet.retweeted:
