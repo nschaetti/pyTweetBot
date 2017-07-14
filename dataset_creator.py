@@ -26,23 +26,12 @@
 import argparse
 import logging
 import os
-import datetime
-import nltk
-from urllib import urlopen
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
-from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
-from friends.FriendsManager import FriendsManager
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
-from twitter.TweetGenerator import TweetGenerator
-from tweet.TweetFactory import TweetFactory
-from learning.Model import Model
-from learning.StatisticalModel import StatisticalModel
-from bs4 import BeautifulSoup
-import urllib
 import pickle
 
 ####################################################

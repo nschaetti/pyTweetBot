@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from tweet.Hunter import Hunter
+from .Hunter import Hunter
 
 
 class TweetFinder(Hunter):

@@ -3,7 +3,7 @@
 #
 
 import feedparser
-from tweet.Hunter import Hunter
+from .Hunter import Hunter
 from twitter.TweetGenerator import TweetGenerator
 from .Tweet import Tweet
 
@@ -19,6 +19,14 @@ class RSSHunter(Hunter):
         self._via = stream['via'] if 'via' in stream else None
         self._current = 0
     # end __init__
+
+    # Get stream
+    def get_stream(self):
+        """
+        Get stream
+        """
+        return self._stream
+    # end get_stream
 
     # Iterator
     def __iter__(self):
@@ -42,8 +50,6 @@ class RSSHunter(Hunter):
         self._current += 1
 
         # Tweet generator
-        #generator = TweetGenerator()
-        #return generator(current_entry['title'], current_entry['links'][0]['href'])
         return Tweet(current_entry['title'], current_entry['links'][0]['href'], self._hashtags, self._via)
     # end next
 

@@ -94,3 +94,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Not my config file
+nilsbot.json

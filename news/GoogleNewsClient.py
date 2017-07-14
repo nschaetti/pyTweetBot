@@ -130,8 +130,7 @@ class GoogleNewsClient(object):
                 title = self._get_news_title(url)
                 news.append((url, title))
             except urllib2.HTTPError:
-                continue
-            except:
+                logging.debug(u"HTTP Error while retrieving page {}".format(url))
                 continue
             # end try
         return news
