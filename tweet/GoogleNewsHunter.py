@@ -6,6 +6,7 @@
 from .Hunter import Hunter
 from news.GoogleNewsClient import GoogleNewsClient
 from .Tweet import Tweet
+import logging
 
 
 # Hunter for Google News
@@ -55,7 +56,15 @@ class GoogleNewsHunter(Hunter):
         # end if
 
         # Current news
-        current_news = self._news[0]
+        try:
+            current_news = self._news[0]
+        except IndexError:
+            logging.error(
+                u"Error: no news for page {} and research terms {} ({}/{})".format(self._current_page,
+                                                                                   self._search_term, self._lang,
+                                                                                   self._country))
+            return self.next()
+        # end try
         self._news.remove(current_news)
 
         # Return

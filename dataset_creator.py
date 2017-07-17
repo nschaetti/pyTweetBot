@@ -48,6 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
+    parser.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
     args = parser.parse_args()
 
     # Logging
@@ -93,6 +94,27 @@ if __name__ == "__main__":
         texts = list()
     # end if
 
+    # Show informations
+    if args.info:
+        # Compute statistics
+        examples_count = len(urls.keys())
+        tweet_count = 0
+        skip_count = 0
+        for url in urls.keys():
+            if urls[url] == "tweet":
+                tweet_count += 1
+            else:
+                skip_count += 1
+            # end if
+        # end for
+
+        # Print info
+        print(u"{} examples in the dataset".format(examples_count))
+        print(u"{} examples in the tweet class".format(tweet_count))
+        print(u"{} examples in the skip class".format(skip_count))
+        exit()
+    # end if
+
     # For each tweet
     for tweet in tweet_finder:
         if tweet.get_url() not in urls.keys() and tweet.get_text() not in texts:
@@ -117,6 +139,8 @@ if __name__ == "__main__":
             with open(args.dataset, 'w') as f:
                 pickle.dump((urls, texts), f)
             # end with
+        else:
+            logging.debug(u"Already in stock : {}".format(tweet.get_url()))
         # end if
     # end for
 

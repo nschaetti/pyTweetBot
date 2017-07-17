@@ -5,6 +5,7 @@
 # Import
 from HTMLParser import HTMLParser
 
+
 #
 # This is a class parsing HTML from Google news.
 # It returns an array containing the URLs.
@@ -35,12 +36,15 @@ class NewsParser(HTMLParser):
         if tag == "a":
             for attr in attrs:
                 if attr[0] == "href":
-                    if "/url?q=" in attr[1]:
+                    if ("http://" in attr[1] or "https://" in attr[1]) and "google." not in attr[1] and "youtube" not \
+                            in attr[1] and "blogger.com" not in attr[1]:
                         # URL
                         url = attr[1]
 
                         # Substring
-                        self.news.append(url[url.find("http"):url.rfind("&sa=")])
+                        if url not in self.news:
+                            self.news.append(url)
+                        # end if
                     # end if
                 # end if
             # end for

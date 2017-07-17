@@ -3,6 +3,7 @@
 #
 
 from .Hunter import Hunter
+import logging
 
 
 class TweetFinder(Hunter):
@@ -57,11 +58,12 @@ class TweetFinder(Hunter):
                 return self._hunters[self._current].next()
             except StopIteration:
                 self._current += 1
-                if self._current >= self._n_hunters:
+                """if self._current >= self._n_hunters:
                     raise StopIteration
                 else:
                     return self._hunters[self._current].next()
-                # end if
+                # end if"""
+                return self.next()
             # end try
         # end if
     # end next

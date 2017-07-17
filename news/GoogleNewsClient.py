@@ -11,6 +11,8 @@ import time
 import random
 from .NewsParser import NewsParser
 import logging
+import httplib
+import socket
 
 
 #
@@ -22,6 +24,20 @@ class GoogleNewsClient(object):
     This a a Google News client.
     Which returns an array containing the URLs and titles.
     """
+
+    # Header
+    _headers = {
+        u'user-agent': u"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) "
+                       u"AppleWebKit/537.36 (KHTML, like Gecko) "
+                       u"Chrome/59.0.3071.115 "
+                       u"Safari/537.36",
+        u'accept': u"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        u'accept-language': u"en-US,en;q=0.8,et;q=0.6,fr;q=0.4",
+        u'cache-control': u"no-cache"
+    }
+
+    # Time out
+    _timeout = 20
 
     # constructor
     def __init__(self, keyword, lang, country):
@@ -72,8 +88,7 @@ class GoogleNewsClient(object):
     ###############################################
 
     # Get news' title
-    @staticmethod
-    def _get_news_title(url):
+    def _get_news_title(self, url):
         """
         Get the news' title
         :param url: The news' URL.
@@ -82,8 +97,14 @@ class GoogleNewsClient(object):
         # HTML parser
         pars = HTMLParser()
 
+        # HTTP request
+        request = urllib2.Request(url, None, self._headers)
+
+        # Get HTML
+        html = urllib2.urlopen(request, timeout=self._timeout).read()
+
         # Get URL's content
-        soup = BeautifulSoup(urllib2.urlopen(url, timeout=10000), "lxml")
+        soup = BeautifulSoup(html, "lxml")
 
         # Clean strange characters
         new_title = unicode(soup.title.string.strip())
@@ -110,17 +131,27 @@ class GoogleNewsClient(object):
         # Init
         news = []
 
+        # URL
+        url = u"https://www.google.ch/search?hl=" + self.lang + u"&gl=" + self.country + u"&q=" + unicode(
+                self.keyword.replace(u" ", u"+")) + u"&tbm=nws&start=" + unicode(page * 10)
+
+        # Log
+        logging.info(u"Retrieving {}".format(url))
+
         # Call URL
-        headers = {
-            u'User-Agent': u"Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3"}
-        request = urllib2.Request(
-            u"https://www.google.ch/search?hl=" + self.lang + u"&gl=" + self.country + u"&q=" + unicode(
-                self.keyword.replace(u" ", u"+")) + u"&tbm=nws&start=" + unicode(page * 10), None, headers)
-        html = urllib2.urlopen(request, timeout=5).read()
+        request = urllib2.Request(url, None, self._headers)
+
+        # Get HTML
+        try:
+            html = urllib2.urlopen(request, timeout=self._timeout).read()
+        except urllib2.URLError as e:
+            time.sleep(20)
+            html = urllib2.urlopen(request, timeout=self._timeout).read()
+        # end try
 
         # instantiate the parser and fed it some HTML
         parser = NewsParser()
-        parser.feed(html)
+        parser.feed(html.decode('utf-8', errors='ignore'))
         urls = parser.get_news()
 
         # For each url
@@ -129,10 +160,20 @@ class GoogleNewsClient(object):
             try:
                 title = self._get_news_title(url)
                 news.append((url, title))
-            except urllib2.HTTPError:
-                logging.debug(u"HTTP Error while retrieving page {}".format(url))
-                continue
+            except urllib2.HTTPError as e:
+                logging.error(u"HTTP Error while retrieving page {} : {}".format(url, e))
+            except AttributeError as e:
+                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+            except httplib.BadStatusLine as e:
+                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+            except socket.timeout as e:
+                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+            except httplib.IncompleteRead as e:
+                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+            except urllib2.URLError as e:
+                logging.error(u"Error while retrieving page {} : {}".format(url, e))
             # end try
+        # end for
         return news
     # end _get_page
 # end GoogleNewsClient
