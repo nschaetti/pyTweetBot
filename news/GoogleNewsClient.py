@@ -13,6 +13,7 @@ from .NewsParser import NewsParser
 import logging
 import httplib
 import socket
+import ssl
 
 
 #
@@ -142,12 +143,22 @@ class GoogleNewsClient(object):
         request = urllib2.Request(url, None, self._headers)
 
         # Get HTML
-        try:
-            html = urllib2.urlopen(request, timeout=self._timeout).read()
-        except urllib2.URLError as e:
-            time.sleep(20)
-            html = urllib2.urlopen(request, timeout=self._timeout).read()
-        # end try
+        cont = True
+        counter = 0
+        while cont:
+            try:
+                html = urllib2.urlopen(request, timeout=self._timeout).read()
+                cont = False
+            except urllib2.URLError as e:
+                logging.error(u"URL error while retrieving page {}".format(url))
+                time.sleep(20)
+                pass
+            # end try
+            counter += 1
+            if counter >= 10:
+                return news
+            # end if
+        # end while
 
         # instantiate the parser and fed it some HTML
         parser = NewsParser()
@@ -163,15 +174,17 @@ class GoogleNewsClient(object):
             except urllib2.HTTPError as e:
                 logging.error(u"HTTP Error while retrieving page {} : {}".format(url, e))
             except AttributeError as e:
-                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+                logging.error(u"AttributeError while retrieving page {} : {}".format(url, e))
             except httplib.BadStatusLine as e:
-                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+                logging.error(u"Bad status line error while retrieving page {} : {}".format(url, e))
             except socket.timeout as e:
-                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+                logging.error(u"Socket error while retrieving page {} : {}".format(url, e))
             except httplib.IncompleteRead as e:
-                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+                logging.error(u"Incomplete read error while retrieving page {} : {}".format(url, e))
             except urllib2.URLError as e:
                 logging.error(u"Error while retrieving page {} : {}".format(url, e))
+            except ssl.CertificateError as e:
+                logging.error(u"Error with SSL Certificate while retrieving {} : {}".format(url, e))
             # end try
         # end for
         return news

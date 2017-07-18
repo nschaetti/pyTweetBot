@@ -6,6 +6,7 @@ import feedparser
 from .Hunter import Hunter
 from twitter.TweetGenerator import TweetGenerator
 from .Tweet import Tweet
+import logging
 
 
 class RSSHunter(Hunter):
@@ -14,6 +15,7 @@ class RSSHunter(Hunter):
     def __init__(self, stream):
         self._stream = stream
         self._stream_url = stream['url']
+        logging.debug(u"Retreiving RSS stream {}".format(self._stream_url))
         self._entries = feedparser.parse(self._stream_url)['entries']
         self._hashtags = stream['hashtags'] if 'hashtags' in stream else list()
         self._via = stream['via'] if 'via' in stream else None
