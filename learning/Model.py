@@ -23,6 +23,7 @@
 #
 
 # Imports
+import pickle
 from db.obj.Model import Model as DbModel
 
 
@@ -50,6 +51,13 @@ class Model(object):
     Learning model abstract class
     """
 
+    # Variables
+    _finalized = False
+
+    #################################################
+    # Public
+    #################################################
+
     # Train the model
     def train(self, text, c):
         """
@@ -60,16 +68,6 @@ class Model(object):
         pass
     # end train
 
-    # Call the model
-    def __call__(self, text):
-        """
-        Call the model to classify new text
-        :param text: Text to classify
-        :return: Resulting class number
-        """
-        pass
-    # end __call__
-
     # Save the model
     def save(self, filename):
         """
@@ -77,8 +75,55 @@ class Model(object):
         :param filename:
         :return:
         """
-        pass
+        with open(filename, 'w') as f:
+            pickle.dump(self, f)
+        # end with
     # end save
+
+    #################################################
+    # Override
+    #################################################
+
+    # Call the model
+    def __call__(self, text):
+        """
+        Call the model to classify new text
+        :param text: Text to classify
+        :return: Resulting class number
+        """
+        if not self._finalized:
+            self._finalize()
+            self._finalized = True
+        # end if
+        return self._predict(text)
+    # end __call__
+
+    #################################################
+    # Private
+    #################################################
+
+    # Predict
+    def _predict(self, text):
+        """
+        Predict
+        :param text: Text to classify
+        :return:
+        """
+        pass
+    # end _predict
+
+    # Finalize the model
+    def _finalize(self):
+        """
+        Finalize the model
+        :return:
+        """
+        pass
+    # end _finalize
+
+    #################################################
+    # Static
+    #################################################
 
     # Load the model
     @staticmethod

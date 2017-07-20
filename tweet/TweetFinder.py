@@ -4,18 +4,20 @@
 
 from .Hunter import Hunter
 import logging
+import random
 
 
 class TweetFinder(Hunter):
 
     # Constructor
-    def __init__(self):
+    def __init__(self, shuffle=False):
         """
         Constructor
         """
         self._hunters = list()
         self._current = 0
         self._n_hunters = 0
+        self._shuffle = shuffle
     # end __init__
 
     # Add an hunter
@@ -27,6 +29,9 @@ class TweetFinder(Hunter):
         """
         self._hunters.append(hunter)
         self._n_hunters += 1
+        if self._shuffle:
+            random.shuffle(self._hunters)
+        # end if
     # end add
 
     # Remove hunter

@@ -27,22 +27,14 @@ import argparse
 import logging
 import os
 import datetime
-import nltk
-from urllib import urlopen
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
-from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
-from friends.FriendsManager import FriendsManager
-from tweet.RSSHunter import RSSHunter
-from tweet.GoogleNewsHunter import GoogleNewsHunter
-from tweet.TweetFinder import TweetFinder
-from twitter.TweetBotConnect import TweetBotConnector
-from twitter.TweetGenerator import TweetGenerator
-from tweet.TweetFactory import TweetFactory
-from learning.Model import Model
 from learning.StatisticalModel import StatisticalModel
 from bs4 import BeautifulSoup
 import urllib
+import pickle
+from HTMLParser import HTMLParser
+
 
 ####################################################
 # Main function
@@ -57,6 +49,8 @@ if __name__ == "__main__":
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--model", type=str, help="Model file", required=True)
     parser.add_argument("--test", action='store_true', default=False)
+    parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
+    parser.add_argument("--param", type=str, help="Model parameter (if creation)", default='dp')
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     args = parser.parse_args()
 
@@ -72,109 +66,109 @@ if __name__ == "__main__":
     mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
                                   db_name=dbc["database"])
 
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
-
-    # Tweet finder
-    tweet_finder = TweetFinder()
-
-    # Create or get model
+    # Load model or create
     if os.path.exists(args.model):
         model = StatisticalModel.load_from_file(args.model)
     else:
-        model = StatisticalModel(name="stats_model_for_tweet", classes=["tweet", "skip"], tokens_probs=None,
-                                 last_update=datetime.datetime.utcnow(), mu=0.05)
+        model = StatisticalModel("tweet_stat_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow(),
+                                 smoothing=args.param, smoothing_param=0.5)
     # end if
 
-    # Add RSS streams
-    for rss_stream in config.get_rss_streams():
-        tweet_finder.add(RSSHunter(rss_stream))
-    # end for
-
-    # Add Google News
-    for news in config.get_news_config():
-        for language in news['languages']:
-            for country in news['countries']:
-                tweet_finder.add(
-                    GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=10))
-            # end for
-        # end for
-    # end for
-
-    # Check URLs doublon
-    urls = dict()
-    texts = list()
-
-    # For each tweet
-    for tweet in tweet_finder:
-        if tweet.get_url() not in urls.keys() and tweet.get_text() not in texts:
-            # Ask
-            print(tweet.get_text())
-            print(tweet.get_url())
-            observed = raw_input("Tweet or Skip (t/S/e)? ").lower()
-
-            # Train or test
-            if not args.test:
-                # Add as example
-                if observed == "e":
-                    break
-                elif observed == "t":
-                    urls[tweet.get_url()] = "tweet"
-                else:
-                    urls[tweet.get_url()] = "skip"
-                # end if
-            # end if
-
-            # Add tweet
-            texts.append(tweet.get_text())
-        # end if
-    # end for
-
-    # Dislay stats
-    if not args.test:
-        # For each url
-        for url in urls.keys():
-            logger.info(u"Training from example {}".format(url))
-
-            # Get URL's text
-            html = urllib.urlopen(url).read()
-            soup = BeautifulSoup(html, "lxml")
-            text = soup.get_text()
-
-            # train
-            model.train(text, urls[url])
-        # end for
+    # Load dataset
+    if os.path.exists(args.dataset):
+        with open(args.dataset, 'r') as f:
+            dataset = pickle.load(f)
+            n_samples = len(dataset[0].keys())
+        # end with
     else:
-        # Init
-        total = 0
+        logging.error(u"Cannot find dataset file {}".format(args.dataset))
+    # end if
+
+    # Train or test
+    if not args.test:
+        try:
+            # For each URL in the dataset
+            for index, url in enumerate(dataset[0].keys()):
+                if not model.is_example_seen(url):
+                    # Class
+                    c = dataset[0][url]
+
+                    # Log
+                    logger.info(u"Downloading example {}".format(url))
+
+                    # Get URL's text
+                    html = urllib.urlopen(url).read()
+                    soup = BeautifulSoup(html, "lxml")
+                    text = soup.get_text()
+
+                    # HTML entities
+                    text = text.replace(u"%20", u" ")
+                    text = text.replace(u"%22", u"\"")
+                    text = text.replace(u"%3A", u":")
+                    text = text.replace(u"%2C", u",")
+                    text = text.replace(u"%2F", u"/")
+                    text = text.replace(u"%7B", u"{")
+                    text = text.replace(u"%7D", u"}")
+                    text = text.replace(u"%5B", u"[")
+                    text = text.replace(u"%5D", u"]")
+                    text = text.replace(u"%E2%80%99", u"'")
+                    text = text.strip()
+                    text = text.replace(u"\n", u"")
+                    text = text.replace(u"\r", u"")
+
+                    # Train
+                    logger.info(u"Training example {}/{} as {}...".format(index+1, n_samples, c))
+                    model.train(text, c)
+
+                    # I've seen that
+                    model.add_url(url)
+
+                    # Display info
+                    print(model)
+                # end if
+            # end for
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        # end try
+
+        # Save the model
+        logger.info(u"Saving model to {}".format(args.model))
+        model.save(args.model)
+    else:
+        # Stats
+        count = 0
         success = 0
 
-        # For each url
-        for url in urls.keys():
-            logger.info(u"Training from example {}".format(url))
+        try:
+            # For each URL in the dataset
+            for url in dataset[0].keys():
+                # Class
+                c = dataset[0][url]
 
-            # Get URL's text
-            html = urllib.urlopen(url).read()
-            soup = BeautifulSoup(html, "lxml")
-            text = soup.get_text()
+                # Log
+                logger.info(u"Testing {}".format(url))
 
-            # Predict
-            predicted = model(text)
+                # Get URL's text
+                html = urllib.urlopen(url).read()
+                soup = BeautifulSoup(html, "lxml")
+                text = soup.get_text()
 
-            # Test
-            if predicted == urls[url]:
-                success += 1.0
-            # end if
+                # Predict
+                prediction = model(text)
 
-            # Add counter
-            total += 1.0
-        # end for
+                # Compare
+                logger.info(u"Predicted {} for observation {}".format(prediction, c))
+                if prediction == c:
+                    success += 1
+                # end if
+                count += 1
+            # end for
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        # end try
 
-        logger.info(u"Test success rate : {}".format(success / total * 100.0))
+        # Show performance
+        logger.info(u"Success rate of {} on dataset".format(success / count * 100.0))
     # end if
-
-    # Save the model
-    logger.info(u"Saving model to {}".format(args.model))
-    model.save(args.model)
 
 # end if

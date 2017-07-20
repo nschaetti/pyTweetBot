@@ -153,6 +153,9 @@ class GoogleNewsClient(object):
                 logging.error(u"URL error while retrieving page {}".format(url))
                 time.sleep(20)
                 pass
+            except UnicodeEncodeError as e:
+                logging.error(u"Error while encoding request to unicode {}".format(url))
+                return news
             # end try
             counter += 1
             if counter >= 10:

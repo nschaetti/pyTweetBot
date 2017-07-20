@@ -30,6 +30,7 @@ import spacy
 import pickle
 import decimal
 from db.DBConnector import DBConnector
+from sys import getsizeof
 
 
 # A statistical model for text classification
@@ -39,7 +40,7 @@ class StatisticalModel(Model):
     """
 
     # Constructor
-    def __init__(self, name, classes, tokens_probs, last_update, mu):
+    def __init__(self, name, classes, last_update, smoothing, smoothing_param):
         """
         Constructor
         :param name: Model's name
@@ -50,14 +51,33 @@ class StatisticalModel(Model):
         self._name = name
         self._classes = classes
         self._n_classes = len(classes)
-        self._tokens_probs = tokens_probs
         self._last_update = last_update
-        self._mu = mu
+        self._n_token = 0
 
         # Init dicionaries
         self._token_counters = dict()
         self._class_counters = dict()
+
+        # URL trained
+        self._urls = list()
+
+        # Smoothing
+        self._smoothing = smoothing
+        self._smoothing_param = smoothing_param
     # end __init__
+
+    #####################################################
+    # Public
+    #####################################################
+
+    # Get token count
+    def get_token_count(self):
+        """
+        Get token count
+        :return:
+        """
+        return len(self._token_counters.keys())
+    # end get_token_count
 
     # Train the model
     def train(self, text, c):
@@ -71,31 +91,107 @@ class StatisticalModel(Model):
 
         # For each token
         for token in tokens:
-            # Token counters
-            if token.text in self._token_counters.keys():
-                self._token_counters[token.text] += decimal.Decimal(1.0)
-            else:
-                self._token_counters[token.text] = decimal.Decimal(1.0)
-            # end if
+            token_text = token.text.lower()
+            if len(token_text) > 1 and len(token_text) < 25 and u'[' not in token_text \
+                    and u'{' not in token_text and u'&' not in token_text and u'"' not in token_text\
+                    and u'.' not in token_text and u'%' not in token_text and u'/' not in token_text\
+                    and u'\'' not in token_text and u'_' not in token_text:
+                # Token counters
+                try:
+                    self._token_counters[token_text] += 1
+                except KeyError:
+                    self._token_counters[token_text] = 1
+                    self._n_token += 1
+                # end try
 
-            # Create entry in class counter
-            if token.text not in self._class_counters.keys():
-                self._class_counters[token.text] = dict()
-            # end if
+                # Create entry in class counter
+                try:
+                    probs = self._class_counters[token_text]
+                except KeyError:
+                    self._class_counters[token_text] = dict()
+                # end try
 
-            # Class counters
-            if c in self._class_counters[token.text].keys():
-                self._class_counters[token.text][c] += decimal.Decimal(1.0)
-            else:
-                self._class_counters[token.text][c] = decimal.Decimal(1.0)
+                # Class counters
+                if c in self._class_counters[token_text].keys():
+                    self._class_counters[token_text][c] += 1
+                else:
+                    self._class_counters[token_text][c] = 1
+                # end if
             # end if
         # end token
     # end train
 
-    # Call the model
-    def __call__(self, text):
+    # Add to url list
+    def add_url(self, url):
         """
-        Call the model to classify new text
+        Add to URL list
+        :param url:
+        :return:
+        """
+        self._urls.append(url)
+    # end add_url
+
+    # Is trained on that example
+    def is_example_seen(self, url):
+        """
+        Is example already seen
+        :param url:
+        :return:
+        """
+        if url in self._urls:
+            return True
+        else:
+            return False
+        # end if
+    # end is_example_seen
+
+    ####################################################
+    # Override
+    ####################################################
+
+    # Get token probability
+    def __getitem__(self, item):
+        """
+        Get token probability
+        :param item:
+        :return:
+        """
+        # Probs
+        probs = dict()
+
+        # Set default
+        for c in self._classes:
+            try:
+                probs[c] = self._class_counters[item] / self._token_counters[item]
+            except KeyError:
+                probs[c] = decimal.Decimal(0.0)
+            # end try
+        # end for
+
+        return probs
+    # end __getitem__
+
+    # To String
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        return "StatisticalModel(name={}, n_classes={}, last_training={}, n_tokens={}, mem_size={}o, " \
+               "token_counters_mem_size={} Go, class_counters_mem_size={} Go)"\
+            .format(self._name, self._n_classes,self._last_update, self.get_token_count(),
+                    getsizeof(self), round(getsizeof(self._token_counters)/1073741824.0, 4),
+                    round(getsizeof(self._class_counters)/1073741824.0, 4))
+    # end __str__
+
+    ####################################################
+    # Private
+    ####################################################
+
+    # Prediction
+    def _predict(self, text):
+        """
+        Prediction
         :param text: Text to classify
         :return: Resulting class number
         """
@@ -124,7 +220,8 @@ class StatisticalModel(Model):
             # For each class
             for c in self._classes:
                 text_probs[c] *= decimal.Decimal(
-                    StatisticalModel.smooth(token_probs[c], self._token_counters[token], len(tokens), mu=self._mu))
+                    StatisticalModel.smooth(self._smoothing, token_probs[c], self._token_counters[token], len(tokens),
+                                            param=self._smoothing_param))
             # end for
         # end for
 
@@ -135,54 +232,15 @@ class StatisticalModel(Model):
             if text_probs[c] > max:
                 max = text_probs[c]
                 result_class = c
-            # end if
+                # end if
         # end for
 
         return result_class
-    # end __call__
+    # end _predict
 
-    # Get token probability
-    def __getitem__(self, item):
-        # Exists
-        if item in self._class_counters:
-            probs = self._class_counters[item]
-        else:
-            probs = dict()
-        # end if
-
-        # Set default
-        for c in self._classes:
-            if c not in probs:
-                probs[c] = decimal.Decimal(0.0)
-            else:
-                probs[c] = probs[c] / self._token_counters[item]
-            # end if
-        # end for
-
-        return probs
-    # end __getitem__
-
-    # To String
-    def __str__(self):
-        """
-        To string
-        :return:
-        """
-        return "StatisticalModel(name={}, n_classes={}, last_training={}".format(self._name, self._n_classes,
-                                                                                 self._last_update)
-    # end __str__
-
-    # Save the model
-    def save(self, filename):
-        """
-        Save the model to a Pickle file
-        :param filename:
-        :return:
-        """
-        with open(filename, 'w') as f:
-            pickle.dump(self, f)
-        # end with
-    # end save
+    ####################################################
+    # Static
+    ####################################################
 
     # Load the model
     @staticmethod
@@ -257,11 +315,50 @@ class StatisticalModel(Model):
         return DbModel.exists(name)
     # end exists
 
-    # Smooth function
+    # Dirichlet prior smoothing function
     @staticmethod
-    def smooth(doc_prob, col_prob, doc_length, mu):
+    def smooth_dirichlet_prior(doc_prob, col_prob, doc_length, mu):
+        """
+        Dirichlet prior smoothing function
+        :param doc_prob:
+        :param col_prob:
+        :param doc_length:
+        :param mu:
+        :return:
+        """
         return (float(doc_length) / (float(doc_length) + float(mu))) * doc_prob + \
                (float(mu) / (float(mu) + float(doc_length))) * col_prob
+    # end smooth
+
+    # Jelinek Mercer smoothing function
+    @staticmethod
+    def smooth_jelinek_mercer(doc_prob, col_prob, param_lambda):
+        """
+        Jelinek Mercer smoothing function
+        :param col_prob:
+        :param param_lambda:
+        :return:
+        """
+        return (1.0 - param_lambda) * doc_prob + param_lambda * col_prob
+    # end smooth
+
+    # Smoothing function
+    @staticmethod
+    def smooth(smooth_algo, doc_prob, col_prob, doc_length, param):
+        """
+        Smoothing function
+        :param smooth_algo: Algo type
+        :param doc_prob:
+        :param col_prob:
+        :param doc_length:
+        :param param:
+        :return:
+        """
+        if smooth_algo == "dp":
+            return StatisticalModel.smooth_dirichlet_prior(doc_prob, col_prob, doc_length, param)
+        else:
+            return StatisticalModel.smooth_jelinek_mercer(doc_prob, col_prob, param)
+        # end if
     # end smooth
 
 # end StatisticalModel

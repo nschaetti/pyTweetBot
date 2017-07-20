@@ -55,43 +55,11 @@ if __name__ == "__main__":
     logging.basicConfig(level=args.log_level)
     logger = logging.getLogger(name="pyTweetBot")
 
-    # Load configuration file
-    config = BotConfig.load(args.config)
-
-    # Connection to MySQL
-    dbc = config.get_database_config()
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
-
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
-
-    # Tweet finder
-    tweet_finder = TweetFinder()
-
-    # Not info request
-    if not args.info:
-        # Add RSS streams
-        for rss_stream in config.get_rss_streams():
-            tweet_finder.add(RSSHunter(rss_stream))
-        # end for
-
-        # Add Google News
-        for news in config.get_news_config():
-            for language in news['languages']:
-                for country in news['countries']:
-                    tweet_finder.add(
-                        GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=args.n_pages))
-                # end for
-            # end for
-        # end for
-    # end if
-
     # Load or create dataset
     if os.path.exists(args.dataset):
         with open(args.dataset, 'r') as f:
             (urls, texts) = pickle.load(f)
-        # end with
+            # end with
     else:
         urls = dict()
         texts = list()
@@ -108,7 +76,7 @@ if __name__ == "__main__":
                 tweet_count += 1
             else:
                 skip_count += 1
-            # end if
+                # end if
         # end for
 
         # Print info
@@ -117,6 +85,35 @@ if __name__ == "__main__":
         print(u"{} examples in the skip class".format(skip_count))
         exit()
     # end if
+
+    # Load configuration file
+    config = BotConfig.load(args.config)
+
+    # Connection to MySQL
+    dbc = config.get_database_config()
+    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
+                                  db_name=dbc["database"])
+
+    # Connection to Twitter
+    twitter_connector = TweetBotConnector(config)
+
+    # Tweet finder
+    tweet_finder = TweetFinder(shuffle=True)
+
+    # Add RSS streams
+    for rss_stream in config.get_rss_streams():
+        tweet_finder.add(RSSHunter(rss_stream))
+    # end for
+
+    # Add Google News
+    for news in config.get_news_config():
+        for language in news['languages']:
+            for country in news['countries']:
+                tweet_finder.add(
+                    GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=args.n_pages))
+            # end for
+        # end for
+    # end for
 
     # For each tweet
     for tweet in tweet_finder:
