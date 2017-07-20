@@ -35,6 +35,33 @@ import urllib
 import pickle
 from HTMLParser import HTMLParser
 
+####################################################
+# Functions
+####################################################
+
+
+# Clean HTML text
+def clean_html_text(to_clean):
+    """
+    Clean HTML text
+    :param to_clean:
+    :return:
+    """
+    to_clean = to_clean.replace(u"%20", u" ")
+    to_clean = to_clean.replace(u"%22", u"\"")
+    to_clean = to_clean.replace(u"%3A", u":")
+    to_clean = to_clean.replace(u"%2C", u",")
+    to_clean = to_clean.replace(u"%2F", u"/")
+    to_clean = to_clean.replace(u"%7B", u"{")
+    to_clean = to_clean.replace(u"%7D", u"}")
+    to_clean = to_clean.replace(u"%5B", u"[")
+    to_clean = to_clean.replace(u"%5D", u"]")
+    to_clean = to_clean.replace(u"%E2%80%99", u"'")
+    to_clean = to_clean.strip()
+    to_clean = to_clean.replace(u"\n", u"")
+    to_clean = to_clean.replace(u"\r", u"")
+    return to_clean
+# end clean_html_text
 
 ####################################################
 # Main function
@@ -102,19 +129,7 @@ if __name__ == "__main__":
                     text = soup.get_text()
 
                     # HTML entities
-                    text = text.replace(u"%20", u" ")
-                    text = text.replace(u"%22", u"\"")
-                    text = text.replace(u"%3A", u":")
-                    text = text.replace(u"%2C", u",")
-                    text = text.replace(u"%2F", u"/")
-                    text = text.replace(u"%7B", u"{")
-                    text = text.replace(u"%7D", u"}")
-                    text = text.replace(u"%5B", u"[")
-                    text = text.replace(u"%5D", u"]")
-                    text = text.replace(u"%E2%80%99", u"'")
-                    text = text.strip()
-                    text = text.replace(u"\n", u"")
-                    text = text.replace(u"\r", u"")
+                    text = clean_html_text(text)
 
                     # Train
                     logger.info(u"Training example {}/{} as {}...".format(index+1, n_samples, c))
@@ -152,6 +167,9 @@ if __name__ == "__main__":
                 html = urllib.urlopen(url).read()
                 soup = BeautifulSoup(html, "lxml")
                 text = soup.get_text()
+
+                # HTML entities
+                text = clean_html_text(text)
 
                 # Predict
                 prediction = model(text)
