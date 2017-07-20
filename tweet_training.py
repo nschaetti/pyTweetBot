@@ -124,7 +124,7 @@ if __name__ == "__main__":
                     logger.info(u"Downloading example {}".format(url))
 
                     # Get URL's text
-                    html = urllib.urlopen(url).read()
+                    html = urllib.urlopen(url).read().decode('utf-8', errors='ignore')
                     soup = BeautifulSoup(html, "lxml")
                     text = soup.get_text()
 
