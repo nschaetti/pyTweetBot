@@ -85,7 +85,7 @@ class Model(object):
     #################################################
 
     # Call the model
-    def __call__(self, text):
+    def __call__(self, text, lang='en'):
         """
         Call the model to classify new text
         :param text: Text to classify
@@ -95,7 +95,7 @@ class Model(object):
             self._finalize()
             self._finalized = True
         # end if
-        return self._predict(text)
+        return self._predict(text, lang=lang)
     # end __call__
 
     #################################################
@@ -103,7 +103,7 @@ class Model(object):
     #################################################
 
     # Predict
-    def _predict(self, text):
+    def _predict(self, text, lang='en'):
         """
         Predict
         :param text: Text to classify

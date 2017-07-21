@@ -31,6 +31,7 @@ import pickle
 import decimal
 from db.DBConnector import DBConnector
 from sys import getsizeof
+import re
 
 
 # A statistical model for text classification
@@ -53,6 +54,7 @@ class StatisticalModel(Model):
         self._n_classes = len(classes)
         self._last_update = last_update
         self._n_token = 0
+        self._n_total_token = 0
 
         # Init dicionaries
         self._token_counters = dict()
@@ -64,6 +66,9 @@ class StatisticalModel(Model):
         # Smoothing
         self._smoothing = smoothing
         self._smoothing_param = smoothing_param
+
+        # Regex
+        self._token_filter = u"+\"*ç%&/()=?§°!£.,±“#Ç[]|{}≠¿¢«…Ç∞”‹⁄[]\ÒÔÚÿÆ•÷»<>≤≥\\_;:\n\r@∑€®†Ω°¡øπ¬∆ºª@ƒ∂ßå¥≈©√∫~'"
     # end __init__
 
     #####################################################
@@ -80,22 +85,20 @@ class StatisticalModel(Model):
     # end get_token_count
 
     # Train the model
-    def train(self, text, c):
+    def train(self, text, c, lang='en'):
         """
         Train the model
         :param text: Training text
         :param c: Text's class
         """
         # Tokens
-        tokens = spacy.load('en')(text)
+        tokens = spacy.load(lang)(text)
 
         # For each token
         for token in tokens:
-            token_text = token.text.lower()
-            if len(token_text) > 1 and len(token_text) < 25 and u'[' not in token_text \
-                    and u'{' not in token_text and u'&' not in token_text and u'"' not in token_text\
-                    and u'.' not in token_text and u'%' not in token_text and u'/' not in token_text\
-                    and u'\'' not in token_text and u'_' not in token_text:
+            token_text = token.text.lower().replace(u" ", u"").replace(u"\t", u"")
+            if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
+                print token_text + u" ",
                 # Token counters
                 try:
                     self._token_counters[token_text] += 1
@@ -117,6 +120,9 @@ class StatisticalModel(Model):
                 else:
                     self._class_counters[token_text][c] = 1
                 # end if
+
+                # One more token
+                self._n_total_token += 1
             # end if
         # end token
     # end train
@@ -162,9 +168,9 @@ class StatisticalModel(Model):
         # Set default
         for c in self._classes:
             try:
-                probs[c] = self._class_counters[item] / self._token_counters[item]
+                probs[c] = self._class_counters[item][c] / self._token_counters[item]
             except KeyError:
-                probs[c] = decimal.Decimal(0.0)
+                probs[c] = 0.0
             # end try
         # end for
 
@@ -178,10 +184,10 @@ class StatisticalModel(Model):
         :return:
         """
         return "StatisticalModel(name={}, n_classes={}, last_training={}, n_tokens={}, mem_size={}o, " \
-               "token_counters_mem_size={} Go, class_counters_mem_size={} Go)"\
+               "token_counters_mem_size={} Go, class_counters_mem_size={} Go, n_total_token={})"\
             .format(self._name, self._n_classes,self._last_update, self.get_token_count(),
                     getsizeof(self), round(getsizeof(self._token_counters)/1073741824.0, 4),
-                    round(getsizeof(self._class_counters)/1073741824.0, 4))
+                    round(getsizeof(self._class_counters)/1073741824.0, 4), self._n_total_token)
     # end __str__
 
     ####################################################
@@ -189,22 +195,22 @@ class StatisticalModel(Model):
     ####################################################
 
     # Prediction
-    def _predict(self, text):
+    def _predict(self, text, lang='en'):
         """
         Prediction
         :param text: Text to classify
         :return: Resulting class number
         """
         # Text's probabilities
-        text_probs = list()
+        text_probs = dict()
 
         # Init
-        for c in range(self._n_classes):
+        for c in self._classes:
             text_probs[c] = decimal.Decimal(1.0)
         # end for
 
         # Parse text
-        text_tokens = spacy.load('en')(text)
+        text_tokens = spacy.load(lang)(text)
 
         # Get all tokens
         tokens = list()
@@ -214,17 +220,29 @@ class StatisticalModel(Model):
 
         # For each token
         for token in tokens:
-            # Get token probs for each class
-            token_probs = self[token.text]
-
-            # For each class
-            for c in self._classes:
-                text_probs[c] *= decimal.Decimal(
-                    StatisticalModel.smooth(self._smoothing, token_probs[c], self._token_counters[token], len(tokens),
-                                            param=self._smoothing_param))
-            # end for
+            token_text = token.text.lower()
+            if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
+                # Get token probs for each class
+                try:
+                    token_probs = self[token_text]
+                    collection_prob = self._token_counters[token_text] / self._n_total_token
+                except KeyError:
+                    print(token_text)
+                    continue
+                # end try
+                print(token_text)
+                print(token_probs)
+                print(collection_prob)
+                # For each class
+                for c in self._classes:
+                    smoothed_value = StatisticalModel.smooth(self._smoothing, token_probs[c], collection_prob, len(tokens),
+                                                             param=self._smoothing_param)
+                    print(smoothed_value)
+                    text_probs[c] *= decimal.Decimal(smoothed_value)
+                # end for
+            # end if
         # end for
-
+        exit()
         # Get highest prob
         max = decimal.Decimal(0.0)
         result_class = ""
@@ -235,8 +253,18 @@ class StatisticalModel(Model):
                 # end if
         # end for
 
-        return result_class
+        return (result_class, text_probs)
     # end _predict
+
+    # Filter tokens
+    def _filter_token(self, token):
+        for sym in self._token_filter:
+            if sym in token:
+                return False
+            # end if
+        # end for
+        return True
+    # end _filter_token
 
     ####################################################
     # Static

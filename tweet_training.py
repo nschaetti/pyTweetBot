@@ -60,6 +60,7 @@ def clean_html_text(to_clean):
     to_clean = to_clean.strip()
     to_clean = to_clean.replace(u"\n", u"")
     to_clean = to_clean.replace(u"\r", u"")
+    to_clean = to_clean.replace(u"\t", u"")
     return to_clean
 # end clean_html_text
 
@@ -124,22 +125,32 @@ if __name__ == "__main__":
                     logger.info(u"Downloading example {}".format(url))
 
                     # Get URL's text
-                    html = urllib.urlopen(url).read().decode('utf-8', errors='ignore')
-                    soup = BeautifulSoup(html, "lxml")
-                    text = soup.get_text()
+                    try:
+                        html = urllib.urlopen(url).read().decode('utf-8', errors='ignore')
+                        soup = BeautifulSoup(html, "lxml")
+                        text = soup.get_text()
 
-                    # HTML entities
-                    text = clean_html_text(text)
+                        # HTML entities
+                        text = clean_html_text(text)
 
-                    # Train
-                    logger.info(u"Training example {}/{} as {}...".format(index+1, n_samples, c))
-                    model.train(text, c)
+                        # Train
+                        logger.info(u"Training example {}/{} as {}...".format(index + 1, n_samples, c))
+                        if ".fr" in url or ".ch" in url:
+                            model.train(text, c)
+                        else:
+                            model.train(text, c)
+                        # end if
 
-                    # I've seen that
-                    model.add_url(url)
+                        # I've seen that
+                        model.add_url(url)
 
-                    # Display info
-                    print(model)
+                        # Display info
+                        print(model)
+                    except (IOError, KeyError) as e:
+                        logger.error(u"Error downloading example {} : {}".format(url, e))
+                        model.add_url(url)
+                        pass
+                    # end except
                 # end if
             # end for
         except (KeyboardInterrupt, SystemExit):
@@ -151,8 +162,8 @@ if __name__ == "__main__":
         model.save(args.model)
     else:
         # Stats
-        count = 0
-        success = 0
+        count = 0.0
+        success = 0.0
 
         try:
             # For each URL in the dataset
@@ -172,14 +183,23 @@ if __name__ == "__main__":
                 text = clean_html_text(text)
 
                 # Predict
-                prediction = model(text)
+                if ".fr" in url or ".ch" in url:
+                    prediction, probs = model(text)
+                else:
+                    prediction, probs = model(text)
+                # end if
+
+                # Same result
+                if probs['tweet'] == probs['skip']:
+                    prediction = "skip"
+                # end if
 
                 # Compare
                 logger.info(u"Predicted {} for observation {}".format(prediction, c))
                 if prediction == c:
-                    success += 1
+                    success += 1.0
                 # end if
-                count += 1
+                count += 1.0
             # end for
         except (KeyboardInterrupt, SystemExit):
             pass
