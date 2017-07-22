@@ -48,47 +48,81 @@ class TFIDFModel(object):
         self._collection_counts = dict()
         self._classes_vectors = dict()
         self._classes_frequency = dict()
-        for c in classes:
-            self._classes_counts[c] = dict()
-            self._classes_token_count[c] = decimal.Decimal(0.0)
-        # end for
         self._token_position = dict()
         self._last_update = last_update
         self._finalized = False
+
+        # Class counters init
+        for c in classes:
+            self._classes_counts[c] = dict()
+            self._classes_token_count[c] = 0.0
+        # end for
+
+        # Regex
+        self._token_filter = u"+\"*ç%&/()=?§°!£.,±“#Ç[]|{}≠¿¢«…Ç∞”‹⁄[]\ÒÔÚÿÆ•÷»<>≤≥\\_;:\n\r@∑€®†Ω°¡øπ¬∆ºª@ƒ∂ßå¥≈©√∫~'"
     # end __init__
 
+    ####################################################
+    # Public
+    ####################################################
+
     # Train the model
-    def train(self, text, c):
+    def train(self, text, c, lang='en'):
         """
         Train the model
         :param text: Training text
         :param c: Text's class
+        :param lang: Text's language
         """
         # Tokens
-        tokens = spacy.load('en')(text)
+        tokens = spacy.load(lang)(text)
 
         # For each token
         for token in tokens:
-            self._classes_counts[c][token.text] += decimal.Decimal(1.0)
-            self._collection_counts[token.text] += decimal.Decimal(1.0)
-            self._classes_token_count[c] += decimal.Decimal(1.0)
+            token_text = token.text.lower().replace(u" ", u"").replace(u"\t", u"")
+            if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
+                self._classes_counts[c][token_text] += 1.0
+                self._collection_counts[token_text] += 1.0
+                self._classes_token_count[c] += 1.0
+            # end if
         # end token
     # end train
 
-    # Call the model
-    def __call__(self, text):
+    # Save the model
+    def save(self, filename):
         """
-        Call the model to classify new text
+        Save the model to a Pickle file
+        :param filename:
+        :return:
+        """
+        with open(filename, 'w') as f:
+            pickle.dump(self, f)
+        # end with
+    # end save
+
+    ####################################################
+    # Override
+    ####################################################
+
+    ###############################################
+    # Private
+    ###############################################
+
+    # Prediction
+    def _predict(self, text, lang='en'):
+        """
+        Prediction
         :param text: Text to classify
         :return: Resulting class number
         """
         # Finalize
         if not self._finalized:
             self._finalize()
+            self._finalized = True
         # end if
 
         # Tokens
-        tokens = spacy.load('en')(text)
+        tokens = spacy.load(lang)(text)
 
         d_vector = np.zeros(len(self._collection_counts.keys()), dtype='float64')
         for token in tokens:
@@ -105,26 +139,69 @@ class TFIDFModel(object):
 
         # For each classes
         similarity = np.zeros(len(self._classes_counts.keys()))
-        index = 0
-        for c in self._classes_counts.keys():
+        for index, c in enumerate(self._classes_counts.keys()):
             similarity[index] = TFIDFModel.cosinus_similarity(self._classes_vectors[c], d_vector)
-            index += 1
         # end for
 
         return self._classes_counts.keys()[np.argmax(similarity)]
-    # end __call__
+    # end _predict
 
-    # Save the model
-    def save(self, filename):
+    # Finalize
+    def _finalize(self):
         """
-        Save the model to a Pickle file
-        :param filename:
+        Finalize
         :return:
         """
-        with open(filename, 'w') as f:
-            pickle.dump(self, f)
-        # end with
-    # end save
+        # Position of each token
+        i = 0
+        for token in sorted(self._collection_counts.keys()):
+            self._token_position[token] = i
+            i += 1
+        # end for
+
+        # Compute classes frequency
+        for token in self._collection_counts.keys():
+            count = 0.0
+            for c in self._classes_counts.keys():
+                if self._classes_counts[c][token] > 0:
+                    count += 1.0
+                # end if
+            # end for
+            self._classes_frequency[token] = count
+            # end for
+        # end if
+
+        # For each classes
+        for c in self._classes_counts.keys():
+            c_vector = np.zeros(len(self._classes_counts[c].keys()), dtype='float64')
+            for token in self._collection_counts.keys():
+                index = self._token_position[token]
+                c_vector[index] = self._classes_counts[c][token]
+            # end for
+            c_vector /= float(self._classes_token_count[c])
+            for token in self._collection_counts.keys():
+                index = self._token_position[token]
+                if self._classes_frequency[token] > 0:
+                    c_vector[index] *= math.log(self._n_classes / self._classes_frequency[token])
+                    # end if
+            # end for
+            self._classes_vectors[c] = c_vector
+        # end for
+    # end finalize
+
+    # Filter tokens
+    def _filter_token(self, token):
+        for sym in self._token_filter:
+            if sym in token:
+                return False
+            # end if
+        # end for
+        return True
+    # end _filter_token
+
+    ####################################################
+    # Static
+    ####################################################
 
     # Load the model
     @staticmethod
@@ -161,57 +238,15 @@ class TFIDFModel(object):
         return DbModel.exists(name)
     # end exists
 
-    ###############################################
-    # Private
-    ###############################################
-
-    # Finalize
-    def _finalize(self):
-        """
-        Finalize
-        :return:
-        """
-        # Position of each token
-        i = 0
-        for token in sorted(self._collection_counts.keys()):
-            self._token_position[token] = i
-            i += 1
-        # end for
-        # Compute classes frequency
-        for token in self._collection_counts.keys():
-            count = 0.0
-            for c in self._classes_counts.keys():
-                if self._classes_counts[c][token] > 0:
-                    count += 1.0
-                    # end if
-            # end for
-            self._classes_frequency[token] = count
-            # end for
-        # end if
-        # For each classes
-        for c in self._classes_counts.keys():
-            c_vector = np.zeros(len(self._classes_counts[c].keys()), dtype='float64')
-            for token in self._collection_counts.keys():
-                index = self._token_position[token]
-                c_vector[index] = self._classes_counts[c][token]
-            # end for
-            c_vector /= float(self._classes_token_count[c])
-            for token in self._collection_counts.keys():
-                index = self._token_position[token]
-                if self._classes_frequency[token] > 0:
-                    c_vector[index] *= math.log(self._n_classes / self._classes_frequency[token])
-                    # end if
-            # end for
-            self._classes_vectors[c] = c_vector
-        # end for
-
-        # Finalize
-        self._finalized = True
-    # end finalize
-
     # Cosinus similarity
     @staticmethod
     def cosinus_similarity(a, b):
+        """
+        Cosinus similarity
+        :param a:
+        :param b:
+        :return:
+        """
         return np.dot(a, b) / (LA.norm(a) * LA.norm(b))
     # end cosinus_similarity
 
