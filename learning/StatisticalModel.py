@@ -98,13 +98,13 @@ class StatisticalModel(Model):
         for token in tokens:
             token_text = token.text.lower().replace(u" ", u"").replace(u"\t", u"")
             if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
-                print token_text + u" ",
+                #print token_text + u" ",
                 # Token counters
                 try:
-                    self._token_counters[token_text] += 1
+                    self._token_counters[token_text] += 1.0
                 except KeyError:
-                    self._token_counters[token_text] = 1
-                    self._n_token += 1
+                    self._token_counters[token_text] = 1.0
+                    self._n_token += 1.0
                 # end try
 
                 # Create entry in class counter
@@ -116,13 +116,13 @@ class StatisticalModel(Model):
 
                 # Class counters
                 if c in self._class_counters[token_text].keys():
-                    self._class_counters[token_text][c] += 1
+                    self._class_counters[token_text][c] += 1.0
                 else:
-                    self._class_counters[token_text][c] = 1
+                    self._class_counters[token_text][c] = 1.0
                 # end if
 
                 # One more token
-                self._n_total_token += 1
+                self._n_total_token += 1.0
             # end if
         # end token
     # end train
@@ -227,22 +227,21 @@ class StatisticalModel(Model):
                     token_probs = self[token_text]
                     collection_prob = self._token_counters[token_text] / self._n_total_token
                 except KeyError:
-                    print(token_text)
                     continue
                 # end try
-                print(token_text)
-                print(token_probs)
-                print(collection_prob)
+                #print(u"#" + token_text + u"#")
+                #print(token_probs)
+                #print(collection_prob)
                 # For each class
                 for c in self._classes:
                     smoothed_value = StatisticalModel.smooth(self._smoothing, token_probs[c], collection_prob, len(tokens),
                                                              param=self._smoothing_param)
-                    print(smoothed_value)
+                    #print(c + ":" + str(smoothed_value))
                     text_probs[c] *= decimal.Decimal(smoothed_value)
                 # end for
             # end if
         # end for
-        exit()
+
         # Get highest prob
         max = decimal.Decimal(0.0)
         result_class = ""

@@ -164,6 +164,7 @@ if __name__ == "__main__":
         # Stats
         count = 0.0
         success = 0.0
+        false_positive = 0.0
 
         try:
             # For each URL in the dataset
@@ -194,6 +195,11 @@ if __name__ == "__main__":
                     prediction = "skip"
                 # end if
 
+                # False positive
+                if prediction == "tweet" and c == "skip":
+                    false_positive += 1.0
+                # end if
+
                 # Compare
                 logger.info(u"Predicted {} for observation {}".format(prediction, c))
                 if prediction == c:
@@ -206,7 +212,8 @@ if __name__ == "__main__":
         # end try
 
         # Show performance
-        logger.info(u"Success rate of {} on dataset".format(success / count * 100.0))
+        logger.info(u"Success rate of {} on dataset, {} false positive".format(success / count * 100.0,
+                                                                               false_positive / count * 100.0))
     # end if
 
 # end if
