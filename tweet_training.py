@@ -30,6 +30,7 @@ import datetime
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from learning.StatisticalModel import StatisticalModel
+from learning.TFIDFModel import TFIDFModel
 from bs4 import BeautifulSoup
 import urllib
 import pickle
@@ -80,6 +81,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
     parser.add_argument("--param", type=str, help="Model parameter (if creation)", default='dp')
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
+    parser.add_argument("--type", type=str, help="Model type (stat, tfidf)", default='stat')
     args = parser.parse_args()
 
     # Logging
@@ -98,8 +100,12 @@ if __name__ == "__main__":
     if os.path.exists(args.model):
         model = StatisticalModel.load_from_file(args.model)
     else:
-        model = StatisticalModel("tweet_stat_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow(),
-                                 smoothing=args.param, smoothing_param=0.5)
+        if args.type == "stat":
+            model = StatisticalModel("tweet_stat_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow(),
+                                     smoothing=args.param, smoothing_param=0.5)
+        else:
+            model = TFIDFModel("tweet_tfidf_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow())
+        # end
     # end if
 
     # Load dataset
@@ -148,6 +154,10 @@ if __name__ == "__main__":
                         print(model)
                     except (IOError, KeyError) as e:
                         logger.error(u"Error downloading example {} : {}".format(url, e))
+                        model.add_url(url)
+                        pass
+                    except UnicodeError as e:
+                        logger.error(u"URL contains unicode characters {}".format(url, e))
                         model.add_url(url)
                         pass
                     # end except

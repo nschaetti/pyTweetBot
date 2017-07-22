@@ -54,6 +54,12 @@ class Model(object):
     # Variables
     _finalized = False
 
+    # Constructor
+    def __init__(self):
+        # URL trained
+        self._urls = list()
+    # end __init__
+
     #################################################
     # Public
     #################################################
@@ -79,6 +85,30 @@ class Model(object):
             pickle.dump(self, f)
         # end with
     # end save
+
+    # Is trained on that example
+    def is_example_seen(self, url):
+        """
+        Is example already seen
+        :param url:
+        :return:
+        """
+        if url in self._urls:
+            return True
+        else:
+            return False
+        # end if
+    # end is_example_seen
+
+    # Add to url list
+    def add_url(self, url):
+        """
+        Add to URL list
+        :param url:
+        :return:
+        """
+        self._urls.append(url)
+    # end add_url
 
     #################################################
     # Override

@@ -48,6 +48,9 @@ class StatisticalModel(Model):
         :param n_classes: Class count
         :param tokens_prob: Array of dictionaries of tokens probabilities
         """
+        # Superclass
+        super(StatisticalModel, self).__init__()
+
         # Properties
         self._name = name
         self._classes = classes
@@ -59,9 +62,6 @@ class StatisticalModel(Model):
         # Init dicionaries
         self._token_counters = dict()
         self._class_counters = dict()
-
-        # URL trained
-        self._urls = list()
 
         # Smoothing
         self._smoothing = smoothing
@@ -98,7 +98,6 @@ class StatisticalModel(Model):
         for token in tokens:
             token_text = token.text.lower().replace(u" ", u"").replace(u"\t", u"")
             if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
-                #print token_text + u" ",
                 # Token counters
                 try:
                     self._token_counters[token_text] += 1.0
@@ -126,30 +125,6 @@ class StatisticalModel(Model):
             # end if
         # end token
     # end train
-
-    # Add to url list
-    def add_url(self, url):
-        """
-        Add to URL list
-        :param url:
-        :return:
-        """
-        self._urls.append(url)
-    # end add_url
-
-    # Is trained on that example
-    def is_example_seen(self, url):
-        """
-        Is example already seen
-        :param url:
-        :return:
-        """
-        if url in self._urls:
-            return True
-        else:
-            return False
-        # end if
-    # end is_example_seen
 
     ####################################################
     # Override

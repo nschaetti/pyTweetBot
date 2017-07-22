@@ -49,6 +49,7 @@ if __name__ == "__main__":
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
     parser.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
+    parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
     args = parser.parse_args()
 
     # Logging
@@ -100,20 +101,24 @@ if __name__ == "__main__":
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
 
-    # Add RSS streams
-    for rss_stream in config.get_rss_streams():
-        tweet_finder.add(RSSHunter(rss_stream))
-    # end for
+    if args.rss == "":
+        # Add RSS streams
+        for rss_stream in config.get_rss_streams():
+            tweet_finder.add(RSSHunter(rss_stream))
+        # end for
 
-    # Add Google News
-    for news in config.get_news_config():
-        for language in news['languages']:
-            for country in news['countries']:
-                tweet_finder.add(
-                    GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=args.n_pages))
+        # Add Google News
+        for news in config.get_news_config():
+            for language in news['languages']:
+                for country in news['countries']:
+                    tweet_finder.add(
+                        GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=args.n_pages))
+                # end for
             # end for
         # end for
-    # end for
+    else:
+        tweet_finder.add(RSSHunter({'url': args.rss, 'hashtags': []}))
+    # end if
 
     # For each tweet
     for tweet in tweet_finder:

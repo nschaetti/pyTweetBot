@@ -104,6 +104,18 @@ class TFIDFModel(object):
     # Override
     ####################################################
 
+    # To String
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        return "TFIDFModel(name={}, n_classes={}, last_training={}, " \
+               "n_tokens={}, mem_size={}o)".format(self._name, self._n_classes,
+                                                   self._last_update, len(self._classes_counts),
+                                                   getsizeof(self))
+    # end __str__
+
     ###############################################
     # Private
     ###############################################
