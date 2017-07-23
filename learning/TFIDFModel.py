@@ -24,25 +24,33 @@
 
 # Imports
 import spacy
+from .Model import Model, ModelNotFoundException, ModelAlreadyExistsException
 from db.obj.Model import Model as DbModel
 import decimal
 import math
 from numpy import linalg as LA
 import numpy as np
 import pickle
+from sys import getsizeof
 
 
 # A TFIDF model
-class TFIDFModel(object):
+class TFIDFModel(Model):
     """
     A TFIDF model
     """
 
     # Constructor
     def __init__(self, name, classes, last_update):
+        # Superclass
+        super(TFIDFModel, self).__init__()
+
+        # Properties
         self._name = name
         self._classes = classes
         self._n_classes = len(classes)
+        self._n_tokens = 0.0
+        self._n_total_tokens = 0.0
         self._classes_counts = dict()
         self._classes_token_count = dict()
         self._collection_counts = dict()
@@ -81,9 +89,30 @@ class TFIDFModel(object):
         for token in tokens:
             token_text = token.text.lower().replace(u" ", u"").replace(u"\t", u"")
             if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
-                self._classes_counts[c][token_text] += 1.0
-                self._collection_counts[token_text] += 1.0
-                self._classes_token_count[c] += 1.0
+                # Classes counts
+                try:
+                    self._classes_counts[c][token_text] += 1.0
+                except KeyError:
+                    self._classes_counts[c][token_text] = 1.0
+                    self._n_tokens += 1.0
+                # end try
+
+                # Collection counts
+                try:
+                    self._collection_counts[token_text] += 1.0
+                except KeyError:
+                    self._collection_counts[token_text] = 1.0
+                # end try
+
+                # Classes token count
+                try:
+                    self._classes_token_count[c] += 1.0
+                except KeyError:
+                    self._classes_token_count[c] = 1.0
+                # end try
+
+                # Total tokens
+                self._n_total_tokens += 1.0
             # end if
         # end token
     # end train
@@ -112,7 +141,7 @@ class TFIDFModel(object):
         """
         return "TFIDFModel(name={}, n_classes={}, last_training={}, " \
                "n_tokens={}, mem_size={}o)".format(self._name, self._n_classes,
-                                                   self._last_update, len(self._classes_counts),
+                                                   self._last_update, self._n_tokens,
                                                    getsizeof(self))
     # end __str__
 
@@ -138,12 +167,15 @@ class TFIDFModel(object):
 
         d_vector = np.zeros(len(self._collection_counts.keys()), dtype='float64')
         for token in tokens:
-            try:
-                index = self._token_position[token]
-                d_vector[index] += 1.0
-            except KeyError:
-                pass
-            # end try
+            token_text = token.text.lower().replace(u" ", u"").replace(u"\t", u"")
+            if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
+                try:
+                    index = self._token_position[token_text]
+                    d_vector[index] += 1.0
+                except KeyError:
+                    pass
+                # end try
+            # end if
         # end for
 
         # Normalize vector

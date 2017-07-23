@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
                         # Display info
                         print(model)
-                    except (IOError, KeyError) as e:
+                    except IOError as e:
                         logger.error(u"Error downloading example {} : {}".format(url, e))
                         model.add_url(url)
                         pass
