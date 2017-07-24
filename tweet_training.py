@@ -30,6 +30,7 @@ import datetime
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from learning.StatisticalModel import StatisticalModel
+from learning.Statistical2GramModel import Statistical2GramModel
 from learning.TFIDFModel import TFIDFModel
 from bs4 import BeautifulSoup
 import urllib
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
     parser.add_argument("--param", type=str, help="Model parameter (if creation)", default='dp')
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--type", type=str, help="Model type (stat, tfidf)", default='stat')
+    parser.add_argument("--type", type=str, help="Model type (stat, tfidf, stat2)", default='stat')
     args = parser.parse_args()
 
     # Logging
@@ -103,8 +104,12 @@ if __name__ == "__main__":
         if args.type == "stat":
             model = StatisticalModel("tweet_stat_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow(),
                                      smoothing=args.param, smoothing_param=0.5)
-        else:
+        elif args.type == "tfidf":
             model = TFIDFModel("tweet_tfidf_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow())
+        elif args.type == "stat2":
+            model = Statistical2GramModel("tweet_stat2_model", ['tweet', 'skip'],
+                                          last_update=datetime.datetime.utcnow(), smoothing=args.param,
+                                          smoothing_param=0.5)
         # end
     # end if
 
@@ -175,6 +180,7 @@ if __name__ == "__main__":
         count = 0.0
         success = 0.0
         false_positive = 0.0
+        false_positive_urls = list()
 
         try:
             # For each URL in the dataset
@@ -208,6 +214,7 @@ if __name__ == "__main__":
                 # False positive
                 if prediction == "tweet" and c == "skip":
                     false_positive += 1.0
+                    false_positive_urls.append(url)
                 # end if
 
                 # Compare
@@ -224,6 +231,12 @@ if __name__ == "__main__":
         # Show performance
         logger.info(u"Success rate of {} on dataset, {} false positive".format(success / count * 100.0,
                                                                                false_positive / count * 100.0))
+
+        # Show false positives
+        logger.info(u"False positives")
+        for url in false_positive_urls:
+            print(url)
+        # end for
     # end if
 
 # end if
