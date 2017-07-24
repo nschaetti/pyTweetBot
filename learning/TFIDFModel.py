@@ -94,7 +94,6 @@ class TFIDFModel(Model):
                     self._classes_counts[c][token_text] += 1.0
                 except KeyError:
                     self._classes_counts[c][token_text] = 1.0
-                    self._n_tokens += 1.0
                 # end try
 
                 # Collection counts
@@ -102,6 +101,7 @@ class TFIDFModel(Model):
                     self._collection_counts[token_text] += 1.0
                 except KeyError:
                     self._collection_counts[token_text] = 1.0
+                    self._n_tokens += 1
                 # end try
 
                 # Classes token count
@@ -182,12 +182,22 @@ class TFIDFModel(Model):
         d_vector /= float(len(tokens))
 
         # For each classes
-        similarity = np.zeros(len(self._classes_counts.keys()))
+        similarity = dict()
         for index, c in enumerate(self._classes_counts.keys()):
-            similarity[index] = TFIDFModel.cosinus_similarity(self._classes_vectors[c], d_vector)
+            similarity[c] = TFIDFModel.cosinus_similarity(self._classes_vectors[c], d_vector)
         # end for
 
-        return self._classes_counts.keys()[np.argmax(similarity)]
+        # Get highest prob
+        max = 0.0
+        result_class = ""
+        for c in self._classes:
+            if similarity[c] > max:
+                max = similarity[c]
+                result_class = c
+            # end if
+        # end for
+
+        return result_class, similarity
     # end _predict
 
     # Finalize
@@ -207,9 +217,13 @@ class TFIDFModel(Model):
         for token in self._collection_counts.keys():
             count = 0.0
             for c in self._classes_counts.keys():
-                if self._classes_counts[c][token] > 0:
-                    count += 1.0
-                # end if
+                try:
+                    if self._classes_counts[c][token] > 0:
+                        count += 1.0
+                    # end if
+                except KeyError:
+                    pass
+                # end try
             # end for
             self._classes_frequency[token] = count
             # end for
@@ -217,17 +231,21 @@ class TFIDFModel(Model):
 
         # For each classes
         for c in self._classes_counts.keys():
-            c_vector = np.zeros(len(self._classes_counts[c].keys()), dtype='float64')
+            c_vector = np.zeros(len(self._collection_counts.keys()), dtype='float64')
             for token in self._collection_counts.keys():
                 index = self._token_position[token]
-                c_vector[index] = self._classes_counts[c][token]
+                try:
+                    c_vector[index] = self._classes_counts[c][token]
+                except KeyError:
+                    c_vector[index] = 0
+                # end try
             # end for
             c_vector /= float(self._classes_token_count[c])
             for token in self._collection_counts.keys():
                 index = self._token_position[token]
                 if self._classes_frequency[token] > 0:
                     c_vector[index] *= math.log(self._n_classes / self._classes_frequency[token])
-                    # end if
+                # end if
             # end for
             self._classes_vectors[c] = c_vector
         # end for
