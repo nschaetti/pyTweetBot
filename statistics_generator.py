@@ -91,9 +91,6 @@ if __name__ == "__main__":
         # For each tweet
         for tweet in page:
             if not tweet.retweeted:
-                print(tweet.created_at.weekday())
-                print(tweet.created_at.hour)
-                print(tweet.retweet_count * 2 + tweet.favorite_count)
                 week_day_stats[
                     tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count * 2 + tweet.favorite_count
             # end if
