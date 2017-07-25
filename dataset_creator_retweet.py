@@ -99,13 +99,15 @@ if __name__ == "__main__":
     twitter_connector = TweetBotConnector(config)
 
     # Retweet finder
-    retweet_finder = RetweetFinder(search_keywords=args.search, languages=['en', 'fr'])
+    retweet_finder = RetweetFinder(search_keywords=args.search, languages=['en', 'fr'], polarity=-1, subjectivity=1)
 
     # For each tweet
-    for tweet in retweet_finder:
+    for tweet, polarity, subjectivity in retweet_finder:
         if tweet.text not in tweets.keys() and not tweet.retweeted:
             # Ask
             print(tweet.text)
+            print(u"Polarity : {}".format(polarity))
+            print(u"Subjectivity : {}".format(subjectivity))
             observed = raw_input("ReTweet or Skip (t/S/e)? ").lower()
 
             # Add as example
@@ -125,42 +127,5 @@ if __name__ == "__main__":
             logging.debug(u"Already in stock : {}".format(tweet.text))
         # end if
     # end if
-
-    # Timeline cursor
-    """if args.search == "":
-        timeline = twitter_connector.get_time_line(n_pages=1000)
-    else:
-        timeline = twitter_connector.search_tweets(args.search)
-    # end if
-
-    # For each tweet
-    for index, page in enumerate(timeline):
-        logger.info(u"Analyzing page number {}".format(index))
-
-        for tweet in page:
-            if tweet.text not in tweets.keys() and not tweet.retweeted:
-                # Ask
-                print(tweet.text)
-                observed = raw_input("ReTweet or Skip (t/S/e)? ").lower()
-
-                # Add as example
-                if observed == "e":
-                    break
-                elif observed == "t":
-                    tweets[tweet.text] = "tweet"
-                else:
-                    tweets[tweet.text] = "skip"
-                # end if
-
-                # Save dataset
-                with open(args.dataset, 'w') as f:
-                    pickle.dump(tweets, f)
-                # end with
-            else:
-                logging.debug(u"Already in stock : {}".format(tweet.text))
-            # end if
-        # end for
-        time.sleep(60)
-    # end for"""
 
 # end if

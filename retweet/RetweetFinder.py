@@ -5,6 +5,7 @@
 from twitter.TweetBotConnect import TweetBotConnector
 from textblob import TextBlob
 import time
+import logging
 
 
 # Class to find tweet to retweet
@@ -86,14 +87,15 @@ class RetweetFinder(object):
 
                 # Pass level of pol & sub
                 if tweet_blob.sentiment.polarity >= self._polarity and \
-                   tweet_blob.sentiment.subjectivity <= self._subjectivity and \
-                   tweet_blob.detect_language() in self._languages:
-                    self._tweets.append(tweet)
+                    tweet_blob.sentiment.subjectivity <= self._subjectivity and \
+                    tweet_blob.detect_language() in self._languages:
+                    self._tweets.append((tweet, tweet_blob.sentiment.polarity, tweet_blob.sentiment.subjectivity))
                 # end if
             # end if
         # end for
 
         # Wait
+        logging.info(u"Waiting 60 seconds...")
         time.sleep(60)
     # end _load_tweets
 

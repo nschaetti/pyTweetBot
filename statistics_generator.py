@@ -27,6 +27,8 @@ import argparse
 import logging
 import time
 import numpy as np
+import os
+import pickle
 import matplotlib.pyplot as plt
 from twitter.TweetBotConnect import TweetBotConnector
 from db.obj.ImpactStatistics import ImpactStatistic
@@ -44,8 +46,10 @@ if __name__ == "__main__":
 
     # Argument
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
+    parser.add_argument("--file", type=str, help="Output file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
+    parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default=10)
     args = parser.parse_args()
 
     # Logging
@@ -64,40 +68,42 @@ if __name__ == "__main__":
     twitter_connector = TweetBotConnector(config)
 
     # Stats for each day of the week
-    week_day_stats = np.zeros((7, 24))
+    if not os.path.exists(args.file):
+        week_day_stats = np.zeros((7, 24))
+    else:
+        week_day_stats = pickle.load(open(args.file, 'r'))
+    # end if
+
+    # Cursor
+    if args.stream == "timeline":
+        cursor = twitter_connector.get_time_line(n_pages=args.n_pages)
+    else:
+        cursor = twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages)
+    # end if
+
+    # Week day index to string
     week_to_string = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     # For each of my tweets
-    for index, page in enumerate(twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages)):
+    for index, page in enumerate(cursor):
         logger.info(u"Analyzing page number {}".format(index))
 
         # For each tweet
         for tweet in page:
             if not tweet.retweeted:
-                week_day_stats[tweet.created_at.weekday(), tweet.created_at.hour] += 1
+                print(tweet.created_at.weekday())
+                print(tweet.created_at.hour)
+                print(tweet.retweet_count * 2 + tweet.favorite_count)
+                week_day_stats[
+                    tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count * 2 + tweet.favorite_count
             # end if
         # end for
 
-        # Update DB
-        for week_day in range(7):
-            for hour in range(24):
-                count = week_day_stats[week_day, hour]
-                the_week_day = week_to_string[week_day]
-                if ImpactStatistic.exists(the_week_day, hour):
-                    ImpactStatistic.update(the_week_day, hour, count)
-                else:
-                    impact_stat = ImpactStatistic(impact_statistic_week_day=the_week_day,
-                                                  impact_statistic_hour=hour,
-                                                  impact_statistic_count=count)
-                    DBConnector().get_session().add(impact_stat)
-                # end if
-            # end for
-        # end for
-
-        # Commit
-        DBConnector().get_session().commit()
+        # Save matrix
+        pickle.dump(week_day_stats, open(args.file, 'w'))
 
         # Wait
+        logger.info(u"Waiting 60 seconds...")
         time.sleep(60)
     # end for
 
