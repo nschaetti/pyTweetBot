@@ -65,6 +65,9 @@ class NoFactory(Exception):
 # Manage bot's action
 @singleton
 class ActionScheduler(object):
+    """
+    Manage bot's action
+    """
 
     # Constructor
     def __init__(self, n_actions=None, update_delay=timedelta(minutes=10), reservoir_size=timedelta(days=3),
