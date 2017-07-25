@@ -3,14 +3,14 @@
 #
 
 from .Hunter import Hunter
-import logging
 import random
+from textblob import TextBlob
 
 
 class TweetFinder(Hunter):
 
     # Constructor
-    def __init__(self, shuffle=False):
+    def __init__(self, shuffle=False, polarity=0.0, subjectivity=0.5, languages=['en']):
         """
         Constructor
         """
@@ -18,6 +18,9 @@ class TweetFinder(Hunter):
         self._current = 0
         self._n_hunters = 0
         self._shuffle = shuffle
+        self._polarity = polarity
+        self._subjectivity = subjectivity
+        self._languages = languages
     # end __init__
 
     # Add an hunter

@@ -31,6 +31,7 @@ from db.DBConnector import DBConnector
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
+from retweet.RetweetFinder import RetweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
 import pickle
 import time
@@ -97,8 +98,36 @@ if __name__ == "__main__":
     # Connection to Twitter
     twitter_connector = TweetBotConnector(config)
 
+    # Retweet finder
+    retweet_finder = RetweetFinder(search_keywords=args.search, languages=['en', 'fr'])
+
+    # For each tweet
+    for tweet in retweet_finder:
+        if tweet.text not in tweets.keys() and not tweet.retweeted:
+            # Ask
+            print(tweet.text)
+            observed = raw_input("ReTweet or Skip (t/S/e)? ").lower()
+
+            # Add as example
+            if observed == "e":
+                break
+            elif observed == "t":
+                tweets[tweet.text] = "tweet"
+            else:
+                tweets[tweet.text] = "skip"
+            # end if
+
+            # Save dataset
+            with open(args.dataset, 'w') as f:
+                pickle.dump(tweets, f)
+            # end with
+        else:
+            logging.debug(u"Already in stock : {}".format(tweet.text))
+        # end if
+    # end if
+
     # Timeline cursor
-    if args.search == "":
+    """if args.search == "":
         timeline = twitter_connector.get_time_line(n_pages=1000)
     else:
         timeline = twitter_connector.search_tweets(args.search)
@@ -132,6 +161,6 @@ if __name__ == "__main__":
             # end if
         # end for
         time.sleep(60)
-    # end for
+    # end for"""
 
 # end if
