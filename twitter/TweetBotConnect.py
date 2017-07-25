@@ -135,13 +135,27 @@ class TweetBotConnector(object):
         :param n_pages:
         :return:
         """
-        print(n_pages)
         if n_pages == -1:
             return tweepy.Cursor(self._api.user_timeline, screen_name=screen_name).pages()
         else:
             return tweepy.Cursor(self._api.user_timeline, screen_name=screen_name).pages(limit=n_pages)
         # end if
     # end get_time_line
+
+    # Ger search cursor
+    def search_tweets(self, search, n_pages=-1):
+        """
+        Get search cursor
+        :param search:
+        :param n_pages:
+        :return:
+        """
+        if n_pages == -1:
+            return tweepy.Cursor(self._api.search, q=search).pages()
+        else:
+            return tweepy.Cursor(self._api.search, q=search).pages(limit=n_pages)
+        # end if
+    # end search_tweets
 
     # Get followers
     def get_followers(self, n_pages=-1):
