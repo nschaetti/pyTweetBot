@@ -25,7 +25,7 @@
 # Import
 import argparse
 import logging
-import os
+import signal, os
 import time
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
@@ -37,6 +37,33 @@ from tweet.TweetFinder import TweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
 from tweet.TweetFactory import TweetFactory
 from learning.Model import Model
+from learning.CensorModel import CensorModel
+
+####################################################
+# Globals
+####################################################
+
+# Continue main loop?
+cont_loop = True
+
+####################################################
+# Functions
+####################################################
+
+
+# Signal handler
+def signal_handler(signum, frame):
+    """
+    Signal handler
+    :param signum:
+    :param frame:
+    :return:
+    """
+    global cont_loop
+    logging.info(u"Signal {} received in frame {}".format(signum, frame))
+    cont_loop = False
+# end signal_handler
+
 
 ####################################################
 # Main function
@@ -52,6 +79,10 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str, help="Model file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     args = parser.parse_args()
+
+    # Set the signal handler and a 5-second alarm
+    signal.signal(signal.SIGQUIT, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
 
     # Logging
     logging.basicConfig(level=args.log_level)
@@ -84,6 +115,10 @@ if __name__ == "__main__":
     # Load model or create
     if os.path.exists(args.model):
         model = Model.load(args.model)
+        censor = CensorModel(config)
+    else:
+        logging.error(u"Mode file {} does not exists".format(args.model))
+        exit()
     # end if
 
     # Add RSS streams
@@ -101,14 +136,15 @@ if __name__ == "__main__":
     # end for
 
     # Keep running
-    while True:
+    while cont_loop:
         # For each tweet
         for tweet in tweet_finder:
             # Predict class
             prediction, = model(tweet.get_text())
+            censor_prediction, = censor(tweet.get_text())
 
             # Predicted as tweet
-            if prediction == "tweet":
+            if prediction == "tweet" and censor_prediction == "tweet":
                 # Try to add
                 try:
                     logging.info(u"Adding Tweet \"{}\" to the scheduler".format(tweet.get_tweet().encode('ascii', errors='ignore')))
