@@ -50,69 +50,9 @@ class CensorModel(Model):
     # Public
     #################################################
 
-    # Train the model
-    def train(self, text, c):
-        """
-        Train the model
-        :param text: Training text
-        :param c: Text's class
-        """
-        pass
-    # end train
-
-    # Save the model
-    def save(self, filename):
-        """
-        Save the model to a Pickle file
-        :param filename:
-        :return:
-        """
-        with open(filename, 'w') as f:
-            pickle.dump(self, f)
-        # end with
-    # end save
-
-    # Is trained on that example
-    def is_example_seen(self, url):
-        """
-        Is example already seen
-        :param url:
-        :return:
-        """
-        if url in self._urls:
-            return True
-        else:
-            return False
-        # end if
-    # end is_example_seen
-
-    # Add to url list
-    def add_url(self, url):
-        """
-        Add to URL list
-        :param url:
-        :return:
-        """
-        self._urls.append(url)
-    # end add_url
-
     #################################################
     # Override
     #################################################
-
-    # Call the model
-    def __call__(self, text, lang='en'):
-        """
-        Call the model to classify new text
-        :param text: Text to classify
-        :return: Resulting class number
-        """
-        if not self._finalized:
-            self._finalize()
-            self._finalized = True
-        # end if
-        return self._predict(text, lang=lang)
-    # end __call__
 
     #################################################
     # Private
@@ -125,53 +65,11 @@ class CensorModel(Model):
         :param text: Text to classify
         :return:
         """
-        pass
-    # end _predict
 
-    # Finalize the model
-    def _finalize(self):
-        """
-        Finalize the model
-        :return:
-        """
-        pass
-    # end _finalize
+    # end _predict
 
     #################################################
     # Static
     #################################################
-
-    # Load the model
-    @staticmethod
-    def load(opt):
-        """
-        Load the model from DB or file
-        :param opt: Loading option
-        :return: The model class
-        """
-        pass
-    # end load
-
-    # Create a new model
-    @staticmethod
-    def create(opt, n_classes=None):
-        """
-        Create a new model in DB or file
-        :param opt: Model options
-        :param n_classes: Classes count if classification model.
-        :return: The newly created model
-        """
-        pass
-    # end create
-
-    @staticmethod
-    def exists(name):
-        """
-        Does a model exists?
-        :param name: Model's name
-        :return: True or False
-        """
-        return DbModel.exists(name)
-    # end exists
 
 # end Model
