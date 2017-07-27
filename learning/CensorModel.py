@@ -65,7 +65,14 @@ class CensorModel(Model):
         :param text: Text to classify
         :return:
         """
+        # For each forbidden word
+        for word in self._forbidden_words:
+            if word.lower() in text.lower():
+                return "skip"
+            # end if
+        # end for
 
+        return "tweet"
     # end _predict
 
     #################################################
