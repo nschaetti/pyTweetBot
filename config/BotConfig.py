@@ -43,6 +43,7 @@ class BotConfig(object):
         self._retweet = data['retweet']
         self._hashtags = data['hashtags']
         self._rss = data['rss']
+        self._forbidden_words = data['forbidden_words']
     # end __init__
 
     # Load configuration file.
@@ -130,5 +131,14 @@ class BotConfig(object):
         """
         return self._news
     # end get_news_config
+
+    # Get forbidden words
+    def get_forbidden_word(self):
+        """
+        Get forbidden words
+        :return: Forbidden words
+        """
+        return self._forbidden_words
+    # end get_forbidden_words
 
 # end BotConfig

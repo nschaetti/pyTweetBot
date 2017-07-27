@@ -23,6 +23,9 @@
 		"new_unfollow" : 336,
 		"unfollow_interval" : 604800
 	},
+	"forbidden_words" :
+	[
+	],
 	"direct_message" : "",
 	"news_settings" : {
 		"interval_days" : 1,

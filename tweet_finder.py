@@ -25,7 +25,8 @@
 # Import
 import argparse
 import logging
-
+import os
+import time
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
@@ -34,8 +35,8 @@ from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
-from twitter.TweetGenerator import TweetGenerator
 from tweet.TweetFactory import TweetFactory
+from learning.Model import Model
 
 ####################################################
 # Main function
@@ -47,8 +48,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
 
     # Argument
-    parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
+    parser.add_argument("--model", type=str, help="Model file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     args = parser.parse_args()
 
@@ -78,7 +79,12 @@ if __name__ == "__main__":
     action_scheduler.set_factory(tweet_factory)
 
     # Tweet finder
-    tweet_finder = TweetFinder()
+    tweet_finder = TweetFinder(shuffle=True)
+
+    # Load model or create
+    if os.path.exists(args.model):
+        model = Model.load(args.model)
+    # end if
 
     # Add RSS streams
     for rss_stream in config.get_rss_streams():
@@ -94,19 +100,29 @@ if __name__ == "__main__":
         # end for
     # end for
 
-    # For each tweet
-    for tweet in tweet_finder:
-        # Try to add
-        try:
-            logging.info(u"Adding Tweet \"{}\" to the scheduler".format(tweet.get_tweet().encode('ascii', errors='ignore')))
-            action_scheduler.add_tweet(tweet)
-        except ActionReservoirFullError:
-            logging.info(u"Reservoir full for Tweet action")
-            pass
-        except ActionAlreadyExists:
-            logging.debug(u"Tweet \"{}\" already exists in the database".format(tweet.get_tweet().encode('ascii', errors='ignore')))
-            pass
-        # end try
-    # end for
+    # Keep running
+    while True:
+        # For each tweet
+        for tweet in tweet_finder:
+            # Predict class
+            prediction, = model(tweet.get_text())
+
+            # Predicted as tweet
+            if prediction == "tweet":
+                # Try to add
+                try:
+                    logging.info(u"Adding Tweet \"{}\" to the scheduler".format(tweet.get_tweet().encode('ascii', errors='ignore')))
+                    action_scheduler.add_tweet(tweet)
+                except ActionReservoirFullError:
+                    logging.error(u"Reservoir full for Tweet action, waiting for one hour")
+                    time.sleep(3600)
+                    pass
+                except ActionAlreadyExists:
+                    logging.error(u"Tweet \"{}\" already exists in the database".format(tweet.get_tweet().encode('ascii', errors='ignore')))
+                    pass
+                # end try
+            # end if
+        # end for
+    # end while
 
 # end if

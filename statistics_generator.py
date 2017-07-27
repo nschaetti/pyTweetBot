@@ -69,9 +69,10 @@ if __name__ == "__main__":
 
     # Stats for each day of the week
     if not os.path.exists(args.file):
-        week_day_stats = np.zeros((7, 24))
+        week_day_stats = np.zeros((7, 24), dtype='float64')
+        last_tweet = None
     else:
-        week_day_stats = pickle.load(open(args.file, 'r'))
+        week_day_stats, last_tweet = pickle.load(open(args.file, 'r'))
     # end if
 
     # Cursor
@@ -90,9 +91,13 @@ if __name__ == "__main__":
 
         # For each tweet
         for tweet in page:
+            if tweet.id == last_tweet:
+                break
+            # end if
             if not tweet.retweeted:
                 week_day_stats[
                     tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count * 2 + tweet.favorite_count
+                last_tweet = tweet.id
             # end if
         # end for
 
