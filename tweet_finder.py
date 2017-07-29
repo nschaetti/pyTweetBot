@@ -144,17 +144,19 @@ if __name__ == "__main__":
             censor_prediction, = censor(tweet.get_text())
 
             # Predicted as tweet
-            if prediction == "tweet" and censor_prediction == "tweet":
+            if prediction == "tweet" and censor_prediction == "tweet" and not tweet.already_tweeted():
                 # Try to add
                 try:
-                    logging.info(u"Adding Tweet \"{}\" to the scheduler".format(tweet.get_tweet().encode('ascii', errors='ignore')))
+                    logging.info(u"Adding Tweet \"{}\" to the scheduler".format(
+                        tweet.get_tweet().encode('ascii', errors='ignore')))
                     action_scheduler.add_tweet(tweet)
                 except ActionReservoirFullError:
                     logging.error(u"Reservoir full for Tweet action, waiting for one hour")
                     time.sleep(3600)
                     pass
                 except ActionAlreadyExists:
-                    logging.error(u"Tweet \"{}\" already exists in the database".format(tweet.get_tweet().encode('ascii', errors='ignore')))
+                    logging.error(u"Tweet \"{}\" already exists in the database".format(
+                        tweet.get_tweet().encode('ascii', errors='ignore')))
                     pass
                 # end try
             # end if
