@@ -27,6 +27,9 @@ import json
 
 # Bot config
 class BotConfig(object):
+    """
+    Bot config
+    """
 
     # Constructor
     def __init__(self, data=None):
@@ -37,14 +40,18 @@ class BotConfig(object):
         self._database = data['database']
         self._twitter = data['twitter']
         self._friends = data['friends']
-        self._direct_message = data['direct_message']
-        self._news_settings = data['news_settings']
-        self._news = data['news']
-        self._retweet = data['retweet']
-        self._hashtags = data['hashtags']
-        self._rss = data['rss']
-        self._forbidden_words = data['forbidden_words']
+        self._direct_message = BotConfig.get_field(data, 'direct_message')
+        self._news_settings = BotConfig.get_field(data, 'news_settings')
+        self._news = BotConfig.get_field(data, 'news')
+        self._retweet = BotConfig.get_field(data, 'retweet')
+        self._hashtags = BotConfig.get_field(data, 'hashtags')
+        self._rss = BotConfig.get_field(data, 'rss')
+        self._forbidden_words = BotConfig.get_field(data, 'forbidden_words')
     # end __init__
+
+    ######################################
+    # Public
+    ######################################
 
     # Load configuration file.
     @staticmethod
@@ -140,5 +147,25 @@ class BotConfig(object):
         """
         return self._forbidden_words
     # end get_forbidden_words
+
+    ######################################
+    # Private
+    ######################################
+
+    # Get a field
+    @staticmethod
+    def get_field(data, key):
+        """
+        Get a field
+        :param data: Data
+        :param key: Key of data
+        :return: The value
+        """
+        try:
+            return data[key]
+        except KeyError:
+            return []
+        # end try
+    # end _get_field
 
 # end BotConfig
