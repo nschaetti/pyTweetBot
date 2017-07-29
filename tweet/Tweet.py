@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Imports
-import db.obj as db_obj
+import db
 
 
 # Object representing a Tweet
@@ -138,7 +138,7 @@ class Tweet(object):
         Already tweeted?
         :return: True/False
         """
-        return db_obj.Tweet.exists(self)
+        return db.Tweet.exists(self)
     # end already_tweeted
 
     ######################################

@@ -24,10 +24,10 @@
 
 # Import
 import datetime
-import logging
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
 from twitter.TweetBotConnect import TweetBotConnector
+from db.obj.Tweeted import Tweeted
 
 
 # Action
@@ -66,8 +66,10 @@ class Action(Base):
             TweetBotConnector().like(self.action_tweet_id)
         elif self.action_type == "Tweet":
             TweetBotConnector().tweet(self.action_tweet_text)
+            Tweeted.insert_tweet(self.action_tweet_text)
         elif self.action_type == "Retweet":
             TweetBotConnector().retweet(self.action_tweet_id)
+            Tweeted.insert_retweet(self.action_tweet_id)
         # end if
     # end
 
