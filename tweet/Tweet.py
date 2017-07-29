@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Imports
-from .TweetFactory import TweetFactory
-from config.BotConfig import BotConfig
+import db.obj as db_obj
 
 
 # Object representing a Tweet
@@ -26,9 +25,7 @@ class Tweet(object):
     # end __init__
 
     ######################################
-    #
     # Public function
-    #
     ######################################
 
     # Get Tweet's text
@@ -134,6 +131,19 @@ class Tweet(object):
         # end if
         return length
     # end get_length
+
+    # Already tweeted
+    def already_tweeted(self):
+        """
+        Already tweeted?
+        :return: True/False
+        """
+        return db_obj.Tweet.exists(self)
+    # end already_tweeted
+
+    ######################################
+    # Override
+    ######################################
 
     # To string
     def __str__(self):
