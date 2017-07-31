@@ -31,7 +31,6 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 from twitter.TweetBotConnect import TweetBotConnector
-from db.obj.ImpactStatistics import ImpactStatistic
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 
@@ -70,9 +69,9 @@ if __name__ == "__main__":
     # Stats for each day of the week
     if not os.path.exists(args.file):
         week_day_stats = np.zeros((7, 24), dtype='float64')
-        last_tweet = None
+        max_tweet_id = 0
     else:
-        week_day_stats, last_tweet = pickle.load(open(args.file, 'r'))
+        week_day_stats, max_tweet_id = pickle.load(open(args.file, 'r'))
     # end if
 
     # Cursor
@@ -91,18 +90,28 @@ if __name__ == "__main__":
 
         # For each tweet
         for tweet in page:
-            if tweet.id == last_tweet:
+            # Stop if already seen
+            if tweet.id <= max_tweet_id:
                 break
+            else:
+                max_tweet_id = tweet.id
+            # end if
+
             # end if
             if not tweet.retweeted:
                 week_day_stats[
-                    tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count * 2 + tweet.favorite_count
-                last_tweet = tweet.id
+                    tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count + tweet.favorite_count * 0.5
+                print(u"{} more retweets and {} more likes for day {} hour {}".format(tweet.retweet_count,
+                                                                                      tweet.favorite_count * 0.5,
+                                                                                      tweet.created_at.weekday(),
+                                                                                      tweet.created_at.hour))
+            else:
+                print(u"retweeted")
             # end if
         # end for
 
         # Save matrix
-        pickle.dump(week_day_stats, open(args.file, 'w'))
+        pickle.dump((week_day_stats, max_tweet_id), open(args.file, 'w'))
 
         # Wait
         logger.info(u"Waiting 60 seconds...")
