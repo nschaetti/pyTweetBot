@@ -80,6 +80,8 @@ class Tweeted(Base):
                     Tweeted.tweet_tweet_url == tweet.get_url())).count() > 0
         elif tweet is unicode:
             return DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_text == tweet).count() > 0
+        elif tweet is int:
+            return DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_id == tweet).count() > 0
         # end if
     # end exists
 
