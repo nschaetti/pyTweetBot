@@ -29,6 +29,7 @@ import signal, os
 import time
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
+from db.obj.Tweeted import Tweeted
 from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
 from friends.FriendsManager import FriendsManager
 from tweet.RSSHunter import RSSHunter
@@ -132,7 +133,7 @@ if __name__ == "__main__":
             censor_prediction, = censor(retweet.text)
 
             # Predicted as tweet
-            if prediction == "tweet" and censor_prediction == "tweet" and not tweet.already_tweeted():
+            if prediction == "tweet" and censor_prediction == "tweet" and not Tweeted.exists(retweet.id):
                 # Try to add
                 try:
                     logging.info(u"Adding Tweet \"{}\" to the scheduler".format(
