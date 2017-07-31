@@ -28,9 +28,6 @@ import logging
 import os
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
-from tweet.RSSHunter import RSSHunter
-from tweet.GoogleNewsHunter import GoogleNewsHunter
-from tweet.TweetFinder import TweetFinder
 from retweet.RetweetFinder import RetweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
 import pickle
