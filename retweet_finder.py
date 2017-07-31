@@ -136,15 +136,15 @@ if __name__ == "__main__":
                 # Try to add
                 try:
                     logging.info(u"Adding Tweet \"{}\" to the scheduler".format(
-                        tweet.get_tweet().encode('ascii', errors='ignore')))
-                    action_scheduler.add_tweet(tweet)
+                        retweet.tweet.encode('ascii', errors='ignore')))
+                    action_scheduler.add_retweet(retweet.id)
                 except ActionReservoirFullError:
-                    logging.error(u"Reservoir full for Tweet action, waiting for one hour")
+                    logging.error(u"Reservoir full for Retweet action, waiting for one hour")
                     time.sleep(3600)
                     pass
                 except ActionAlreadyExists:
-                    logging.error(u"Tweet \"{}\" already exists in the database".format(
-                        tweet.get_tweet().encode('ascii', errors='ignore')))
+                    logging.error(u"Retweet \"{}\" already exists in the database".format(
+                        retweet.text.encode('ascii', errors='ignore')))
                     pass
                 # end try
             # end if
