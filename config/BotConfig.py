@@ -148,6 +148,15 @@ class BotConfig(object):
         return self._forbidden_words
     # end get_forbidden_words
 
+    # Get retweet settings
+    def get_retweet_config(self):
+        """
+        Get retweet settings
+        :return: Retweet settings
+        """
+        return self._retweet
+    # end get_retweet_config
+
     ######################################
     # Private
     ######################################
