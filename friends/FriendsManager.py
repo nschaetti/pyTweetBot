@@ -170,6 +170,15 @@ class FriendsManager(object):
         return TweetBotConnector().get_user().friends_count
     # end n_followers
 
+    # Get followers cursor
+    def get_followers_cursor(self):
+        """
+        Get followers cursor
+        :return: Followers cursor
+        """
+        return tweepy.Cursor(self._api.followers)
+    # end get_followers_cursor
+
     ######################################################
     #
     # PRIVATE FUNCTIONS
