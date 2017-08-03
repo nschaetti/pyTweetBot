@@ -86,7 +86,6 @@ if __name__ == "__main__":
 
     # Loop control
     cont = True
-
     # For each of my tweets
     for index_page, page in enumerate(cursor):
         logger.info(u"Analyzing page number {}".format(index_page))
@@ -94,28 +93,23 @@ if __name__ == "__main__":
         # For each tweet
         for index_tweet, tweet in enumerate(page):
             # Stock max index
-            if index_tweet == 0:
+            if index_page == 0 and index_tweet == 0:
                 new_max_tweet_id = tweet.id
             # end if
 
             # Stop if already seen
             if tweet.id <= max_tweet_id:
-                print("break")
                 break
-            else:
-                max_tweet_id = tweet.id
             # end if
-            print(u"#" + tweet.text + u"#")
+
             # end if
             if not tweet.retweeted:
                 week_day_stats[
                     tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count + tweet.favorite_count * 0.5
-                print(u"{} more retweets and {} more likes for day {} hour {}".format(tweet.retweet_count,
-                                                                                      tweet.favorite_count * 0.5,
-                                                                                      tweet.created_at.weekday(),
-                                                                                      tweet.created_at.hour))
-            else:
-                print(u"Retweet")
+                logging.info(u"{} more retweets and {} more likes for day {} hour {}".format(tweet.retweet_count,
+                                                                                             tweet.favorite_count * 0.5,
+                                                                                             tweet.created_at.weekday(),
+                                                                                             tweet.created_at.hour))
             # end if
         # end for
 
