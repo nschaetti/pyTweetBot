@@ -83,46 +83,49 @@ if __name__ == "__main__":
 
     # Loop control
     cont = True
-    # For each of my tweets
-    for index_page, page in enumerate(cursor):
-        logger.info(u"Analyzing page number {}".format(index_page))
 
-        # For each tweet
-        for index_tweet, tweet in enumerate(page):
-            # Stock max index
-            if index_page == 0 and index_tweet == 0:
-                new_max_tweet_id = tweet.id
-            # end if
+    # Start statistics
+    stats_manager.start()
 
-            # Stop if already seen
-            if tweet.id <= max_tweet_id:
+    try:
+        # For each of my tweets
+        for index_page, page in enumerate(cursor):
+            logger.info(u"Analyzing page number {}".format(index_page))
+
+            # For each tweet
+            for index_tweet, tweet in enumerate(page):
+
+                # Count
+                if not tweet.retweeted:
+                    stats_manager.add(tweet)
+                    logging.info(u"{} more retweets and {} more likes for day {} hour {}".format(tweet.retweet_count,
+                                                                                                 float(
+                                                                                                     tweet.favorite_count) * 0.5,
+                                                                                                 tweet.created_at.weekday(),
+                                                                                                 tweet.created_at.hour))
+                # end if
+            # end for
+
+            # Save statistics
+            stats_manager.save(args.file)
+
+            # Control
+            if not cont:
                 break
             # end if
 
-            # end if
-            if not tweet.retweeted:
-                week_day_stats[
-                    tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count + float(
-                    tweet.favorite_count) * 0.5
-                logging.info(u"{} more retweets and {} more likes for day {} hour {}".format(tweet.retweet_count,
-                                                                                             float(
-                                                                                                 tweet.favorite_count) * 0.5,
-                                                                                             tweet.created_at.weekday(),
-                                                                                             tweet.created_at.hour))
-            # end if
+            # Wait
+            logger.info(u"Waiting 60 seconds...")
+            time.sleep(60)
         # end for
+    except KeyboardInterrupt:
+        pass
+    # end try
 
-        # Save matrix
-        pickle.dump((week_day_stats, new_max_tweet_id), open(args.file, 'w'))
+    # Save statistics
+    stats_manager.save(args.file)
 
-        # Control
-        if not cont:
-            break
-        # end if
-
-        # Wait
-        logger.info(u"Waiting 60 seconds...")
-        time.sleep(60)
-    # end for
+    # Stop statistics
+    stats_manager.stop()
 
 # end if
