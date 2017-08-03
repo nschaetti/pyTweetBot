@@ -56,30 +56,18 @@ if __name__ == "__main__":
     # Load or create dataset
     if os.path.exists(args.dataset):
         with open(args.dataset, 'r') as f:
-            tweets = pickle.load(f)
+            (follow, unfollow) = pickle.load(f)
         # end with
     else:
-        tweets = dict()
+        follow, unfollow = list(), list()
     # end if
 
     # Show informations
     if args.info:
-        # Compute statistics
-        examples_count = len(tweets.keys())
-        retweet_count = 0
-        skip_count = 0
-        for tweet in tweets.keys():
-            if tweets[tweet] == "tweet":
-                retweet_count += 1
-            else:
-                skip_count += 1
-                # end if
-        # end for
-
         # Print info
-        print(u"{} examples in the dataset".format(examples_count))
-        print(u"{} examples in the retweet class".format(retweet_count))
-        print(u"{} examples in the skip class".format(skip_count))
+        print(u"{} examples in the dataset".format(len(follow) + len(unfollow)))
+        print(u"{} examples in the follow class".format(len(follow)))
+        print(u"{} examples in the unfollow class".format(len(unfollow)))
         exit()
     # end if
 

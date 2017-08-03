@@ -84,19 +84,28 @@ if __name__ == "__main__":
     # Week day index to string
     week_to_string = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+    # Loop control
+    cont = True
+
     # For each of my tweets
-    for index, page in enumerate(cursor):
-        logger.info(u"Analyzing page number {}".format(index))
+    for index_page, page in enumerate(cursor):
+        logger.info(u"Analyzing page number {}".format(index_page))
 
         # For each tweet
-        for tweet in page:
+        for index_tweet, tweet in enumerate(page):
+            # Stock max index
+            if index_tweet == 0:
+                new_max_tweet_id = tweet.id
+            # end if
+
             # Stop if already seen
             if tweet.id <= max_tweet_id:
+                print("break")
                 break
             else:
                 max_tweet_id = tweet.id
             # end if
-
+            print(u"#" + tweet.text + u"#")
             # end if
             if not tweet.retweeted:
                 week_day_stats[
@@ -106,12 +115,17 @@ if __name__ == "__main__":
                                                                                       tweet.created_at.weekday(),
                                                                                       tweet.created_at.hour))
             else:
-                print(u"retweeted")
+                print(u"Retweet")
             # end if
         # end for
 
         # Save matrix
-        pickle.dump((week_day_stats, max_tweet_id), open(args.file, 'w'))
+        pickle.dump((week_day_stats, new_max_tweet_id), open(args.file, 'w'))
+
+        # Control
+        if not cont:
+            break
+        # end if
 
         # Wait
         logger.info(u"Waiting 60 seconds...")
