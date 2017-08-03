@@ -139,8 +139,10 @@ class TweetStatistics(object):
         :param filename:
         :return:
         """
-        with io.open(filename, 'r') as f:
-            return pickle.load(f)
+        with open(filename, 'r') as f:
+            obj = pickle.load(f)
+            obj.stop()
+            return obj
         # end with
     # end load
 
@@ -151,7 +153,7 @@ class TweetStatistics(object):
         :param filename:
         :return:
         """
-        with io.open(filename, 'w') as f:
+        with open(filename, 'w') as f:
             pickle.dump(self, f)
         # end with
     # end save

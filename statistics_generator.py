@@ -30,7 +30,7 @@ import numpy as np
 import os
 import pickle
 import matplotlib.pyplot as plt
-from stats.TweetStatistics import TweetStatistics
+from stats.TweetStatistics import TweetStatistics, TweetAlreadyCountedException
 from twitter.TweetBotConnect import TweetBotConnector
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
@@ -74,53 +74,72 @@ if __name__ == "__main__":
         stats_manager = TweetStatistics.load(args.file)
     # end if
 
-    # Cursor
-    if args.stream == "timeline":
-        cursor = twitter_connector.get_time_line(n_pages=args.n_pages)
-    else:
-        cursor = twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages)
-    # end if
-
     # Loop control
     cont = True
+    main_loop = True
 
     # Start statistics
     stats_manager.start()
 
-    try:
-        # For each of my tweets
-        for index_page, page in enumerate(cursor):
-            logger.info(u"Analyzing page number {}".format(index_page))
+    # Main loop
+    while main_loop:
+        # Cursor
+        if args.stream == "timeline":
+            cursor = twitter_connector.get_time_line(n_pages=args.n_pages)
+        else:
+            cursor = twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages)
+        # end if
 
-            # For each tweet
-            for index_tweet, tweet in enumerate(page):
+        # Start statistics
+        stats_manager.start()
 
-                # Count
-                if not tweet.retweeted:
-                    stats_manager.add(tweet)
-                    logging.info(u"{} more retweets and {} more likes for day {} hour {}".format(tweet.retweet_count,
-                                                                                                 float(
-                                                                                                     tweet.favorite_count) * 0.5,
-                                                                                                 tweet.created_at.weekday(),
-                                                                                                 tweet.created_at.hour))
+        try:
+            # For each of my tweets
+            for index_page, page in enumerate(cursor):
+                logger.info(u"Analyzing page number {}".format(index_page))
+
+                # For each tweet
+                for index_tweet, tweet in enumerate(page):
+
+                    # Count
+                    if not tweet.retweeted:
+                        try:
+                            stats_manager.add(tweet)
+                            logging.info(u"{} more retweets and {} more likes for day {} hour {}".format(tweet.retweet_count,
+                                                                                                         float(
+                                                                                                             tweet.favorite_count) * 0.5,
+                                                                                                         tweet.created_at.weekday(),
+                                                                                                         tweet.created_at.hour))
+                        except TweetAlreadyCountedException:
+                            logging.info(u"Last tweet in stats reached... Exiting")
+                            cont = False
+                            break
+                        # end try
+                    # end if
+                # end for
+
+                # Control
+                if not cont:
+                    break
                 # end if
+
+                # Wait
+                logger.info(u"Waiting 60 seconds for next page...")
+                time.sleep(60)
             # end for
+        except KeyboardInterrupt:
+            main_loop = False
+            pass
+        # end try
 
-            # Save statistics
-            stats_manager.save(args.file)
+        # Stop & save statistics
+        stats_manager.stop()
+        stats_manager.save(args.file)
 
-            # Control
-            if not cont:
-                break
-            # end if
-
-            # Wait
-            logger.info(u"Waiting 60 seconds...")
-            time.sleep(60)
-        # end for
-    except KeyboardInterrupt:
-        pass
-    # end try
+        # Waiting 60 seconds to get new tweets
+        logger.info(u"Waiting 60 seconds to get new tweets...")
+        time.sleep(60)
+    # end while
 
     # Save statistics
     stats_manager.save(args.file)
