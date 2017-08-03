@@ -105,9 +105,11 @@ if __name__ == "__main__":
             # end if
             if not tweet.retweeted:
                 week_day_stats[
-                    tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count + tweet.favorite_count * 0.5
+                    tweet.created_at.weekday(), tweet.created_at.hour] += tweet.retweet_count + float(
+                    tweet.favorite_count) * 0.5
                 logging.info(u"{} more retweets and {} more likes for day {} hour {}".format(tweet.retweet_count,
-                                                                                             tweet.favorite_count * 0.5,
+                                                                                             float(
+                                                                                                 tweet.favorite_count) * 0.5,
                                                                                              tweet.created_at.weekday(),
                                                                                              tweet.created_at.hour))
             # end if
