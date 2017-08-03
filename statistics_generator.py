@@ -30,6 +30,7 @@ import numpy as np
 import os
 import pickle
 import matplotlib.pyplot as plt
+from stats.TweetStatistics import TweetStatistics
 from twitter.TweetBotConnect import TweetBotConnector
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
@@ -68,10 +69,9 @@ if __name__ == "__main__":
 
     # Stats for each day of the week
     if not os.path.exists(args.file):
-        week_day_stats = np.zeros((7, 24), dtype='float64')
-        max_tweet_id = 0
+        stats_manager = TweetStatistics()
     else:
-        week_day_stats, max_tweet_id = pickle.load(open(args.file, 'r'))
+        stats_manager = TweetStatistics.load(args.file)
     # end if
 
     # Cursor
@@ -80,9 +80,6 @@ if __name__ == "__main__":
     else:
         cursor = twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages)
     # end if
-
-    # Week day index to string
-    week_to_string = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     # Loop control
     cont = True
