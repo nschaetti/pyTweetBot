@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # File : pyTweetBot.py
-# Description : pyTweetBot main execution file.
+# Description : pyTweetBot, generate statistics about tweets.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     parser.add_argument("--file", type=str, help="Output file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
-    parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default=10)
+    parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
     args = parser.parse_args()
 
     # Logging
@@ -100,7 +100,6 @@ if __name__ == "__main__":
 
                 # For each tweet
                 for index_tweet, tweet in enumerate(page):
-
                     # Count
                     if not tweet.retweeted:
                         try:
