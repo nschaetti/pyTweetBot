@@ -53,6 +53,10 @@ class TweetBotConnector(object):
         self._config = config
     # end __init__
 
+    ###########################################
+    # Public
+    ###########################################
+
     # Retweet
     def retweet(self, tweet_id):
         """
@@ -192,16 +196,36 @@ class TweetBotConnector(object):
         self._page = None
     # end reset
 
-    # Load followers
-    def _load_followers(self):
-        self._page = self._cursor.next()
-        self._followers = list()
-        for follower in self._page:
-            self._followers.append(follower)
-        # end for
-        self._current_follower = 0
-        time.sleep(60)
-    # end load
+    # Get followers cursor
+    def get_followers_cursor(self):
+        """
+        Get followers cursor.
+        :return: Followers cursor.
+        """
+        return tweepy.Cursor(self._api.followers)
+    # end get_followers_cursor
+
+    # Get following cursor
+    def get_following_cursor(self):
+        """
+        Get following cursor.
+        :return: Following cursor.
+        """
+        return tweepy.Cursor(self._api.friends)
+    # end get_followers_cursor
+
+    # Get the user
+    def get_user(self):
+        """
+        Get the user
+        :return: The Twitter user object.
+        """
+        return self._api.get_user(self._config['user'])
+    # end get_user
+
+    ###########################################
+    # Override
+    ###########################################
 
     def next(self):
         # Follower
@@ -216,31 +240,19 @@ class TweetBotConnector(object):
         return follower
     # end next
 
-    # Get followers cursor
-    def get_followers_cursor(self):
-        """
-        Get followers cursor.
-        :return: Followers cursor.
-        """
-        return tweepy.Cursor(self._api.followers).pages()
-    # end get_followers_cursor
+    ###########################################
+    # Private
+    ###########################################
 
-    # Get following cursor
-    def get_following_cursor(self):
-        """
-        Get following cursor.
-        :return: Following cursor.
-        """
-        return tweepy.Cursor(self._api.friends).pages()
-    # end get_followers_cursor
-
-    # Get the user
-    def get_user(self):
-        """
-        Get the user
-        :return: The Twitter user object.
-        """
-        return self._api.get_user(self._config['user'])
-    # end get_user
+    # Load followers
+    def _load_followers(self):
+        self._page = self._cursor.next()
+        self._followers = list()
+        for follower in self._page:
+            self._followers.append(follower)
+        # end for
+        self._current_follower = 0
+        time.sleep(60)
+    # end load
 
 # end TweetBotConnector
