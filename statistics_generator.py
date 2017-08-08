@@ -50,6 +50,7 @@ if __name__ == "__main__":
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
     parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
+    parser.add_argument("--info", action='store_true', help="Display informations", default=False)
     args = parser.parse_args()
 
     # Logging
@@ -72,6 +73,24 @@ if __name__ == "__main__":
         stats_manager = TweetStatistics()
     else:
         stats_manager = TweetStatistics.load(args.file)
+    # end if
+
+    # Display info?
+    if args.info:
+        for weekday in range(7):
+            for hour in range(24):
+                if stats_manager.count(weekday, hour) > 0:
+                    """print(u"Expected number of retweets/likes "
+                          u"for weekday {}, hour {} : {} ({})".
+                          format(weekday, hour, stats_manager.value(weekday, hour) / stats_manager.count(weekday, hour),
+                                 stats_manager.count(weekday, hour)))"""
+                    print(u"Expected number of retweets/likes "
+                          u"for weekday {}, hour {} : {} ({})".
+                          format(weekday, hour, stats_manager.expect_norm(weekday, hour), stats_manager.count(weekday, hour)))
+                # end if
+            # end for
+        # end for
+        exit()
     # end if
 
     # Loop control
@@ -137,7 +156,7 @@ if __name__ == "__main__":
 
         # Waiting 60 seconds to get new tweets
         logger.info(u"Waiting 60 seconds to get new tweets...")
-        time.sleep(60)
+        time.sleep(600)
     # end while
 
     # Save statistics

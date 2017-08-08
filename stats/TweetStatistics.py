@@ -44,6 +44,7 @@ class TweetAlreadyCountedException(Exception):
 # Class
 #######################################
 
+
 # Tweet statistics managing class
 class TweetStatistics(object):
     """
@@ -106,6 +107,28 @@ class TweetStatistics(object):
         # end if
     # end add
 
+    # Get total retweets/likes for a tuple weekday, hour
+    def value(self, weekday, hour):
+        """
+        Get total retweets/likes to a tuple weekday, hour
+        :param weekday:
+        :param hour:
+        :return:
+        """
+        return self._statistic_matrix[weekday, hour]
+    # end value
+
+    # Get total counts for a tuple (weekday, hour)
+    def count(self, weekday, hour):
+        """
+        Get total counts for a tuple (weekday, hour)
+        :param weekday:
+        :param hour:
+        :return:
+        """
+        return self._counting_matrix[weekday, hour]
+    # end count
+
     # Get expected retweet for a tuple weekday, hour
     def expect(self, weekday, hour):
         """
@@ -126,6 +149,13 @@ class TweetStatistics(object):
         :return:
         """
         retweet_values = self._statistic_matrix / self._counting_matrix
+        for w in range(7):
+            for h in range(24):
+                if np.isnan(retweet_values[w, h]):
+                    retweet_values[w, h] = 0.0
+                # end if
+            # end for
+        # end for
         max_value = np.max(retweet_values)
         retweet_values /= max_value
         return retweet_values[weekday, hour]
