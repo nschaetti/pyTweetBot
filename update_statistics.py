@@ -26,6 +26,7 @@
 import argparse
 import logging
 import smtplib
+import ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from config.BotConfig import BotConfig
@@ -45,7 +46,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
 
     # Argument
-    parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     args = parser.parse_args()
@@ -105,7 +105,12 @@ if __name__ == "__main__":
     msg.attach(part2)
 
     # Send the message via local SMTP server.
-    s = smtplib.SMTP('localhost')
+    s = smtplib.SMTP('smtp.gmail.com')
+
+    s.set_debuglevel(1)
+    s.ehlo()
+    s.starttls()
+    s.login("", "")
 
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
