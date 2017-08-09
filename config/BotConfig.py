@@ -47,6 +47,7 @@ class BotConfig(object):
         self._hashtags = BotConfig.get_field(data, 'hashtags')
         self._rss = BotConfig.get_field(data, 'rss')
         self._forbidden_words = BotConfig.get_field(data, 'forbidden_words')
+        self._email = data['email']
     # end __init__
 
     ######################################
@@ -156,6 +157,15 @@ class BotConfig(object):
         """
         return self._retweet
     # end get_retweet_config
+
+    # Get email address
+    def get_email(self):
+        """
+        Get email
+        :return:
+        """
+        return self._email
+    # end get_email
 
     ######################################
     # Private

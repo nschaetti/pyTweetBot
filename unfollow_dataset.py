@@ -56,17 +56,17 @@ if __name__ == "__main__":
     # Load or create dataset
     if os.path.exists(args.dataset):
         with open(args.dataset, 'r') as f:
-            (keep, unfollow) = pickle.load(f)
+            (follow, unfollow, screen_names) = pickle.load(f)
         # end with
     else:
-        keep, unfollow = list(), list()
+        follow, unfollow, screen_names = list(), list(), list()
     # end if
 
     # Show informations
     if args.info:
         # Print info
-        print(u"{} examples in the dataset".format(len(keep) + len(unfollow)))
-        print(u"{} examples in the keep class".format(len(keep)))
+        print(u"{} examples in the dataset".format(len(follow) + len(unfollow)))
+        print(u"{} examples in the follow class".format(len(follow)))
         print(u"{} examples in the unfollow class".format(len(unfollow)))
         exit()
     # end if
@@ -86,27 +86,32 @@ if __name__ == "__main__":
     for page in twitter_connector.get_following_cursor().pages():
         # For each followers
         for friend in page:
-            print(u"Next friend to analyze: ")
-            print(u"Screen name: {}".format(friend.screen_name))
-            print(u"Followers count: {}".format(friend.followers_count))
-            print(u"Friends count: {}".format(friend.friends_count))
-            print(u"Lang: {}".format(friend.lang))
-            print(u"Description: {}".format(friend.description))
+            if friend.screen_name not in screen_names:
+                print(u"Next friend to analyze: ")
+                print(u"Screen name: {}".format(friend.screen_name))
+                print(u"Followers count: {}".format(friend.followers_count))
+                print(u"Friends count: {}".format(friend.friends_count))
+                print(u"Lang: {}".format(friend.lang))
+                print(u"Description: {}".format(friend.description))
 
-            # Ask
-            response = raw_input(u"Action (u(nfollow), K(eep) : ").lower()
-            print(u"")
+                # Ask
+                response = raw_input(u"Action (u(nfollow), F(ollow) : ").lower()
+                print(u"")
 
-            # Add
-            if response == 'u':
-                unfollow.append(friend)
-            else:
-                keep.append(friend)
-            # end if
+                # Add
+                if response == 'u':
+                    unfollow.append(friend)
+                else:
+                    follow.append(friend)
+                # end if
 
-            # Save
-            with open(args.dataset, 'w') as f:
-                pickle.dump((keep, unfollow), f)
+                # Save name
+                screen_names.append(friend.screen_name)
+
+                # Save
+                with open(args.dataset, 'w') as f:
+                    pickle.dump((follow, unfollow, screen_names), f)
+                # end with
             # end with
         # end for
 
