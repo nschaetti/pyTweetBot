@@ -48,6 +48,7 @@ class BotConfig(object):
         self._rss = BotConfig.get_field(data, 'rss')
         self._forbidden_words = BotConfig.get_field(data, 'forbidden_words')
         self._email = data['email']
+        self._scheduler_config = BotConfig.get_field(data, 'scheduler')
     # end __init__
 
     ######################################
@@ -166,6 +167,15 @@ class BotConfig(object):
         """
         return self._email
     # end get_email
+
+    # Get scheduler config
+    def get_scheduler_config(self):
+        """
+        Get scheduler config
+        :return:
+        """
+        return self._scheduler_config
+    # end get_scheduler_config
 
     ######################################
     # Private

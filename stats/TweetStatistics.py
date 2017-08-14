@@ -25,7 +25,7 @@
 # Imports
 import numpy as np
 import pickle
-import io
+import datetime
 
 #######################################
 # Exception
@@ -52,7 +52,7 @@ class TweetStatistics(object):
     """
 
     # Constructor
-    def __init__(self):
+    def __init__(self, slope=25, beta=5):
         """
         Constructor
         """
@@ -62,6 +62,8 @@ class TweetStatistics(object):
         self._last_tweet_id = 0
         self._tmp_max_tweet_id = 0
         self._counting = False
+        self._slope = slope
+        self._beta = 5
     # end __init__
 
     ##########################################
@@ -161,6 +163,43 @@ class TweetStatistics(object):
         return retweet_values[weekday, hour]
     # end expect_norm
 
+    # Save the object to a file
+    def save(self, filename):
+        """
+        Save the object to a file
+        :param filename:
+        :return:
+        """
+        with open(filename, 'w') as f:
+            pickle.dump(self, f)
+        # end with
+    # end save
+
+    ##########################################
+    # Static
+    ##########################################
+
+    # Call and return the waiting time for now
+    def __call__(self, time=datetime.datetime.utcnow(), slope=25.0, beta=5.0):
+        """
+        Call and return the waiting time for now
+        :param time:
+        :return: Waiting time in seconds
+        """
+        # Expected retweet counts normalized and inversed
+        inv_norm_retweets = (self.expect_norm(time.weekday(), time.hour) * -1.0) + 1.0
+
+        # Apply the function
+        waiting_minutes = slope * inv_norm_retweets + beta
+
+        # To seconds
+        return waiting_minutes * 60.0
+    # end __call__
+
+    ##########################################
+    # Static
+    ##########################################
+
     # Load the object
     @staticmethod
     def load(filename):
@@ -175,18 +214,6 @@ class TweetStatistics(object):
             return obj
         # end with
     # end load
-
-    # Save the object to a file
-    def save(self, filename):
-        """
-        Save the object to a file
-        :param filename:
-        :return:
-        """
-        with open(filename, 'w') as f:
-            pickle.dump(self, f)
-        # end with
-    # end save
 
     ##########################################
     # Private

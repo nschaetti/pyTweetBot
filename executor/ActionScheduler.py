@@ -33,6 +33,9 @@ from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
 import tweet.Tweet as tw
+import sys
+import time
+from threading import Thread
 
 
 # Reservoir full exception
@@ -64,14 +67,14 @@ class NoFactory(Exception):
 
 # Manage bot's action
 @singleton
-class ActionScheduler(object):
+class ActionScheduler(Thread):
     """
     Manage bot's action
     """
 
     # Constructor
     def __init__(self, n_actions=None, update_delay=timedelta(minutes=10), reservoir_size=timedelta(days=3),
-                 purge_delay=timedelta(weeks=2)):
+                 purge_delay=timedelta(weeks=2), config=None, stats=None):
         """
         Constructor
         :param n_exec:
@@ -83,20 +86,42 @@ class ActionScheduler(object):
             self._n_actions = {"Follow": 1, "Unfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
         else:
             self._n_actions = n_actions
+        # end if
         self._purge_delay = purge_delay
         self._reservoir_size = reservoir_size
         self._update_delay = update_delay
         self._factory = None
+        self._config = config
 
         # Purge the reservoir
         self._purge_reservoir()
+
+        # Thread control and stats
+        if config is not None and stats is not None:
+            Thread.__init__(self)
+            self._stats_manager = stats
+        # end if
     # end __init__
 
     ##############################################
-    #
-    # Public functions
-    #
+    # Public
     ##############################################
+
+    # Thread running function
+    def run(self):
+        """
+        Thread running function
+        :return:
+        """
+        while True:
+            print("run!!")
+            # Wait
+            scheduler_config = self._config.get_scheduler_config()
+            waiting_seconds = self._stats_manager(datetime.datetime.utcnow(), scheduler_config['slope'], scheduler_config['beta'])
+            logging.getLogger(u"pyTweetBot").info(u"Waiting {0:.{1}f} minutes for next run".format(waiting_seconds/60.0, 0))
+            time.sleep(waiting_seconds)
+        # end while
+    # end run
 
     # Add an action to the DB
     def add(self, action):
@@ -226,6 +251,32 @@ class ActionScheduler(object):
             # end for
         # end for
     # end __call__
+
+    # Execute next actions
+    def exec_next_actions(self):
+        """
+        Execute next actions
+        :return:
+        """
+        for action_type in ["Follow", "Unfollow", "Like", "Tweet", "Retweet"]:
+            # Get action to be executed
+            self.exec_next_action(action_type=action_type)
+        # end for
+    # end exec_next_action
+
+    # Execute next action (by type)
+    def exec_next_action(self, action_type):
+        """
+        Execute next action (by type)
+        :param action_type: Action's type (like, follow, etc)
+        :return:
+        """
+        # Get all actions
+        action = self._session.query(Action).filter(Action.action_type == action_type) \
+            .order_by(Action.action_id).all()[0]
+        action.execute()
+        self.delete(action)
+    # end exec_next_action
 
     # Is reservoir empty
     def empty(self, action_type):
