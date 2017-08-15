@@ -25,16 +25,13 @@
 # Import
 import argparse
 import logging
-import smtplib
-import sys
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
-from executor.ActionScheduler import ActionScheduler
 from friends.FriendsManager import FriendsManager
 from twitter.TweetBotConnect import TweetBotConnector
-import dns.resolver
+from mail.MailBuilder import MailBuilder
+from mail.MailSender import MailSender
+import pkg_resources
 
 
 ####################################################
@@ -69,60 +66,26 @@ if __name__ == "__main__":
     # Friends
     friends_manager = FriendsManager()
 
-    # Action scheduler
-    action_scheduler = ActionScheduler()
-
     # Update statistics in the DB
     friends_manager.update_statistics()
 
-    # Create message container - the correct MIME type is multipart/alternative.
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = "pyTweetBot statistics"
-    msg['From'] = "pytweetbot@bot.ai"
-    msg['To'] = config.get_email()
+    # Get template
+    template = pkg_resources.resource_string("templates", 'weekly_statistics.html')
 
-    # Create the body of the message (a plain-text and an HTML version).
-    text = "Hi!\nHow are you?\nHere is the link you wanted:\nhttp://www.python.org"
-    html = """\
-    <html>
-      <head></head>
-      <body>
-        <p>Hi!<br>
-           How are you?<br>
-           Here is the <a href="http://www.python.org">link</a> you wanted.
-        </p>
-      </body>
-    </html>
-    """
+    # Mail builder
+    mail_builder = MailBuilder(template)
 
-    # Record the MIME types of both parts - text/plain and text/html.
-    part1 = MIMEText(text, 'plain')
-    part2 = MIMEText(html, 'html')
+    # Parameter template
+    mail_builder['followers'] = friends_manager.n_followers()
+    mail_builder['following'] = friends_manager.n_following()
 
-    # Attach parts into message container.
-    # According to RFC 2046, the last part of a multipart message, in this case
-    # the HTML message, is best and preferred.
-    msg.attach(part1)
-    msg.attach(part2)
+    # Mail
+    to_address = config.get_email()
 
-    answers = dns.resolver.query('gmail.com', 'MX')
-    if len(answers) <= 0:
-        sys.stderr.write('No mail servers found for destination\n')
-        sys.exit(1)
+    # Mail sender
+    sender = MailSender(subject="Your weekly update", from_address="pytweetbot@bot.ai", to_addresses=[to_address],
+                        msg=mail_builder.message())
 
-    # Just pick the first answer
-    server = str(answers[0].exchange)
-
-    # Send the message via local SMTP server.
-    s = smtplib.SMTP(server)
-
-    s.set_debuglevel(1)
-    #s.starttls()
-    #s.ehlo("bot.ai")
-
-    # sendmail function takes 3 arguments: sender's address, recipient's address
-    # and message to send - here it is sent as one string.
-    s.sendmail("pytweetbot@bot.ai", config.get_email(), msg.as_string())
-    s.quit()
-
+    # Send
+    sender.send()
 # end if
