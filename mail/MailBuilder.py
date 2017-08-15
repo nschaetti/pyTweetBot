@@ -30,11 +30,39 @@ class MailBuilder(object):
     """
 
     # Constructor
-    def __init__(self):
+    def __init__(self, message_model):
         """
         Constructor
         """
-        pass
+        self._parameters = dict()
+        self._message = message_model
     # end __init__
+
+    # Get message
+    def message(self):
+        """
+        Get message
+        :return: Message as HTML code
+        """
+        message = self._message
+
+        # Replace
+        for key in self._parameters.keys():
+            message = message.replace(u"@@_" + key + u"_@@", unicode(self._parameters[key]))
+        # end for
+
+        return message
+    # end message
+
+    # Set parameter
+    def __setitem__(self, key, value):
+        """
+        Set parameter
+        :param key:
+        :param value:
+        :return:
+        """
+        self._parameters[key] = value
+    # end __setattr__
 
 # end MailBuilder

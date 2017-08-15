@@ -179,22 +179,21 @@ class FriendsManager(object):
         return tweepy.Cursor(self._api.followers)
     # end get_followers_cursor
 
-    ######################################################
-    #
-    # PRIVATE FUNCTIONS
-    #
-    ######################################################
-
     # Insert a value in the statistics table
     def update_statistics(self):
         """
         Insert a value in the statistics table.
         """
-        statistic = Statistic(statistic_friends_count=self.n_following(), statistic_followers_count=self.n_followers(),
+        statistic = Statistic(statistic_friends_count=self.n_following(),
+                              statistic_followers_count=self.n_followers(),
                               statistic_statuses_count=ActionScheduler().n_statuses())
         self._session.add(statistic)
         self._session.commit()
     # end _insert_statistic
+
+    ######################################################
+    # PRIVATE FUNCTIONS
+    ######################################################
 
     # Add a friend
     def _add_friend(self, screen_name, description, location, followers_count, friends_count,
