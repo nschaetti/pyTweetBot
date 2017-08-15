@@ -92,7 +92,6 @@ if __name__ == "__main__":
         # end while
     except (KeyboardInterrupt, SystemExit):
         logger.info(u"Stopping executing action with scheduler...")
-        action_scheduler.stop()
     # end try
 
 # end if

@@ -138,7 +138,7 @@ class ActionScheduler(Thread):
             # Commit
             self._session.commit()
         else:
-            raise ActionReservoirFullError("To many action in the reservoir to add a new one")
+            raise ActionReservoirFullError(u"To many action in the reservoir to add a new one")
         # end if
     # end add
 

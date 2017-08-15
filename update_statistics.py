@@ -26,7 +26,7 @@
 import argparse
 import logging
 import smtplib
-import ssl
+import sys
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from config.BotConfig import BotConfig
@@ -34,6 +34,7 @@ from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler
 from friends.FriendsManager import FriendsManager
 from twitter.TweetBotConnect import TweetBotConnector
+import dns.resolver
 
 
 ####################################################
@@ -104,13 +105,20 @@ if __name__ == "__main__":
     msg.attach(part1)
     msg.attach(part2)
 
+    answers = dns.resolver.query('gmail.com', 'MX')
+    if len(answers) <= 0:
+        sys.stderr.write('No mail servers found for destination\n')
+        sys.exit(1)
+
+    # Just pick the first answer
+    server = str(answers[0].exchange)
+
     # Send the message via local SMTP server.
-    s = smtplib.SMTP('smtp.gmail.com')
+    s = smtplib.SMTP(server)
 
     s.set_debuglevel(1)
-    s.ehlo()
-    s.starttls()
-    s.login("", "")
+    #s.starttls()
+    #s.ehlo("bot.ai")
 
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.

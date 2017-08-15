@@ -75,7 +75,6 @@ if __name__ == "__main__":
 
     # Display info?
     if args.info:
-        print(u"Waiting time : {}".format(stats_manager()))
         for weekday in range(7):
             for hour in range(24):
                 if stats_manager.count(weekday, hour) > 0:
