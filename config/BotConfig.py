@@ -22,7 +22,7 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import json
+import simplejson
 
 
 # Bot config
@@ -64,7 +64,7 @@ class BotConfig(object):
         :return: PyTweetBotConfig object.
         """
         with open(config_file, 'r') as json_file:
-            data = json.load(json_file)
+            data = simplejson.load(json_file)
         # end with
         return BotConfig(data)
     # end load
