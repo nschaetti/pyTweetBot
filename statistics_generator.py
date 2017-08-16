@@ -28,6 +28,7 @@ import logging
 import time
 import os
 import datetime
+import tweepy
 from stats.TweetStatistics import TweetStatistics, TweetAlreadyCountedException
 from twitter.TweetBotConnect import TweetBotConnector
 from config.BotConfig import BotConfig
@@ -145,6 +146,12 @@ if __name__ == "__main__":
             # end for
         except KeyboardInterrupt:
             main_loop = False
+            pass
+        except tweepy.error.TweepError as e:
+            logger.error(u"Tweepy error while retrieving page : {}".format(e))
+            if e.api_code == 429:
+                time.sleep(600)
+            # end if
             pass
         # end try
 
