@@ -84,8 +84,8 @@ if __name__ == "__main__":
                           format(weekday, hour, stats_manager.value(weekday, hour) / stats_manager.count(weekday, hour),
                                  stats_manager.count(weekday, hour)))"""
                     print(u"Expected number of retweets/likes "
-                          u"for weekday {}, hour {} : {} ({})".
-                          format(weekday, hour, stats_manager.expect_norm(weekday, hour), stats_manager.count(weekday, hour)))
+                          u"for weekday {}, hour {} : {} ({}/{})".
+                          format(weekday, hour, stats_manager.expect_norm(weekday, hour), stats_manager.count(weekday, hour), stats_manager.expect(weekday, hour)))
                 # end if
             # end for
         # end for
