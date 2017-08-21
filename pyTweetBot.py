@@ -25,7 +25,7 @@
 # Import
 import argparse
 import logging
-
+import sys
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler
@@ -35,7 +35,11 @@ from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
 from twitter.TweetGenerator import TweetGenerator
-from tweet.TweetFactory import TweetFactory
+from update_statistics import update_statistics
+from tweet_finder import tweet_finder
+from tweet_dataset import tweet_dataset
+from statistics_generator import statistics_generator
+from executor import execute_actions
 
 ####################################################
 # Main function
@@ -47,9 +51,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
 
     # Argument
-    parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
+    parser.add_argument('command', type=str, nargs='?', help="Command (update_statistics, find-tweet, tweet-dataset, statistics-generator)")
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
+    parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
+    parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
+    parser.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
+    parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
+    parser.add_argument("--model", type=str, help="Classification model file")
+    parser.add_argument("--file", type=str, help="Output file", required=True)
+    parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
     args = parser.parse_args()
 
     # Logging
@@ -69,62 +80,29 @@ if __name__ == "__main__":
 
     # Friends
     friends_manager = FriendsManager()
-    #n_follower, d_follower, n_following, d_following = friends_manager.update()
-    #logger.info("%d new follower, %d unfollow, %d new following, %d unfollowing")
-    """obsolete_friends = friends_manager.get_obsolete_friends(days=14)
-    logger.info("Obsolete friends : ")
-    for friend in obsolete_friends:
-        print(friend.friend_screen_name)
-        print(friend.friend_following_date)
-    # end for"""
 
     # Action scheduler
     action_scheduler = ActionScheduler()
 
-    # Add until reservoir is full
-    """index = 433
-    while True:
-        try:
-            action_scheduler.add_follow(index)
-        except ActionAlreadyExists as e:
-            print(e)
-            break
-        # end tryp
-        index += 1
-    # end while"""
-    """for action in action_scheduler.get_exec_action():
-        action.execute()
-    # end for"""
-    #action_scheduler.add_tweet("http://www.nilsschaetti.com")
-    #action_scheduler.add_tweet("This is a test for #pyTweetBot https://github.com/nschaetti/pyTweetBot")
-    #action_scheduler()
-
-    #friends_manager.update_statistics()
-
-    # Tweet generator
-    tweet_factory = TweetFactory(config.get_hashtags())
-    action_scheduler.set_factory(tweet_factory)
-
-    # Tweet finder
-    tweet_finder = TweetFinder()
-    for rss_stream in config.get_rss_streams():
-        tweet_finder.add(RSSHunter(rss_stream))
-    # end for
-    #tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/startups"))
-    #tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/fundings-exits"))
-    #tweet_finder.add(RSSHunter("http://feeds.feedburner.com/TechCrunch/social"))
-    tweet_finder.add(GoogleNewsHunter(search_term="machine learning", lang="en", country="us"))
-
-    # Tweet preparator
-    #tweet_preparator = TweetPreparator(config.get_hashtags())
-
-    # For each tweet
-    for tweet in tweet_finder:
-        #action_scheduler.add_tweet(tweet)
-        print(unicode(tweet_factory(tweet)).encode('ascii', errors='ignore'))
-        print(unicode(tweet.get_tweet()).encode('ascii', errors='ignore'))
-        print(len(tweet.get_tweet()) + 24)
-        print("")
-    # end for
+    # Test command
+    # Update statistics
+    if args.command == "update-statistics":
+        update_statistics(config=config)
+    # Find tweets
+    elif args.command == "find-tweet":
+        tweet_finder(config, args.model, action_scheduler)
+    # Retweet dataset
+    elif args.command == "tweet-dataset":
+        tweet_dataset(config, tweet_connector=twitter_connector)
+    # Statistics generator
+    elif args.command == "statistics-generator":
+        statistics_generator(config, mysql_connector, twitter_connector)
+    # Executor
+    elif args.command == "execute":
+        execute_actions(config, twitter_connector, action_scheduler)
+    # Unknown command
+    else:
+        sys.stderr.write(u"Unknown command {}\n".format(args.command))
+    # end if
 
 # end if
