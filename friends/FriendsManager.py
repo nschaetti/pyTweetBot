@@ -189,6 +189,7 @@ class FriendsManager(object):
                               statistic_statuses_count=ActionScheduler().n_statuses())
         self._session.add(statistic)
         self._session.commit()
+        return self.n_followers(), self.n_following(), ActionScheduler().n_statuses()
     # end _insert_statistic
 
     ######################################################

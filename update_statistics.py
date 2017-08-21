@@ -66,8 +66,10 @@ if __name__ == "__main__":
     # Friends
     friends_manager = FriendsManager()
 
+    # Get last statistics
+
     # Update statistics in the DB
-    friends_manager.update_statistics()
+    n_followers, n_following, n_statuses = friends_manager.update_statistics()
 
     # Get template
     template = pkg_resources.resource_string("templates", 'weekly_statistics.html')
@@ -76,8 +78,9 @@ if __name__ == "__main__":
     mail_builder = MailBuilder(template)
 
     # Parameter template
-    mail_builder['followers'] = friends_manager.n_followers()
-    mail_builder['following'] = friends_manager.n_following()
+    mail_builder['followers'] = n_followers
+    mail_builder['following'] = n_following
+    mail_builder['statuses_count'] = n_statuses
 
     # Mail
     to_address = config.get_email()
