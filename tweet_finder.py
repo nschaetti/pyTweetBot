@@ -69,41 +69,17 @@ def signal_handler(signum, frame):
 # Main function
 ####################################################
 
-if __name__ == "__main__":
-
-    # Argument parser
-    parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
-
-    # Argument
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--model", type=str, help="Model file", required=True)
-    parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    args = parser.parse_args()
+def tweet_finder(config, model, action_scheduler):
+    """
+    Find tweet in the hunters
+    :param config:
+    :param model:
+    :return:
+    """
 
     # Set the signal handler and a 5-second alarm
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
-
-    # Logging
-    logging.basicConfig(level=args.log_level)
-    logger = logging.getLogger(name="pyTweetBot")
-
-    # Load configuration file
-    config = BotConfig.load(args.config)
-
-    # Connection to MySQL
-    dbc = config.get_database_config()
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
-
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
-
-    # Friends
-    friends_manager = FriendsManager()
-
-    # Action scheduler
-    action_scheduler = ActionScheduler()
 
     # Tweet factory
     tweet_factory = TweetFactory(config.get_hashtags())
@@ -113,11 +89,11 @@ if __name__ == "__main__":
     tweet_finder = TweetFinder(shuffle=True)
 
     # Load model or create
-    if os.path.exists(args.model):
-        model = Model.load(args.model)
+    if os.path.exists(model):
+        model = Model.load(model)
         censor = CensorModel(config)
     else:
-        logging.error(u"Mode file {} does not exists".format(args.model))
+        logging.error(u"Mode file {} does not exists".format(model))
         exit()
     # end if
 
