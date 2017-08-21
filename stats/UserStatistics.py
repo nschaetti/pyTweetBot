@@ -23,9 +23,16 @@
 #
 
 # Imports
-import numpy as np
-import pickle
-import datetime
+import logging
+from db.DBConnector import DBConnector
+from executor.ActionScheduler import ActionScheduler
+from db.obj.Statistic import Statistic
+from patterns.singleton import singleton
+from twitter.TweetBotConnect import TweetBotConnector
+from friends.FriendsManager import FriendsManager
+from sqlalchemy import update, delete, select
+from sqlalchemy.orm import load_only
+from sqlalchemy import or_, and_, not_
 
 
 #######################################
@@ -34,15 +41,62 @@ import datetime
 
 
 # Manage user's statistics
+@singleton
 class UserStatistics(object):
     """
     Manage user's statistics
     """
 
     # Constructor
+    def __init__(self):
+        """
+        Constructor
+        """
+        # DB session
+        self._session = DBConnector().get_session()
+
+        # Twitter connection
+        self._twitter_con = TweetBotConnector()
+
+        # Friends manager
+        self._friend_manager = FriendsManager()
+
+        # Logger
+        self._logger = logging.getLogger(name="pyTweetBot")
+    # end __init__
 
     #################################################
     # Public
-    ###########
+    #################################################
+
+    # Insert a value in the statistics table
+    def update_statistics(self):
+        """
+        Insert a value in the statistics table.
+        """
+        # Stats
+        n_followers = self._friend_manager.n_followers()
+        n_following = self._friend_manager.n_following()
+        n_statuses = ActionScheduler().n_statuses()
+
+        # Add
+        statistic = Statistic(statistic_friends_count=n_following,
+                              statistic_followers_count=n_followers,
+                              statistic_statuses_count=n_statuses)
+        self._session.add(statistic)
+        self._session.commit()
+
+        return n_followers, n_following, n_statuses
+    # end update_statistics
+
+    # Get last inserted statistics
+    def get_statistics(self, pos=-1):
+        """
+        Get last inserted statistics
+        :param pos:
+        :return:
+        """
+
+    # end get_statistics
 
 # end UserStatistics
