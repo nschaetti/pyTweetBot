@@ -43,45 +43,18 @@ from stats.TweetStatistics import TweetStatistics
 # Main function
 ####################################################
 
-if __name__ == "__main__":
 
-    # Argument parser
-    parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
-
-    # Argument
-    parser.add_argument("--action", type=str, help="What to do (execute, dm, friends, news, retweet).")
-    parser.add_argument("--file", type=str, help="Output file", required=True)
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    args = parser.parse_args()
-
-    # Logging
-    logging.basicConfig(level=args.log_level)
-    logger = logging.getLogger(name="pyTweetBot")
-
-    # Load configuration file
-    config = BotConfig.load(args.config)
-
-    # Stats for each day of the week
-    if not os.path.exists(args.file):
-        stats_manager = TweetStatistics()
-    else:
-        stats_manager = TweetStatistics.load(args.file)
-    # end if
-
-    # Connection to MySQL
-    dbc = config.get_database_config()
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
-
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
-
-    # Action scheduler
-    action_scheduler = ActionScheduler(config=config, stats=stats_manager)
-
+# Execute actions
+def execute_actions(action_scheduler):
+    """
+    Execute actions
+    :param config:
+    :param twitter_connector:
+    :param action_scheduler:
+    :return:
+    """
     # Start executing action
-    logger.info(u"Start executing action with scheduler...")
+    logging.getLogger(u"pyTweetBot").info(u"Start executing action with scheduler...")
     action_scheduler.daemon = True
     action_scheduler.start()
 
@@ -91,7 +64,7 @@ if __name__ == "__main__":
             action_scheduler.join(5)
         # end while
     except (KeyboardInterrupt, SystemExit):
-        logger.info(u"Stopping executing action with scheduler...")
+        logging.getLogger(u"pyTweetBot").info(u"Stopping executing action with scheduler...")
     # end try
 
 # end if
