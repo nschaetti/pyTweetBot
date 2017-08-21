@@ -89,14 +89,27 @@ class UserStatistics(object):
         return n_followers, n_following, n_statuses
     # end update_statistics
 
+    # Get statistics
+    def get_statistics(self):
+        """
+        Get statistics
+        :return:
+        """
+        return self._session.query(Statistic).order_by(Statistic.statistic_date)
+    # end get_statistics
+
     # Get last inserted statistics
-    def get_statistics(self, pos=-1):
+    def get_last_statistics(self, pos=-1):
         """
         Get last inserted statistics
         :param pos:
         :return:
         """
+        # Get statistics
+        statistics = self.get_statistics()
 
-    # end get_statistics
+        # Return
+        return statistics[pos]
+    # end get_last_statistics
 
 # end UserStatistics

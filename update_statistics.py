@@ -27,7 +27,7 @@ import argparse
 import logging
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
-from friends.FriendsManager import FriendsManager
+from stats.UserStatistics import UserStatistics
 from twitter.TweetBotConnect import TweetBotConnector
 from mail.MailBuilder import MailBuilder
 from mail.MailSender import MailSender
@@ -63,13 +63,11 @@ if __name__ == "__main__":
     # Connection to Twitter
     twitter_connector = TweetBotConnector(config)
 
-    # Friends
-    friends_manager = FriendsManager()
-
     # Get last statistics
+    last_stats = UserStatistics().get_last_statistics()
 
     # Update statistics in the DB
-    n_followers, n_following, n_statuses = friends_manager.update_statistics()
+    n_followers, n_following, n_statuses = UserStatistics().update_statistics()
 
     # Get template
     template = pkg_resources.resource_string("templates", 'weekly_statistics.html')
@@ -77,10 +75,18 @@ if __name__ == "__main__":
     # Mail builder
     mail_builder = MailBuilder(template)
 
+    # Last report date
+    mail_builder['date_last'] = unicode(last_stats.statistic_date)
+
     # Parameter template
     mail_builder['followers'] = n_followers
     mail_builder['following'] = n_following
-    mail_builder['statuses_count'] = n_statuses
+    mail_builder['statuses'] = n_statuses
+
+    # Differences
+    mail_builder['diff_followers'] = (n_followers - last_stats.statistic_followers_count)
+    mail_builder['diff_following'] = (n_following - last_stats.statistic_friends_count)
+    mail_builder['diff_statuses'] = (n_statuses - last_stats.statistic_statuses_count)
 
     # Mail
     to_address = config.get_email()
