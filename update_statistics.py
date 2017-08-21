@@ -38,10 +38,16 @@ import pkg_resources
 # Main function
 ####################################################
 
-if __name__ == "__main__":
+# Update statistics in the DB
+def update_statistics(config):
+    """
+    Update the statistics in the DB
+    :param config:
+    :return:
+    """
 
     # Argument parser
-    parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
+    """parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
 
     # Argument
     parser.add_argument("--config", type=str, help="Configuration file", required=True)
@@ -61,7 +67,7 @@ if __name__ == "__main__":
                                   db_name=dbc["database"])
 
     # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
+    twitter_connector = TweetBotConnector(config)"""
 
     # Get last statistics
     last_stats = UserStatistics().get_last_statistics()
@@ -97,4 +103,4 @@ if __name__ == "__main__":
 
     # Send
     sender.send()
-# end if
+# end update_statistics
