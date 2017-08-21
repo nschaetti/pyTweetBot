@@ -38,7 +38,12 @@ from db.DBConnector import DBConnector
 # Main function
 ####################################################
 
-if __name__ == "__main__":
+
+# Statistics generator
+def statistics_generator(config, mysql_connector, twitter_connector):
+    """
+    Statistics generator
+    """
 
     # Argument parser
     parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
@@ -51,21 +56,6 @@ if __name__ == "__main__":
     parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
     parser.add_argument("--info", action='store_true', help="Display informations", default=False)
     args = parser.parse_args()
-
-    # Logging
-    logging.basicConfig(level=args.log_level)
-    logger = logging.getLogger(name="pyTweetBot")
-
-    # Load configuration file
-    config = BotConfig.load(args.config)
-
-    # Connection to MySQL
-    dbc = config.get_database_config()
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
-
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
 
     # Stats for each day of the week
     if not os.path.exists(args.file):
