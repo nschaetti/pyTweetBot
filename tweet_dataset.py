@@ -38,7 +38,7 @@ import pickle
 # Main function
 ####################################################
 
-if __name__ == "__main__":
+def tweet_dataset(config, tweet_connector):
 
     # Argument parser
     parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
