@@ -35,4 +35,9 @@ def list_actions(action_scheduler):
     actions = action_scheduler.list_actions()
 
     # For each action
+    for action in actions:
+        if action.action_type == 'tweet':
+            print(u"[{}] will tweet \"{}\"".format(action.action_tweet_text))
+        # end if
+    # end for
 # end list_actions

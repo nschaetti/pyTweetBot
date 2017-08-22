@@ -39,7 +39,6 @@ from update_statistics import update_statistics
 from tweet_finder import tweet_finder
 from tweet_dataset import tweet_dataset
 from statistics_generator import statistics_generator
-from executor import execute_actions
 from list_actions import list_actions
 
 ####################################################
@@ -53,14 +52,14 @@ if __name__ == "__main__":
 
     # Argument
     parser.add_argument('command', type=str, nargs='?', help="Command (update_statistics, find-tweet, tweet-dataset, statistics-generator)")
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
+    parser.add_argument("--config", type=str, help="Configuration file")
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
+    parser.add_argument("--dataset", type=str, help="Dataset file")
     parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
     parser.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
     parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
     parser.add_argument("--model", type=str, help="Classification model file")
-    parser.add_argument("--file", type=str, help="Output file", required=True)
+    parser.add_argument("--file", type=str, help="Output file")
     parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
     args = parser.parse_args()
 
@@ -100,7 +99,8 @@ if __name__ == "__main__":
         statistics_generator(config, mysql_connector, twitter_connector)
     # Executor
     elif args.command == "execute":
-        execute_actions(config, twitter_connector, action_scheduler)
+        #execute_actions(config, twitter_connector, action_scheduler)
+        pass
     # List future action
     elif args.command == "list":
         list_actions(action_scheduler)
