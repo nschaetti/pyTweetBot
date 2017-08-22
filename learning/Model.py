@@ -163,7 +163,7 @@ class Model(object):
         :param opt: Loading option
         :return: The model class
         """
-        pass
+        return pickle.load(open(opt, 'r'))
     # end load
 
     # Create a new model
