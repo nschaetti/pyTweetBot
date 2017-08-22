@@ -97,7 +97,7 @@ def tweet_finder(config, model, action_scheduler):
         sys.stderr.write(u"Mode file {} does not exists\n".format(model))
         exit()
     # end if
-
+    print(model)
     # Add RSS streams
     for rss_stream in config.get_rss_streams():
         tweet_finder.add(RSSHunter(rss_stream))
