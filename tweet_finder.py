@@ -90,7 +90,7 @@ def tweet_finder(config, model, action_scheduler):
     tweet_finder = TweetFinder(shuffle=True)
 
     # Load model or create
-    if os.path.exists(model):
+    if model is not None and os.path.exists(model):
         model = Model.load(model)
         censor = CensorModel(config)
     else:
