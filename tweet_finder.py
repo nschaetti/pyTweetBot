@@ -88,7 +88,7 @@ def tweet_finder(config, model, action_scheduler):
 
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
-    print(model)
+
     # Load model or create
     if model is not None and os.path.exists(model):
         model = Model.load(model)
@@ -97,7 +97,7 @@ def tweet_finder(config, model, action_scheduler):
         sys.stderr.write(u"Mode file {} does not exists\n".format(model))
         exit()
     # end if
-    print(model)
+
     # Add RSS streams
     for rss_stream in config.get_rss_streams():
         tweet_finder.add(RSSHunter(rss_stream))
@@ -117,7 +117,8 @@ def tweet_finder(config, model, action_scheduler):
         # For each tweet
         for tweet in tweet_finder:
             # Predict class
-            prediction, = model(tweet.get_text())
+            prediction = model(tweet.get_text())
+            print(prediction)
             censor_prediction, = censor(tweet.get_text())
 
             # Predicted as tweet
