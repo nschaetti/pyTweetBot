@@ -27,6 +27,7 @@ import argparse
 import logging
 import signal, os
 import time
+import sys
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
@@ -93,7 +94,7 @@ def tweet_finder(config, model, action_scheduler):
         model = Model.load(model)
         censor = CensorModel(config)
     else:
-        logging.error(u"Mode file {} does not exists".format(model))
+        sys.stderr.write(u"Mode file {} does not exists\n".format(model))
         exit()
     # end if
 

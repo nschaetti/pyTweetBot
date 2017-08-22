@@ -89,7 +89,7 @@ if __name__ == "__main__":
     if args.command == "update-statistics":
         update_statistics(config=config)
     # Find tweets
-    elif args.command == "find-tweet":
+    elif args.command == "find-tweets":
         tweet_finder(config, args.model, action_scheduler)
     # Retweet dataset
     elif args.command == "tweet-dataset":
