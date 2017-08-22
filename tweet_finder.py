@@ -88,7 +88,7 @@ def tweet_finder(config, model, action_scheduler):
 
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
-
+    print(model)
     # Load model or create
     if model is not None and os.path.exists(model):
         model = Model.load(model)
