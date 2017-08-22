@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     # Argument
     parser.add_argument('command', type=str, nargs='?', help="Command (update_statistics, find-tweet, tweet-dataset, statistics-generator)")
-    parser.add_argument("--config", type=str, help="Configuration file")
+    parser.add_argument("--config", type=str, help="Configuration file", required=True)
     parser.add_argument("--log-level", type=int, help="Log level", default=20)
     parser.add_argument("--dataset", type=str, help="Dataset file")
     parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
