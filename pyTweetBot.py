@@ -40,6 +40,7 @@ from tweet_finder import tweet_finder
 from tweet_dataset import tweet_dataset
 from statistics_generator import statistics_generator
 from executor import execute_actions
+from list_actions import list_actions
 
 ####################################################
 # Main function
@@ -100,6 +101,9 @@ if __name__ == "__main__":
     # Executor
     elif args.command == "execute":
         execute_actions(config, twitter_connector, action_scheduler)
+    # List future action
+    elif args.command == "list":
+        list_actions(action_scheduler)
     # Unknown command
     else:
         sys.stderr.write(u"Unknown command {}\n".format(args.command))

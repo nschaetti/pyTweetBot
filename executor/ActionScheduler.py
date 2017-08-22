@@ -278,6 +278,16 @@ class ActionScheduler(Thread):
         self.delete(action)
     # end exec_next_action
 
+    # List actions in the reservoir
+    def list_actions(self):
+        """
+        List actions in the reservoir
+        :return:
+        """
+        # Get actions
+        return self._session.query(Action).filter().order_by(Action.action_id).all()
+    # end list_actions
+
     # Is reservoir empty
     def empty(self, action_type):
         """
