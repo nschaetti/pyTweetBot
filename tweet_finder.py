@@ -117,9 +117,8 @@ def tweet_finder(config, model, action_scheduler):
         # For each tweet
         for tweet in tweet_finder:
             # Predict class
-            prediction = model(tweet.get_text())
-            print(prediction)
-            censor_prediction, = censor(tweet.get_text())
+            prediction, _ = model(tweet.get_text())
+            censor_prediction, _ = censor(tweet.get_text())
 
             # Predicted as tweet
             if prediction == "tweet" and censor_prediction == "tweet" and not tweet.already_tweeted():
