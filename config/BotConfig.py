@@ -142,7 +142,7 @@ class BotConfig(object):
     # end get_news_config
 
     # Get forbidden words
-    def get_forbidden_word(self):
+    def get_forbidden_words(self):
         """
         Get forbidden words
         :return: Forbidden words
