@@ -42,30 +42,63 @@ from statistics_generator import statistics_generator
 from list_actions import list_actions
 
 ####################################################
+# Functions
+####################################################
+
+
+# Add default arguments
+def add_default_arguments(p):
+    """
+    Add default arguments
+    :param parser:
+    :return:
+    """
+    # Configuration and log
+    p.add_argument("--config", type=str, help="Configuration file", required=True)
+    p.add_argument("--log-level", type=int, help="Log level", default=20)
+# end add_default_arguments
+
+####################################################
 # Main function
 ####################################################
 
 if __name__ == "__main__":
 
     # Argument parser
-    parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
+    parser = argparse.ArgumentParser(prog="pyTweetBot", description="pyTweetBot - Smart Twitter Bot")
 
-    # Argument
-    parser.add_argument('command', type=str, nargs='?', help="Command (update_statistics, find-tweet, tweet-dataset, statistics-generator)")
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--dataset", type=str, help="Dataset file")
-    parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
-    parser.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
-    parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
-    parser.add_argument("--model", type=str, help="Classification model file")
-    parser.add_argument("--file", type=str, help="Output file")
-    parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
+    # Command subparser
+    command_subparser = parser.add_subparsers(dest="command")
+
+    # Update statistics parser
+    update_stats_parser = command_subparser.add_parser("user-statistics")
+    add_default_arguments(update_stats_parser)
+
+    # Find tweet
+    find_tweet_parser = command_subparser.add_parser("find-tweets")
+    add_default_arguments(find_tweet_parser)
+    find_tweet_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
+    find_tweet_parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
+    find_tweet_parser.add_argument("--model", type=str, help="Classification model file")
+
+    # Tweet dataset
+    tweet_dataset = command_subparser.add_parser("tweet-dataset")
+    add_default_arguments(tweet_dataset)
+    tweet_dataset.add_argument("--dataset", type=str, help="Input/output dataset file")
+
+    # User's statistics
+    user_statistics = command_subparser.add_parser("statistics")
+    add_default_arguments(user_statistics)
+    user_statistics.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
+    user_statistics.add_argument("--stats-file", type=str, help="Twitter statistics file")
+    user_statistics.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
+    user_statistics.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
+
+    # Parse
     args = parser.parse_args()
 
     # Logging
-    logging.basicConfig(level=args.log_level)
-    logger = logging.getLogger(name="pyTweetBot")
+    logging.basicConfig(level=args.log_level, format='%(asctime)s :: %(levelname)s :: %(message)s')
 
     # Load configuration file
     config = BotConfig.load(args.config)
@@ -86,7 +119,7 @@ if __name__ == "__main__":
 
     # Test command
     # Update statistics
-    if args.command == "update-statistics":
+    if args.command == "user-statistics":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
@@ -95,8 +128,8 @@ if __name__ == "__main__":
     elif args.command == "tweet-dataset":
         tweet_dataset(config, tweet_connector=twitter_connector)
     # Statistics generator
-    elif args.command == "statistics-generator":
-        statistics_generator(config, mysql_connector, twitter_connector)
+    elif args.command == "statistics":
+        statistics_generator(twitter_connector, args.stats_file, args.n_pages, args.stream, args.info)
     # Executor
     elif args.command == "execute":
         #execute_actions(config, twitter_connector, action_scheduler)

@@ -23,16 +23,12 @@
 #
 
 # Import
-import argparse
 import logging
 import time
 import os
-import datetime
 import tweepy
+import sys
 from stats.TweetStatistics import TweetStatistics, TweetAlreadyCountedException
-from twitter.TweetBotConnect import TweetBotConnector
-from config.BotConfig import BotConfig
-from db.DBConnector import DBConnector
 
 ####################################################
 # Main function
@@ -40,42 +36,26 @@ from db.DBConnector import DBConnector
 
 
 # Statistics generator
-def statistics_generator(config, mysql_connector, twitter_connector):
+def statistics_generator(twitter_connector, stats_file, n_pages, stream, info):
     """
     Statistics generator
     """
-
-    # Argument parser
-    parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
-
-    # Argument
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--file", type=str, help="Output file", required=True)
-    parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
-    parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
-    parser.add_argument("--info", action='store_true', help="Display informations", default=False)
-    args = parser.parse_args()
-
     # Stats for each day of the week
-    if not os.path.exists(args.file):
+    if not os.path.exists(stats_file):
         stats_manager = TweetStatistics()
     else:
-        stats_manager = TweetStatistics.load(args.file)
+        stats_manager = TweetStatistics.load(stats_file)
     # end if
 
     # Display info?
-    if args.info:
+    if info:
         for weekday in range(7):
             for hour in range(24):
                 if stats_manager.count(weekday, hour) > 0:
-                    """print(u"Expected number of retweets/likes "
-                          u"for weekday {}, hour {} : {} ({})".
-                          format(weekday, hour, stats_manager.value(weekday, hour) / stats_manager.count(weekday, hour),
-                                 stats_manager.count(weekday, hour)))"""
-                    print(u"Expected number of retweets/likes "
-                          u"for weekday {}, hour {} : {} ({}/{})".
-                          format(weekday, hour, stats_manager.expect_norm(weekday, hour), stats_manager.count(weekday, hour), stats_manager.expect(weekday, hour)))
+                    sys.stdout.write(u"Expected number of retweets/likes "
+                                     u"for weekday {}, hour {} : {} ({}/{})\n".
+                                     format(weekday, hour, stats_manager.expect_norm(weekday, hour),
+                                            stats_manager.count(weekday, hour), stats_manager.expect(weekday, hour)))
                 # end if
             # end for
         # end for
@@ -92,10 +72,10 @@ def statistics_generator(config, mysql_connector, twitter_connector):
     # Main loop
     while main_loop:
         # Cursor
-        if args.stream == "timeline":
-            cursor = twitter_connector.get_time_line(n_pages=args.n_pages)
+        if stream == "timeline":
+            cursor = twitter_connector.get_time_line(n_pages=n_pages)
         else:
-            cursor = twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=args.n_pages)
+            cursor = twitter_connector.get_user_timeline(screen_name="nschaetti", n_pages=n_pages)
         # end if
 
         # Start statistics
@@ -104,7 +84,7 @@ def statistics_generator(config, mysql_connector, twitter_connector):
         try:
             # For each of my tweets
             for index_page, page in enumerate(cursor):
-                logger.info(u"Analyzing page number {}".format(index_page))
+                logging.info(u"Analyzing page number {}".format(index_page))
 
                 # For each tweet
                 for index_tweet, tweet in enumerate(page):
@@ -131,14 +111,14 @@ def statistics_generator(config, mysql_connector, twitter_connector):
                 # end if
 
                 # Wait
-                logger.info(u"Waiting 60 seconds for next page...")
+                logging.info(u"Waiting 60 seconds for next page...")
                 time.sleep(60)
             # end for
         except KeyboardInterrupt:
             main_loop = False
             pass
         except tweepy.error.TweepError as e:
-            logger.error(u"Tweepy error while retrieving page : {}".format(e))
+            logging.error(u"Tweepy error while retrieving page : {}".format(e))
             if e.api_code == 429:
                 time.sleep(600)
             # end if
@@ -147,15 +127,15 @@ def statistics_generator(config, mysql_connector, twitter_connector):
 
         # Stop & save statistics
         stats_manager.stop()
-        stats_manager.save(args.file)
+        stats_manager.save(stats_file)
 
         # Waiting 60 seconds to get new tweets
-        logger.info(u"Waiting 60 seconds to get new tweets...")
+        logging.info(u"Waiting 60 seconds to get new tweets...")
         time.sleep(600)
     # end while
 
     # Save statistics
-    stats_manager.save(args.file)
+    stats_manager.save(stats_file)
 
     # Stop statistics
     stats_manager.stop()
