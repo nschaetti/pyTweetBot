@@ -78,7 +78,7 @@ if __name__ == "__main__":
     find_tweet_parser = command_subparser.add_parser("find-tweets")
     add_default_arguments(find_tweet_parser)
     find_tweet_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
-    find_tweet_parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
+    #find_tweet_parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
     find_tweet_parser.add_argument("--model", type=str, help="Classification model file")
 
     # Tweet dataset
@@ -93,6 +93,10 @@ if __name__ == "__main__":
     user_statistics.add_argument("--stats-file", type=str, help="Twitter statistics file")
     user_statistics.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
     user_statistics.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
+
+    # List actions
+    list_actions_parser = command_subparser.add_parser("list")
+    add_default_arguments(list_actions_parser)
 
     # Parse
     args = parser.parse_args()

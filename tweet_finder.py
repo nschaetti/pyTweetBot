@@ -125,7 +125,7 @@ def tweet_finder(config, model, action_scheduler):
                 # Try to add
                 try:
                     logging.info(u"Adding Tweet \"{}\" to the scheduler".format(
-                        tweet.get_tweet().encode('ascii', errors='ignore')))
+                        tweet.get_tweet()))
                     action_scheduler.add_tweet(tweet)
                 except ActionReservoirFullError:
                     logging.error(u"Reservoir full for Tweet action, waiting for one hour")
