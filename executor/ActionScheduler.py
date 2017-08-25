@@ -181,7 +181,7 @@ class ActionScheduler(Thread):
         elif self._factory is not None:
             self._add_text_action("Tweet", tweet.get_tweet())
         else:
-            raise NoFactory("No factory given to create Tweets")
+            raise NoFactory(u"No factory given to create Tweets")
         # end if
     # end add_tweet
 
@@ -314,7 +314,7 @@ class ActionScheduler(Thread):
                            * self._n_actions[action_type])
 
         # Log
-        logging.debug("is_reservoir_full: {} in the reservoir for a max value of {}".format(reservoir_level,
+        logging.debug(u"is_reservoir_full: {} in the reservoir for a max value of {}".format(reservoir_level,
                                                                                             max_n_action))
 
         # reservoir_level >= max_n_action => full
@@ -401,9 +401,9 @@ class ActionScheduler(Thread):
             action = Action(action_type=action_type, action_tweet_id=the_id)
             self.add(action)
         else:
-            logging.getLogger("pyTweetBot").warning("{} action for friend/tweet {} already in database"
+            logging.getLogger("pyTweetBot").warning(u"{} action for friend/tweet {} already in database"
                                                     .format(action_type, the_id))
-            raise ActionAlreadyExists("{} action for friend/tweet {} already in database".format(action_type, the_id))
+            raise ActionAlreadyExists(u"{} action for friend/tweet {} already in database".format(action_type, the_id))
         # end if
     # end _add_id_action
 
@@ -420,7 +420,7 @@ class ActionScheduler(Thread):
         else:
             logging.getLogger("pyTweetBot").warning(u"{} action for text {} already in database"
                                                     .format(action_type, the_text))
-            raise ActionAlreadyExists("{} action for text {} already in database".format(action_type, the_text))
+            raise ActionAlreadyExists(u"{} action for text {} already in database".format(action_type, the_text))
         # end if
     # end _add_text_action
 
