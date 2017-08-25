@@ -227,7 +227,7 @@ class StatisticalModel(Model):
                 # end if
         # end for
 
-        return (result_class, text_probs)
+        return result_class, text_probs
     # end _predict
 
     # Filter tokens

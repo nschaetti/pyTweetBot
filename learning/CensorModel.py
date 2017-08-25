@@ -42,6 +42,8 @@ class CensorModel(Model):
         Constructor
         :param config: Settings
         """
+        super(CensorModel, self).__init__()
+
         # Forbidden words
         self._forbidden_words = config.get_forbidden_words()
     # end __init__
@@ -68,11 +70,11 @@ class CensorModel(Model):
         # For each forbidden word
         for word in self._forbidden_words:
             if word.lower() in text.lower():
-                return "skip"
+                return "skip", None
             # end if
         # end for
 
-        return "tweet"
+        return "tweet", None
     # end _predict
 
     #################################################
