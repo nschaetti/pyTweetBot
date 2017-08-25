@@ -74,6 +74,11 @@ class Tweeted(Base):
     # Tweet exists
     @staticmethod
     def exists(tweet):
+        """
+        Tweet exists
+        :param tweet:
+        :return:
+        """
         if tweet is tw.Tweet:
             return DBConnector().get_session().query(Tweeted).filter(
                 or_(Tweeted.tweet_tweet_text == tweet.get_text(),

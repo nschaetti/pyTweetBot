@@ -138,7 +138,7 @@ class Tweet(object):
         Already tweeted?
         :return: True/False
         """
-        return db.Tweet.exists(self)
+        return db.Tweeted.exists(self)
     # end already_tweeted
 
     ######################################
