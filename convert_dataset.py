@@ -26,15 +26,9 @@
 import argparse
 import logging
 import os
-from config.BotConfig import BotConfig
-from db.DBConnector import DBConnector
-from tweet.RSSHunter import RSSHunter
-from tweet.GoogleNewsHunter import GoogleNewsHunter
-from tweet.TweetFinder import TweetFinder
-from retweet.RetweetFinder import RetweetFinder
-from twitter.TweetBotConnect import TweetBotConnector
 import pickle
-import time
+from learning.Dataset import Dataset
+
 
 ####################################################
 # Main function
@@ -49,5 +43,32 @@ if __name__ == "__main__":
     parser.add_argument("--input", type=str, help="Input dataset file", required=True)
     parser.add_argument("--output", type=str, help="Output dataset file", required=True)
     args = parser.parse_args()
+
+    # Load old dataset
+    if os.path.exists(args.input):
+        with open(args.output, 'r') as f:
+            (urls, texts) = pickle.load(f)
+        # end with
+    # end if
+
+    # Load new dataset
+    if os.path.exists(args.output):
+        dataset = Dataset.load(args.output)
+    else:
+        dataset = Dataset()
+    # end if
+
+    # For each texts
+    for url in urls.keys():
+        print(u"Adding url {}".format(url))
+        # Get title
+
+        # Class
+        if urls[url] == "tweet":
+            dataset.add_pos(title, url)
+        else:
+            dataset.add_neg(title, url)
+        # end if
+    # end for
 
 
