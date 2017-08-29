@@ -78,13 +78,16 @@ if __name__ == "__main__":
     find_tweet_parser = command_subparser.add_parser("find-tweets")
     add_default_arguments(find_tweet_parser)
     find_tweet_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
-    #find_tweet_parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
     find_tweet_parser.add_argument("--model", type=str, help="Classification model file")
 
     # Tweet dataset
-    tweet_dataset = command_subparser.add_parser("tweet-dataset")
-    add_default_arguments(tweet_dataset)
-    tweet_dataset.add_argument("--dataset", type=str, help="Input/output dataset file")
+    dataset_parser = command_subparser.add_parser("dataset")
+    add_default_arguments(dataset_parser)
+    dataset_parser.add_argument("--dataset", type=str, help="Input/output dataset file")
+    dataset_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
+    dataset_parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
+    dataset_parser.add_argument("--info", action='store_true', help="Show informations about the dataset?", default=False)
+    dataset_parser.add_argument("--source", type=str, help="Information source to classify (news, tweets, friends, user)")
 
     # User's statistics
     user_statistics = command_subparser.add_parser("statistics")
@@ -129,8 +132,8 @@ if __name__ == "__main__":
     elif args.command == "find-tweets":
         tweet_finder(config, args.model, action_scheduler)
     # Retweet dataset
-    elif args.command == "tweet-dataset":
-        tweet_dataset(config, tweet_connector=twitter_connector)
+    elif args.command == "dataset":
+        tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
     # Statistics generator
     elif args.command == "statistics":
         statistics_generator(twitter_connector, args.stats_file, args.n_pages, args.stream, args.info)
