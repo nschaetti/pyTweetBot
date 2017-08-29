@@ -23,15 +23,12 @@
 #
 
 # Import
-import argparse
 import logging
 import os
-from config.BotConfig import BotConfig
-from db.DBConnector import DBConnector
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
-from twitter.TweetBotConnect import TweetBotConnector
+from learning.Dataset import Dataset
 import pickle
 
 ####################################################
@@ -49,32 +46,15 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
     """
     # Load or create dataset
     if os.path.exists(dataset_file):
-        with open(dataset_file, 'r') as f:
-            (urls, texts) = pickle.load(f)
-            # end with
+        print(u"Opening dataset file {}".format(dataset_file))
+        dataset = Dataset.load(dataset_file)
     else:
-        urls = dict()
-        texts = list()
+        dataset = Dataset()
     # end if
 
     # Show informations
     if info:
-        # Compute statistics
-        examples_count = len(urls.keys())
-        tweet_count = 0
-        skip_count = 0
-        for url in urls.keys():
-            if urls[url] == "tweet":
-                tweet_count += 1
-            else:
-                skip_count += 1
-                # end if
-        # end for
-
-        # Print info
-        print(u"{} examples in the dataset".format(examples_count))
-        print(u"{} examples in the tweet class".format(tweet_count))
-        print(u"{} examples in the skip class".format(skip_count))
+        print(dataset)
         exit()
     # end if
 
@@ -102,30 +82,27 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
 
     # For each tweet
     for tweet in tweet_finder:
-        if tweet.get_url() not in urls.keys() and tweet.get_text() not in texts:
+        # Not already in dataset
+        if not dataset.is_in(tweet.get_text(), tweet.get_url()):
             # Ask
-            print(tweet.get_text())
-            print(tweet.get_url())
-            observed = raw_input("Tweet or Skip (t/S/e)? ").lower()
+            print(u"Would you classify the following element as negative(n) or positive(p)?")
+            print(u"Text : {}".format(tweet.get_text()))
+            print(u"URL : {}".format(tweet.get_url()))
+            observed = raw_input(u"Positive or negative (p/n) (q for quit) : ").lower()
 
             # Add as example
-            if observed == "e":
+            if observed == 'q':
                 break
-            elif observed == "t":
-                urls[tweet.get_url()] = "tweet"
-            else:
-                urls[tweet.get_url()] = "skip"
+            elif observed == 'p':
+                dataset.add_pos(tweet.get_text(), tweet.get_url())
+            elif observed == 'n':
+                dataset.add_neg(tweet.get_text(), tweet.get_url())
             # end if
 
-            # Add tweet
-            texts.append(tweet.get_text())
-
             # Save dataset
-            with open(dataset_file, 'w') as f:
-                pickle.dump((urls, texts), f)
-            # end with
+            dataset.save(dataset_file)
         else:
-            logging.debug(u"Already in stock : {}".format(tweet.get_url()))
+            logging.debug(u"Is already in the dataset : {}".format(tweet.get_url()))
         # end if
     # end for
 
