@@ -41,6 +41,10 @@ class Dataset(object):
         self._urls = list()
         self._titles = list()
         self._samples = list()
+        self._n_samples = 0
+        self._n_positive_samples = 0
+        self._n_negative_samples = 0
+        self._pos = 0
     # end __init__
 
     #################################################
@@ -55,7 +59,12 @@ class Dataset(object):
         :param url:
         :return:
         """
-        self._add_sample(title, url, u"pos")
+        if self._add_sample(title, url, u"pos"):
+            self._n_positive_samples += 1
+            return True
+        else:
+            return False
+        # end if
     # end add_pos
 
     # Add a negative sample
@@ -66,8 +75,33 @@ class Dataset(object):
         :param url:
         :return:
         """
-        self._add_sample(title, url, u"neg")
+        if self._add_sample(title, url, u"neg"):
+            self._n_negative_samples += 1
+            return True
+        else:
+            return False
+        # end if
     # end add_pos
+
+    # Save the dataset
+    def save(self, filename):
+        """
+        Save the dataset
+        :param filename:
+        """
+        pickle.dump(self, open(filename, 'w'))
+    # end save
+
+    # Is in dataset
+    def is_in(self, title, url):
+        """
+        Is in dataset?
+        :param title:
+        :param url:
+        :return:
+        """
+        return title in self._titles and url in self._urls
+    # end is_in
 
     #################################################
     # Override
@@ -81,6 +115,31 @@ class Dataset(object):
         """
         return self
     # end __iter__
+
+    # Next element
+    def next(self):
+        """
+        Next element
+        :return:
+        """
+        if self._pos >= len(self._samples):
+            raise StopIteration()
+        else:
+            self._pos += 1
+            return self._samples[self._pos-1]
+        # end if
+    # end next
+
+    # To string
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        print(u"Total number of samples in the dataset : {}".format(self._n_samples))
+        print(u"Number of positive samples : {}".format(self._n_positive_samples))
+        print(u"Number of negative samples : {}".format(self._n_negative_samples))
+    # end __str__
 
     #################################################
     # Private
@@ -99,6 +158,7 @@ class Dataset(object):
             self._urls.append(url)
             self._titles.append(title)
             self._samples.append((title, url, c))
+            self._n_samples += 1
             return True
         else:
             return False
