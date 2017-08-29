@@ -38,27 +38,18 @@ import pickle
 # Main function
 ####################################################
 
-def tweet_dataset(config, tweet_connector):
 
-    # Argument parser
-    parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
-
-    # Argument
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
-    parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
-    parser.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
-    parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
-    args = parser.parse_args()
-
-    # Logging
-    logging.basicConfig(level=args.log_level)
-    logger = logging.getLogger(name="pyTweetBot")
-
+# Create a tweet dataset
+def tweet_dataset(config, dataset_file, n_pages, info, rss):
+    """
+    Create a tweet dataset
+    :param config:
+    :param tweet_connector:
+    :return:
+    """
     # Load or create dataset
-    if os.path.exists(args.dataset):
-        with open(args.dataset, 'r') as f:
+    if os.path.exists(dataset_file):
+        with open(dataset_file, 'r') as f:
             (urls, texts) = pickle.load(f)
             # end with
     else:
@@ -67,7 +58,7 @@ def tweet_dataset(config, tweet_connector):
     # end if
 
     # Show informations
-    if args.info:
+    if info:
         # Compute statistics
         examples_count = len(urls.keys())
         tweet_count = 0
@@ -87,21 +78,10 @@ def tweet_dataset(config, tweet_connector):
         exit()
     # end if
 
-    # Load configuration file
-    config = BotConfig.load(args.config)
-
-    # Connection to MySQL
-    dbc = config.get_database_config()
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
-
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
-
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
 
-    if args.rss == "":
+    if rss == "":
         # Add RSS streams
         for rss_stream in config.get_rss_streams():
             tweet_finder.add(RSSHunter(rss_stream))
@@ -112,12 +92,12 @@ def tweet_dataset(config, tweet_connector):
             for language in news['languages']:
                 for country in news['countries']:
                     tweet_finder.add(
-                        GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=args.n_pages))
+                        GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=n_pages))
                 # end for
             # end for
         # end for
     else:
-        tweet_finder.add(RSSHunter({'url': args.rss, 'hashtags': []}))
+        tweet_finder.add(RSSHunter({'url': rss, 'hashtags': []}))
     # end if
 
     # For each tweet
@@ -141,7 +121,7 @@ def tweet_dataset(config, tweet_connector):
             texts.append(tweet.get_text())
 
             # Save dataset
-            with open(args.dataset, 'w') as f:
+            with open(dataset_file, 'w') as f:
                 pickle.dump((urls, texts), f)
             # end with
         else:
