@@ -70,61 +70,47 @@ def clean_html_text(to_clean):
 # Main function
 ####################################################
 
-if __name__ == "__main__":
 
-    # Argument parser
-    parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
-
-    # Argument
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--model", type=str, help="Model file", required=True)
-    parser.add_argument("--test", action='store_true', default=False)
-    parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
-    parser.add_argument("--param", type=str, help="Model parameter (if creation)", default='dp')
-    parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--type", type=str, help="Model type (stat, tfidf, stat2)", default='stat')
-    args = parser.parse_args()
-
-    # Logging
-    logging.basicConfig(level=args.log_level)
-    logger = logging.getLogger(name="pyTweetBot")
-
-    # Load configuration file
-    config = BotConfig.load(args.config)
-
-    # Connection to MySQL
-    dbc = config.get_database_config()
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
-
+# Train a classifier on a dataset
+def tweet_training(config, dataset_file, model_file="", data='title', test=False, param='dp', type='stat'):
+    """
+    Train a classifier on a dataset.
+    :param config: pyTweetBot configuration object
+    :param dataset_file: Path to the dataset file
+    :param model_file: Path to model file if needed
+    :param data: Title or content
+    :param test: Test the classification success rate
+    :param param: Model parameter (dp, ...)
+    :param type: Model's type (stat, tfidf, stat2, textblob)
+    """
     # Load model or create
-    if os.path.exists(args.model):
-        model = StatisticalModel.load_from_file(args.model)
+    if os.path.exists(model_file):
+        model = StatisticalModel.load_from_file(model_file)
     else:
-        if args.type == "stat":
+        if type == "stat":
             model = StatisticalModel("tweet_stat_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow(),
-                                     smoothing=args.param, smoothing_param=0.5)
-        elif args.type == "tfidf":
+                                     smoothing=param, smoothing_param=0.5)
+        elif type == "tfidf":
             model = TFIDFModel("tweet_tfidf_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow())
-        elif args.type == "stat2":
+        elif type == "stat2":
             model = Statistical2GramModel("tweet_stat2_model", ['tweet', 'skip'],
-                                          last_update=datetime.datetime.utcnow(), smoothing=args.param,
+                                          last_update=datetime.datetime.utcnow(), smoothing=param,
                                           smoothing_param=0.5)
         # end
     # end if
 
     # Load dataset
-    if os.path.exists(args.dataset):
-        with open(args.dataset, 'r') as f:
+    if os.path.exists(dataset_file):
+        with open(dataset_file, 'r') as f:
             dataset = pickle.load(f)
             n_samples = len(dataset[0].keys())
         # end with
     else:
-        logging.error(u"Cannot find dataset file {}".format(args.dataset))
+        logging.error(u"Cannot find dataset file {}".format(dataset_file))
     # end if
 
     # Train or test
-    if not args.test:
+    if not test:
         try:
             # For each URL in the dataset
             for index, url in enumerate(dataset[0].keys()):
@@ -133,7 +119,7 @@ if __name__ == "__main__":
                     c = dataset[0][url]
 
                     # Log
-                    logger.info(u"Downloading example {}".format(url))
+                    print(u"Downloading example {}".format(url))
 
                     # Get URL's text
                     try:
