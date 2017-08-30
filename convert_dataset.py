@@ -28,6 +28,7 @@ import os
 import pickle
 import urllib2
 import sys
+import socket
 from BeautifulSoup import BeautifulSoup
 from learning.Dataset import Dataset
 
@@ -48,7 +49,7 @@ if __name__ == "__main__":
 
     # Load old dataset
     if os.path.exists(args.input):
-        with open(args.output, 'r') as f:
+        with open(args.input, 'r') as f:
             (urls, texts) = pickle.load(f)
         # end with
     else:
@@ -63,24 +64,52 @@ if __name__ == "__main__":
         dataset = Dataset()
     # end if
 
-    # For each texts
-    for url in urls.keys():
-        print(u"Retrieving URL {}".format(url))
-        # Get title
-        soup = BeautifulSoup(urllib2.urlopen("https://www.google.com"))
-        title = soup.title.string
+    try:
+        # For each texts
+        index = 0
+        for url in urls.keys():
+            if not dataset.is_url_in(url):
+                print(u"Retrieving URL {}".format(url))
+                # Get title
+                try:
+                    soup = BeautifulSoup(urllib2.urlopen(url))
+                except urllib2.HTTPError as e:
+                    sys.stderr.write(u"HTTP error while retrieving {} : {}\n".format(url, e))
+                    continue
+                except socket.error as e:
+                    sys.stderr.write(u"Socket error while retrieving {} : {}\n".format(url, e))
+                    continue
+                except urllib2.URLError as e:
+                    sys.stderr.write(u"URL error while retrieving {} : {}\n".format(url, e))
+                    continue
+                # end try
+                title = soup.title.string
 
-        # Class
-        if urls[url] == "tweet":
-            print(u"Adding \"{}\" as positive".format(title))
-            dataset.add_pos(title, url)
-        else:
-            print(u"Adding \"{}\" as negative".format(title))
-            dataset.add_neg(title, url)
-        # end if
-    # end for
+                # Class
+                if urls[url] == "tweet":
+                    print(u"Adding \"{}\" as positive".format(title))
+                    check_added = dataset.add_pos(title, url)
+                else:
+                    print(u"Adding \"{}\" as negative".format(title))
+                    check_added = dataset.add_neg(title, url)
+                # end if
 
-    # Save dataset
-    dataset.save()
+                # Error handle
+                if not check_added:
+                    sys.stderr.write(u"URL {} is already in the dataset\n".format(url))
+                # end if
 
+                # Save dataset
+                if index % 50 == 0:
+                    print(u"Saving dataset to {}".format(args.output))
+                    dataset.save(args.output)
+                # end if
+
+                index += 1
+            # end if
+        # end for
+    except (KeyboardInterrupt, SystemExit):
+        print(u"Saving dataset to {}".format(args.output))
+        dataset.save(args.output)
+    # end try
 # end if
