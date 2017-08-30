@@ -80,14 +80,18 @@ if __name__ == "__main__":
     find_tweet_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
     find_tweet_parser.add_argument("--model", type=str, help="Classification model file")
 
-    # Tweet dataset
+    # Create data set
     dataset_parser = command_subparser.add_parser("dataset")
     add_default_arguments(dataset_parser)
-    dataset_parser.add_argument("--dataset", type=str, help="Input/output dataset file")
+    dataset_parser.add_argument("--action", type=str, help="Create a data set (dataset) or train a model (train)")
+    dataset_parser.add_argument("--model", type=str, help="Path to model's file")
+    dataset_parser.add_argument("--dataset", type=str, help="Input/output data set file")
     dataset_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
-    dataset_parser.add_argument("--rss", type=str, help="RSS stream to learn from", default="")
-    dataset_parser.add_argument("--info", action='store_true', help="Show informations about the dataset?", default=False)
-    dataset_parser.add_argument("--source", type=str, help="Information source to classify (news, tweets, friends, user)")
+    dataset_parser.add_argument("--rss", type=str, help="Specific RSS stream to capture", default="")
+    dataset_parser.add_argument("--news", type=str, help="Specific Google News research to capture", default="")
+    dataset_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
+    dataset_parser.add_argument("--source", type=str,
+                                help="Information source to classify (rss, news, tweets, friends, user)", required=True)
 
     # User's statistics
     user_statistics = command_subparser.add_parser("statistics")
@@ -97,9 +101,17 @@ if __name__ == "__main__":
     user_statistics.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
     user_statistics.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
 
-    # List actions
-    list_actions_parser = command_subparser.add_parser("list")
+    # List command
+    list_actions_parser = command_subparser.add_parser("actions")
     add_default_arguments(list_actions_parser)
+    list_actions_parser.add_argument("--type", type=str, help="Action type (tweet, retweet, like, follow, unfollow",
+                                     default="all")
+
+    # List followers
+    list_friends_parser = command_subparser.add_parser("friends")
+    add_default_arguments(list_friends_parser)
+    list_friends_parser.add_argument("--obsolete", action='store_true', help="Show only obsolete friends")
+    list_friends_parser.add_argument("--friends", action='store_true', help="Show only friends")
 
     # Parse
     args = parser.parse_args()
@@ -142,8 +154,11 @@ if __name__ == "__main__":
         #execute_actions(config, twitter_connector, action_scheduler)
         pass
     # List future action
-    elif args.command == "list":
+    elif args.command == "actions":
         list_actions(action_scheduler)
+    # List friends
+    elif args.command == "friends":
+        pass
     # Unknown command
     else:
         sys.stderr.write(u"Unknown command {}\n".format(args.command))
