@@ -113,6 +113,13 @@ if __name__ == "__main__":
     list_friends_parser.add_argument("--obsolete", action='store_true', help="Show only obsolete friends")
     list_friends_parser.add_argument("--friends", action='store_true', help="Show only friends")
 
+    # Executor
+    executor_parser = command_subparser.add_parser("execute")
+    add_default_arguments(executor_parser)
+    executor_parser.add_argument("--daemon", action='store_true', help="Run executor in daemon mode", default=False)
+    executor_parser.add_argument("--break-time", action='store_true',
+                                 help="Show break duration between execution for the current time", default=False)
+
     # Parse
     args = parser.parse_args()
 
