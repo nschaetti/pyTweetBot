@@ -285,7 +285,7 @@ class ActionScheduler(Thread):
         :return:
         """
         # Get actions
-        return self._session.query(Action).filter().order_by(Action.action_id).all()
+        return self._session.query(Action).order_by(Action.action_id).all()
     # end list_actions
 
     # Is reservoir empty
