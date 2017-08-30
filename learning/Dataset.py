@@ -24,6 +24,9 @@
 
 # Imports
 import pickle
+import sys
+
+sys.setrecursionlimit(10000)
 
 
 # A dataset for training
@@ -89,7 +92,9 @@ class Dataset(object):
         Save the dataset
         :param filename:
         """
-        pickle.dump(self, open(filename, 'w'))
+        with open(filename, 'w') as f:
+            pickle.dump(self, f)
+        # end with
     # end save
 
     # Is in dataset
@@ -102,6 +107,16 @@ class Dataset(object):
         """
         return title in self._titles and url in self._urls
     # end is_in
+
+    # Is URL in dataset
+    def is_url_in(self, url):
+        """
+        Is URL in dataset?
+        :param url:
+        :return:
+        """
+        return url in self._urls
+    # end is_url_in
 
     #################################################
     # Override
@@ -123,6 +138,7 @@ class Dataset(object):
         :return:
         """
         if self._pos >= len(self._samples):
+            self._pos = 0
             raise StopIteration()
         else:
             self._pos += 1
