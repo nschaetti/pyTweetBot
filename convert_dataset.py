@@ -24,9 +24,11 @@
 
 # Import
 import argparse
-import logging
 import os
 import pickle
+import urllib2
+import sys
+from BeautifulSoup import BeautifulSoup
 from learning.Dataset import Dataset
 
 
@@ -40,8 +42,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=u"pyTweetBot - Convert to new dataset format")
 
     # Argument
-    parser.add_argument("--input", type=str, help="Input dataset file", required=True)
-    parser.add_argument("--output", type=str, help="Output dataset file", required=True)
+    parser.add_argument("--input", type=str, help=u"Input dataset file", required=True)
+    parser.add_argument("--output", type=str, help=u"Output dataset file", required=True)
     args = parser.parse_args()
 
     # Load old dataset
@@ -49,6 +51,9 @@ if __name__ == "__main__":
         with open(args.output, 'r') as f:
             (urls, texts) = pickle.load(f)
         # end with
+    else:
+        sys.stderr.write(u"Can't find dataset file {}\n".format(args.input))
+        exit()
     # end if
 
     # Load new dataset
@@ -60,15 +65,22 @@ if __name__ == "__main__":
 
     # For each texts
     for url in urls.keys():
-        print(u"Adding url {}".format(url))
+        print(u"Retrieving URL {}".format(url))
         # Get title
+        soup = BeautifulSoup(urllib2.urlopen("https://www.google.com"))
+        title = soup.title.string
 
         # Class
         if urls[url] == "tweet":
+            print(u"Adding \"{}\" as positive".format(title))
             dataset.add_pos(title, url)
         else:
+            print(u"Adding \"{}\" as negative".format(title))
             dataset.add_neg(title, url)
         # end if
     # end for
 
+    # Save dataset
+    dataset.save()
 
+# end if
