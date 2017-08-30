@@ -33,6 +33,7 @@ def list_actions(action_scheduler):
     """
     # Get actions
     actions = action_scheduler.list_actions()
+    print(actions)
 
     # For each action
     for action in actions:
