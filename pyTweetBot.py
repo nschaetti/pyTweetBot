@@ -30,14 +30,13 @@ from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler
 from friends.FriendsManager import FriendsManager
-from tweet.RSSHunter import RSSHunter
-from tweet.GoogleNewsHunter import GoogleNewsHunter
-from tweet.TweetFinder import TweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
-from twitter.TweetGenerator import TweetGenerator
 from update_statistics import update_statistics
 from tweet_finder import tweet_finder
 from tweet_dataset import tweet_dataset
+from tweet_training import tweet_training
+from model_training import model_training
+from model_testing import model_testing
 from statistics_generator import statistics_generator
 from list_actions import list_actions
 
@@ -81,17 +80,21 @@ if __name__ == "__main__":
     find_tweet_parser.add_argument("--model", type=str, help="Classification model file")
 
     # Create data set
-    dataset_parser = command_subparser.add_parser("dataset")
-    add_default_arguments(dataset_parser)
-    dataset_parser.add_argument("--action", type=str, help="Create a data set (dataset) or train a model (train)")
-    dataset_parser.add_argument("--model", type=str, help="Path to model's file")
-    dataset_parser.add_argument("--dataset", type=str, help="Input/output data set file")
-    dataset_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
-    dataset_parser.add_argument("--rss", type=str, help="Specific RSS stream to capture", default="")
-    dataset_parser.add_argument("--news", type=str, help="Specific Google News research to capture", default="")
-    dataset_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
-    dataset_parser.add_argument("--source", type=str,
-                                help="Information source to classify (rss, news, tweets, friends, user)", required=True)
+    train_parser = command_subparser.add_parser("train")
+    add_default_arguments(train_parser)
+    train_parser.add_argument("--action", type=str,
+                              help="Create a data set (dataset), train or test a model (train/test)")
+    train_parser.add_argument("--model", type=str, help="Path to model's file")
+    train_parser.add_argument("--dataset", type=str, help="Input/output data set file")
+    train_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
+    train_parser.add_argument("--rss", type=str, help="Specific RSS stream to capture", default="")
+    train_parser.add_argument("--news", type=str, help="Specific Google News research to capture", default="")
+    train_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
+    train_parser.add_argument("--classifier", type=str, help="Classifier type (NaiveBayes, MaxEnt, TFIDF, etc)",
+                              default="NaiveBayes")
+    train_parser.add_argument("--param", type=float, help="Classifier parameter", default=1.0)
+    train_parser.add_argument("--source", type=str,
+                              help="Information source to classify (rss, news, tweets, friends, user)", required=True)
 
     # User's statistics
     user_statistics = command_subparser.add_parser("statistics")
@@ -150,9 +153,19 @@ if __name__ == "__main__":
     # Find tweets
     elif args.command == "find-tweets":
         tweet_finder(config, args.model, action_scheduler)
-    # Retweet dataset
-    elif args.command == "dataset":
-        tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
+    # Training
+    elif args.command == "train":
+        # Action
+        if args.action == u"dataset":
+            tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
+        elif args.action == u"test":
+            model_testing(data_set_file=args.dataset, model_file=args.model)
+        elif args.action == u"train":
+            model_training(data_set_file=args.dataset, model_file=args.model, param=args.param, model_type=args.type)
+        else:
+            sys.stderr.write(u"Unknown training action {}".format(args.action))
+            exit()
+        # end if
     # Statistics generator
     elif args.command == "statistics":
         statistics_generator(twitter_connector, args.stats_file, args.n_pages, args.stream, args.info)
