@@ -24,7 +24,7 @@
 
 # Imports
 import pickle
-from TextBlob.classifiers import NaiveBayesClassifier
+from textblob.classifiers import NaiveBayesClassifier
 
 
 # TextBlob naive bayes classifier
