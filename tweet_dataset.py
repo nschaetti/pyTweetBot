@@ -26,7 +26,7 @@
 import logging
 import os
 
-from learning.dataset.Dataset import Dataset
+from learning.Dataset import Dataset
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.RSSHunter import RSSHunter
 from tweet.TweetFinder import TweetFinder

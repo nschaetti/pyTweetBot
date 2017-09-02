@@ -165,7 +165,7 @@ class Dataset(object):
         :return:
         """
         if text not in self._texts:
-            self._texts.append(text)
+            self._texts.append((text, c))
             self._n_texts += 1
             return True
         else:
