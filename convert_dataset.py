@@ -26,12 +26,12 @@
 import argparse
 import os
 import pickle
-import urllib2
-import sys
 import socket
-from BeautifulSoup import BeautifulSoup
+import sys
+import urllib2
+from bs4 import BeautifulSoup
 from learning.Dataset import Dataset
-
+from news.PageParser import PageParser, PageParserRetrievalError
 
 ####################################################
 # Main function
@@ -68,30 +68,25 @@ if __name__ == "__main__":
         # For each texts
         index = 0
         for url in urls.keys():
-            if not dataset.is_url_in(url):
-                print(u"Retrieving URL {}".format(url))
-                # Get title
-                try:
-                    soup = BeautifulSoup(urllib2.urlopen(url))
-                except urllib2.HTTPError as e:
-                    sys.stderr.write(u"HTTP error while retrieving {} : {}\n".format(url, e))
-                    continue
-                except socket.error as e:
-                    sys.stderr.write(u"Socket error while retrieving {} : {}\n".format(url, e))
-                    continue
-                except urllib2.URLError as e:
-                    sys.stderr.write(u"URL error while retrieving {} : {}\n".format(url, e))
-                    continue
-                # end try
-                title = soup.title.string
+            print(u"Retrieving URL {}".format(url))
 
+            # Get page's text
+            try:
+                page_text = PageParser.get_text(url)
+            except PageParserRetrievalError as e:
+                sys.stderr.write(u"Page retrieval error : {}".format(e))
+                continue
+            # end try
+
+            # Not already in
+            if not dataset.is_in(page_text):
                 # Class
                 if urls[url] == "tweet":
-                    print(u"Adding \"{}\" as positive".format(title))
-                    check_added = dataset.add_pos(title, url)
+                    print(u"Adding \"{}\" (len {}) as positive".format(url, len(page_text)))
+                    check_added = dataset.add_positive(page_text)
                 else:
-                    print(u"Adding \"{}\" as negative".format(title))
-                    check_added = dataset.add_neg(title, url)
+                    print(u"Adding \"{}\" (len {}) as negative".format(url, len(page_text)))
+                    check_added = dataset.add_negative(page_text)
                 # end if
 
                 # Error handle
