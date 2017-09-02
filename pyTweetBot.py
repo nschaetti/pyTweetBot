@@ -34,7 +34,6 @@ from twitter.TweetBotConnect import TweetBotConnector
 from update_statistics import update_statistics
 from tweet_finder import tweet_finder
 from tweet_dataset import tweet_dataset
-from tweet_training import tweet_training
 from model_training import model_training
 from model_testing import model_testing
 from statistics_generator import statistics_generator
@@ -94,7 +93,7 @@ if __name__ == "__main__":
                               default="NaiveBayes")
     train_parser.add_argument("--param", type=float, help="Classifier parameter", default=1.0)
     train_parser.add_argument("--source", type=str,
-                              help="Information source to classify (rss, news, tweets, friends, user)", required=True)
+                              help="Information source to classify (rss, news, tweets, friends, user)")
 
     # User's statistics
     user_statistics = command_subparser.add_parser("statistics")
