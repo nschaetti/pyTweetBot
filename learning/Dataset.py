@@ -41,12 +41,10 @@ class Dataset(object):
         Constructor
         """
         # Data
-        self._urls = list()
-        self._titles = list()
-        self._samples = list()
-        self._n_samples = 0
-        self._n_positive_samples = 0
-        self._n_negative_samples = 0
+        self._texts = list()
+        self._n_texts = 0
+        self._n_positive_texts = 0
+        self._n_negative_texts = 0
         self._pos = 0
     # end __init__
 
@@ -55,15 +53,14 @@ class Dataset(object):
     #################################################
 
     # Add a positive sample
-    def add_pos(self, title, url):
+    def add_positive(self, text):
         """
         Add a positive sample
-        :param title:
-        :param url:
+        :param text:
         :return:
         """
-        if self._add_sample(title, url, u"pos"):
-            self._n_positive_samples += 1
+        if self._add_sample(text, u"pos"):
+            self._n_positive_texts += 1
             return True
         else:
             return False
@@ -71,15 +68,14 @@ class Dataset(object):
     # end add_pos
 
     # Add a negative sample
-    def add_neg(self, title, url):
+    def add_negative(self, text):
         """
         Add a positive sample
-        :param title:
-        :param url:
+        :param text:
         :return:
         """
-        if self._add_sample(title, url, u"neg"):
-            self._n_negative_samples += 1
+        if self._add_sample(text, u"neg"):
+            self._n_negative_texts += 1
             return True
         else:
             return False
@@ -98,29 +94,28 @@ class Dataset(object):
     # end save
 
     # Is in dataset
-    def is_in(self, title, url):
+    def is_in(self, text):
         """
         Is in dataset?
         :param title:
         :param url:
         :return:
         """
-        return title in self._titles and url in self._urls
+        return text in self._texts
     # end is_in
-
-    # Is URL in dataset
-    def is_url_in(self, url):
-        """
-        Is URL in dataset?
-        :param url:
-        :return:
-        """
-        return url in self._urls
-    # end is_url_in
 
     #################################################
     # Override
     #################################################
+
+    # Length
+    def __len__(self):
+        """
+        Length
+        :return:
+        """
+        return self._n_texts
+    # end __len__
 
     # Iterator
     def __iter__(self):
@@ -137,12 +132,12 @@ class Dataset(object):
         Next element
         :return:
         """
-        if self._pos >= len(self._samples):
+        if self._pos >= len(self._texts):
             self._pos = 0
             raise StopIteration()
         else:
             self._pos += 1
-            return self._samples[self._pos-1]
+            return self._texts[self._pos-1]
         # end if
     # end next
 
@@ -152,9 +147,9 @@ class Dataset(object):
         To string
         :return:
         """
-        print(u"Total number of samples in the dataset : {}".format(self._n_samples))
-        print(u"Number of positive samples : {}".format(self._n_positive_samples))
-        print(u"Number of negative samples : {}".format(self._n_negative_samples))
+        print(u"Total number of samples in the dataset : {}".format(self._n_texts))
+        print(u"Number of positive samples : {}".format(self._n_positive_texts))
+        print(u"Number of negative samples : {}".format(self._n_negative_texts))
     # end __str__
 
     #################################################
@@ -162,19 +157,16 @@ class Dataset(object):
     #################################################
 
     # Add a sample
-    def _add_sample(self, title, url, c):
+    def _add_sample(self, text, c):
         """
         Add a sample
-        :param title:
-        :param url:
+        :param text:
         :param c:
         :return:
         """
-        if title not in self._titles and url not in self._urls:
-            self._urls.append(url)
-            self._titles.append(title)
-            self._samples.append((title, url, c))
-            self._n_samples += 1
+        if text not in self._texts:
+            self._texts.append(text)
+            self._n_texts += 1
             return True
         else:
             return False
@@ -193,7 +185,7 @@ class Dataset(object):
         :param opt: Loading option
         :return: The model class
         """
-        return pickle.load(open(opt, 'r'))
+        return pickle.load(open(opt, 'rb'))
     # end load
 
 # end Model
