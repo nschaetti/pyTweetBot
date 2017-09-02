@@ -31,6 +31,7 @@ from learning.StatisticalModel import StatisticalModel
 from learning.Statistical2GramModel import Statistical2GramModel
 from learning.TFIDFModel import TFIDFModel
 from learning.TextBlobModel import TextBlobModel
+from learning.Dataset import Dataset
 from bs4 import BeautifulSoup
 import urllib
 import pickle
@@ -73,10 +74,7 @@ def model_training(data_set_file, model_file="", param='dp', model_type='stat'):
 
     # Load dataset
     if os.path.exists(data_set_file):
-        with open(data_set_file, 'r') as f:
-            dataset = pickle.load(f)
-            n_samples = len(dataset[0].keys())
-        # end with
+        dataset = Dataset.load(data_set_file)
     else:
         logging.error(u"Cannot find dataset file {}".format(data_set_file))
     # end if
@@ -89,10 +87,7 @@ def model_training(data_set_file, model_file="", param='dp', model_type='stat'):
 
     try:
         # For each text in the dataset
-        for text in dataset:
-            # Class
-            c = dataset[0][url]
-
+        for text, c in dataset:
             # Predict
             if ".fr" in url or ".ch" in url:
                 prediction, probs = model(text)
