@@ -72,7 +72,7 @@ def clean_html_text(to_clean):
 
 
 # Train a classifier on a dataset
-def tweet_training(config, dataset_file, model_file="", data='title', test=False, param='dp', type='stat'):
+def tweet_training(dataset_file, model_file="", test=False, param='dp', type='stat'):
     """
     Train a classifier on a dataset.
     :param config: pyTweetBot configuration object
