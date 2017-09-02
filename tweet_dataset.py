@@ -25,11 +25,12 @@
 # Import
 import logging
 import os
-from tweet.RSSHunter import RSSHunter
+
+from learning.dataset.Dataset import Dataset
 from tweet.GoogleNewsHunter import GoogleNewsHunter
+from tweet.RSSHunter import RSSHunter
 from tweet.TweetFinder import TweetFinder
-from learning.Dataset import Dataset
-import pickle
+
 
 ####################################################
 # Main function
