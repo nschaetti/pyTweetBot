@@ -37,30 +37,6 @@ from learning.Dataset import Dataset
 ####################################################
 
 
-# Clean HTML text
-def clean_html_text(to_clean):
-    """
-    Clean HTML text
-    :param to_clean:
-    :return:
-    """
-    to_clean = to_clean.replace(u"%20", u" ")
-    to_clean = to_clean.replace(u"%22", u"\"")
-    to_clean = to_clean.replace(u"%3A", u":")
-    to_clean = to_clean.replace(u"%2C", u",")
-    to_clean = to_clean.replace(u"%2F", u"/")
-    to_clean = to_clean.replace(u"%7B", u"{")
-    to_clean = to_clean.replace(u"%7D", u"}")
-    to_clean = to_clean.replace(u"%5B", u"[")
-    to_clean = to_clean.replace(u"%5D", u"]")
-    to_clean = to_clean.replace(u"%E2%80%99", u"'")
-    to_clean = to_clean.strip()
-    to_clean = to_clean.replace(u"\n", u"")
-    to_clean = to_clean.replace(u"\r", u"")
-    to_clean = to_clean.replace(u"\t", u"")
-    return to_clean
-# end clean_html_text
-
 ####################################################
 # Main function
 ####################################################
@@ -89,65 +65,39 @@ def model_testing(data_set_file, model_file):
     # end if
 
     # Stats
-    count = 0.0
-    success = 0.0
-    false_positive = 0.0
-    false_positive_urls = list()
+    confusion_matrix = {'pos': {'pos': 0.0, 'neg': 0.0}, 'neg': {'pos': 0.0, 'neg': 0.0}}
 
     try:
         # For each URL in the dataset
-        for url in dataset[0].keys():
-            # Class
-            c = dataset[0][url]
-
+        index = 1
+        for text, c in dataset:
             # Log
-            logger.info(u"Testing {}".format(url))
-
-            # Get URL's text
-            html = urllib.urlopen(url).read()
-            soup = BeautifulSoup(html, "lxml")
-            text = soup.get_text()
-
-            # HTML entities
-            text = clean_html_text(text)
+            logging.info(u"Testing sample {}/{}".format(index, len(dataset)))
 
             # Predict
-            if ".fr" in url or ".ch" in url:
-                prediction, probs = model(text)
-            else:
-                prediction, probs = model(text)
-            # end if
+            prediction, probs = model(text)
 
-            # Same result
-            if probs['tweet'] == probs['skip']:
-                prediction = "skip"
-            # end if
-
-            # False positive
-            if prediction == "tweet" and c == "skip":
-                false_positive += 1.0
-                false_positive_urls.append(url)
-            # end if
+            # Save result
+            confusion_matrix[prediction][c] += 1.0
 
             # Compare
-            logger.info(u"Predicted {} for observation {}".format(prediction, c))
-            if prediction == c:
-                success += 1.0
-            # end if
-            count += 1.0
+            logging.info(u"Predicted {} for observation {}".format(prediction, c))
+
+            # Index
+            index += 1
         # end for
     except (KeyboardInterrupt, SystemExit):
         pass
     # end try
 
-    # Show performance
-    logger.info(u"Success rate of {} on dataset, {} false positive".format(success / count * 100.0,
-                                                                           false_positive / count * 100.0))
+    # False positive/negative
+    false_positive = confusion_matrix['pos']['neg'] / float(len(dataset))
+    false_negative = confusion_matrix['neg']['pos'] / float(len(dataset))
+    success_rate = (confusion_matrix['pos']['pos'] + confusion_matrix['neg']['neg']) / float(len(dataset))
 
-    # Show false positives
-    logger.info(u"False positives")
-    for url in false_positive_urls:
-        print(url)
-    # end for
+    # Show performance
+    logging.info(
+        u"Success rate of {} on dataset, {} false positive, {} false negative".format(success_rate, false_positive,
+                                                                                      false_negative))
 
 # end if
