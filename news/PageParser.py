@@ -6,6 +6,7 @@
 import socket
 import sys
 import urllib2
+import httplib
 from bs4 import BeautifulSoup
 
 
@@ -49,7 +50,11 @@ class PageParser(object):
                 raise PageParserRetrievalError(u"HTTP error while retrieving {} : {}\n".format(url, e))
             except socket.error as e:
                 count += 1
+                pass
             except urllib2.URLError:
+                count += 1
+                pass
+            except httplib.IncompleteRead:
                 count += 1
                 pass
             # end try
