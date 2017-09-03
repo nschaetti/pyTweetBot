@@ -26,15 +26,13 @@
 import logging
 import os
 import datetime
+import sys
 from learning.Model import Model
 from learning.StatisticalModel import StatisticalModel
 from learning.Statistical2GramModel import Statistical2GramModel
 from learning.TFIDFModel import TFIDFModel
 from learning.TextBlobModel import TextBlobModel
 from learning.Dataset import Dataset
-from bs4 import BeautifulSoup
-import urllib
-import pickle
 
 ####################################################
 # Functions
@@ -76,18 +74,13 @@ def model_training(data_set_file, model_file="", param='dp', model_type='NaiveBa
     if os.path.exists(data_set_file):
         dataset = Dataset.load(data_set_file)
     else:
-        logging.error(u"Cannot find dataset file {}".format(data_set_file))
+        sys.stderr.write(u"Cannot find dataset file {}\n".format(data_set_file))
+        exit()
     # end if
-
-    # Train or test
-    count = 0.0
-    success = 0.0
-    false_positive = 0.0
-    false_positive_urls = list()
 
     try:
         # For each text in the dataset
-        index = 1
+        """index = 1
         for text, c in dataset:
             # Log
             logging.getLogger(u"pyTweetBot").info(
@@ -96,9 +89,18 @@ def model_training(data_set_file, model_file="", param='dp', model_type='NaiveBa
             # Add training example
             model.train(text, c)
 
+            # Save
+            if index % 100 == 0:
+                logging.getLogger(u"pyTweetBot").info(u"Saving model to {}".format(model_file))
+                model.save(model_file)
+            # end if
+
             # Index
             index += 1
-        # end for
+        # end for"""
+        # Train
+        print(u"Training...")
+        model.update(dataset.get_texts())
     except (KeyboardInterrupt, SystemExit):
         pass
     # end try
