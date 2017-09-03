@@ -25,6 +25,7 @@
 # Imports
 import pickle
 import sys
+import json
 
 sys.setrecursionlimit(10000)
 
@@ -51,6 +52,15 @@ class Dataset(object):
     #################################################
     # Public
     #################################################
+
+    # Get texts
+    def get_texts(self):
+        """
+        Get texts
+        :return:
+        """
+        return self._texts
+    # end get_texts
 
     # Add a positive sample
     def add_positive(self, text):
@@ -103,6 +113,24 @@ class Dataset(object):
         """
         return text in self._texts
     # end is_in
+
+    # To JSON
+    def to_json(self):
+        """
+        To JSON
+        :return:
+        """
+        # Samples
+        samples = list()
+
+        # For each text
+        for text, c in self._texts:
+            samples.append({'text': text, 'label': c})
+        # end for
+
+        # Return JSON
+        return json.dumps(samples)
+    # end to_json
 
     #################################################
     # Override
@@ -164,7 +192,7 @@ class Dataset(object):
         :param c:
         :return:
         """
-        if text not in self._texts:
+        if (text, c) not in self._texts:
             self._texts.append((text, c))
             self._n_texts += 1
             return True
