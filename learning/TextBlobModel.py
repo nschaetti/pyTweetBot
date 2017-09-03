@@ -25,10 +25,11 @@
 # Imports
 import pickle
 from textblob.classifiers import NaiveBayesClassifier
+from Model import Model
 
 
 # TextBlob naive bayes classifier
-class TextBlobModel(object):
+class TextBlobModel(Model):
     """
     TextBlob naive bayes classifier
     """
@@ -59,21 +60,32 @@ class TextBlobModel(object):
         :param c: Text's class
         """
         # Update the classifier
-        self._cl.update((text, c))
+        self._cl.update([(text, c)])
     # end train
+
+    # Update
+    def update(self, samples):
+        """
+        Update
+        :param samples:
+        :return:
+        """
+        self._cl.update(samples)
+    # end update
 
     #################################################
     # Private
     #################################################
 
     # Predict
-    def _predict(self, text):
+    def _predict(self, text, lang='en'):
         """
         Predict
         :param text: Text to classify
         :return:
         """
-        return self._cl.classify(text)
+        prob_dist = self._cl.prob_classify(text)
+        return prob_dist.max(), [prob_dist.prob("pos"), prob_dist.prob("neg")]
     # end _predict
 
     #################################################
