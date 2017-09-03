@@ -46,7 +46,7 @@ import pickle
 
 
 # Train a classifier on a dataset
-def model_training(data_set_file, model_file="", param='dp', model_type='stat'):
+def model_training(data_set_file, model_file="", param='dp', model_type='NaiveBayes'):
     """
     Train a classifier on a dataset.
     :param data_set_file: Path to the dataset file
@@ -87,44 +87,23 @@ def model_training(data_set_file, model_file="", param='dp', model_type='stat'):
 
     try:
         # For each text in the dataset
+        index = 1
         for text, c in dataset:
-            # Predict
-            if ".fr" in url or ".ch" in url:
-                prediction, probs = model(text)
-            else:
-                prediction, probs = model(text)
-            # end if
+            # Log
+            logging.getLogger(u"pyTweetBot").info(
+                u"Training model on example {}/{} with c={}".format(index, len(dataset), c))
 
-            # Same result
-            if probs['tweet'] == probs['skip']:
-                prediction = "skip"
-            # end if
+            # Add training example
+            model.train(text, c)
 
-            # False positive
-            if prediction == "tweet" and c == "skip":
-                false_positive += 1.0
-                false_positive_urls.append(url)
-            # end if
-
-            # Compare
-            logger.info(u"Predicted {} for observation {}".format(prediction, c))
-            if prediction == c:
-                success += 1.0
-            # end if
-            count += 1.0
+            # Index
+            index += 1
         # end for
     except (KeyboardInterrupt, SystemExit):
         pass
     # end try
 
     # Show performance
-    logger.info(u"Success rate of {} on dataset, {} false positive".format(success / count * 100.0,
-                                                                           false_positive / count * 100.0))
-
-    # Show false positives
-    logger.info(u"False positives")
-    for url in false_positive_urls:
-        print(url)
-    # end for
-
+    logging.getLogger(u"pyTweetBot").info(u"Training finished... Saving model to {}".format(model_file))
+    model.save(model_file)
 # end if

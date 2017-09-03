@@ -68,7 +68,7 @@ if __name__ == "__main__":
         # For each texts
         index = 0
         for url in urls.keys():
-            print(u"Retrieving URL {}".format(url))
+            print(u"Retrieving URL {}/{} : {}".format(index+1, len(urls.keys()), url))
 
             # Get page's text
             try:

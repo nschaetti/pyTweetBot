@@ -160,7 +160,7 @@ if __name__ == "__main__":
         elif args.action == u"test":
             model_testing(data_set_file=args.dataset, model_file=args.model)
         elif args.action == u"train":
-            model_training(data_set_file=args.dataset, model_file=args.model, param=args.param, model_type=args.type)
+            model_training(data_set_file=args.dataset, model_file=args.model, param=args.param, model_type=args.classifier)
         else:
             sys.stderr.write(u"Unknown training action {}".format(args.action))
             exit()
