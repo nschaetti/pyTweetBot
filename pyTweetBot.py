@@ -32,12 +32,18 @@ from executor.ActionScheduler import ActionScheduler
 from friends.FriendsManager import FriendsManager
 from twitter.TweetBotConnect import TweetBotConnector
 from update_statistics import update_statistics
-from tweet_finder import tweet_finder
+from find_tweets import find_tweets
+from find_retweets import find_retweets
+from find_likes import find_likes
+from find_follows import find_follows
+from find_unfollows import find_unfollows
+from find_quotes import find_quotes
 from tweet_dataset import tweet_dataset
 from model_training import model_training
 from model_testing import model_testing
 from statistics_generator import statistics_generator
 from list_actions import list_actions
+from tweet.TweetFactory import TweetFactory
 
 ####################################################
 # Functions
@@ -54,6 +60,7 @@ def add_default_arguments(p):
     # Configuration and log
     p.add_argument("--config", type=str, help="Configuration file", required=True)
     p.add_argument("--log-level", type=int, help="Log level", default=20)
+    p.add_argument("--log-file", type=str, help="Log file", default=None)
 # end add_default_arguments
 
 
@@ -61,12 +68,43 @@ def add_default_arguments(p):
 def add_model_argument(p, required):
     """
     Add model argument
-    :param p:
-    :return:
+    :param p: Parser object
+    :param required: Is the model argument required?
     """
     # Model
     p.add_argument("--model", type=str, help="Classification model's file", required=required)
 # end add_model_argument
+
+
+# Create logger
+def create_logger(name, log_level=logging.INFO, log_format="%(asctime)s :: %(levelname)s :: %(message)s", log_file=""):
+    """
+    Create logger
+    :param name: Logger's name
+    :param log_level: Log level
+    :param log_format: Log format
+    :param log_file: Where to put the logs
+    :return: The logger object
+    """
+    # New logger
+    logger = logging.getLogger(name)
+    logger.setLevel(log_level)
+
+    # Create a file handler if needed
+    if log_file != "":
+        handler = logging.FileHandler(log_file)
+        handler.setLevel(logging.INFO)
+
+        # Create a logging format
+        formatter = logging.Formatter(log_format)
+        handler.setFormatter(formatter)
+
+        # Add the handlers to the logger
+        logger.addHandler(handler)
+    # end if
+
+    return logger
+# end create_logger
 
 ####################################################
 # Main function
@@ -97,30 +135,30 @@ if __name__ == "__main__":
     find_retweet_parser.add_argument("--n-pages", type=int, help="Number of pages in hashtags feed", default=10)
 
     # Find likes
-    find_like_parser = command_subparser.add_parser("find-like")
+    find_like_parser = command_subparser.add_parser("find-likes")
     add_default_arguments(find_like_parser)
     add_model_argument(find_like_parser, True)
     find_like_parser.add_argument("--n-pages", type=int, help="Number of pages in hashtags feed", default=10)
 
     # Find follow
-    find_follow_parser = command_subparser.add_parser("find-follow")
+    find_follow_parser = command_subparser.add_parser("find-follows")
     add_default_arguments(find_follow_parser)
     add_model_argument(find_follow_parser, True)
 
     # Find unfollow
-    find_unfollow_parser = command_subparser.add_parser("find-unfollow")
+    find_unfollow_parser = command_subparser.add_parser("find-unfollows")
     add_default_arguments(find_unfollow_parser)
     add_model_argument(find_unfollow_parser, True)
-
-    # Send private messages
-    send_pm_parser = command_subparser.add_parser("send-private-message")
-    add_default_arguments(send_pm_parser)
-    add_model_argument(send_pm_parser, True)
 
     # Find quotes to respond to
     find_quotes_parser = command_subparser.add_parser("find-quotes")
     add_default_arguments(find_quotes_parser)
     add_model_argument(find_quotes_parser)
+
+    # Send private messages
+    send_pm_parser = command_subparser.add_parser("send-private-message")
+    add_default_arguments(send_pm_parser)
+    add_model_argument(send_pm_parser, True)
 
     # Create data set and train models
     train_parser = command_subparser.add_parser("train")
@@ -172,7 +210,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Logging
-    logging.basicConfig(level=args.log_level, format='%(asctime)s :: %(levelname)s :: %(message)s')
+    logger = create_logger(__name__, log_level=args.log_level, log_file=args.log_file)
 
     # Load configuration file
     config = BotConfig.load(args.config)
@@ -191,13 +229,32 @@ if __name__ == "__main__":
     # Action scheduler
     action_scheduler = ActionScheduler()
 
+    # Tweet factory
+    tweet_factory = TweetFactory(config.get_hashtags())
+    action_scheduler.set_factory(tweet_factory)
+
     # Test command
     # Update statistics
     if args.command == "user-statistics":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
-        tweet_finder(config, args.model, action_scheduler)
+        find_tweets(config, args.model, action_scheduler)
+    # Find retweets
+    elif args.command == "find-retweets":
+        find_retweets(config, args.model, action_scheduler)
+    # Find likes
+    elif args.command == "find-likes":
+        find_likes(config, args.model, action_scheduler)
+    # Find follows
+    elif args.command == "find-follows":
+        find_follows(config, args.model, action_scheduler)
+    # Find unfollows
+    elif args.command == "find-unfollows":
+        find_unfollows(config, args.model, action_scheduler)
+    # Find quotes
+    elif args.command == "find-quotes":
+        find_quotes(config, args.model, action_scheduler)
     # Training
     elif args.command == "train":
         # Action
