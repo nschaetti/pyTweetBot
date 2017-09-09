@@ -56,6 +56,18 @@ def add_default_arguments(p):
     p.add_argument("--log-level", type=int, help="Log level", default=20)
 # end add_default_arguments
 
+
+# Add model argument
+def add_model_argument(p, required):
+    """
+    Add model argument
+    :param p:
+    :return:
+    """
+    # Model
+    p.add_argument("--model", type=str, help="Classification model's file", required=required)
+# end add_model_argument
+
 ####################################################
 # Main function
 ####################################################
@@ -72,18 +84,50 @@ if __name__ == "__main__":
     update_stats_parser = command_subparser.add_parser("user-statistics")
     add_default_arguments(update_stats_parser)
 
-    # Find tweet
+    # Find tweets
     find_tweet_parser = command_subparser.add_parser("find-tweets")
     add_default_arguments(find_tweet_parser)
-    find_tweet_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
-    find_tweet_parser.add_argument("--model", type=str, help="Classification model file")
+    add_model_argument(find_tweet_parser, True)
+    find_tweet_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=5)
 
-    # Create data set
+    # Find retweets
+    find_retweet_parser = command_subparser.add_parser("find-retweets")
+    add_default_arguments(find_retweet_parser)
+    add_model_argument(find_retweet_parser, True)
+    find_retweet_parser.add_argument("--n-pages", type=int, help="Number of pages in hashtags feed", default=10)
+
+    # Find likes
+    find_like_parser = command_subparser.add_parser("find-like")
+    add_default_arguments(find_like_parser)
+    add_model_argument(find_like_parser, True)
+    find_like_parser.add_argument("--n-pages", type=int, help="Number of pages in hashtags feed", default=10)
+
+    # Find follow
+    find_follow_parser = command_subparser.add_parser("find-follow")
+    add_default_arguments(find_follow_parser)
+    add_model_argument(find_follow_parser, True)
+
+    # Find unfollow
+    find_unfollow_parser = command_subparser.add_parser("find-unfollow")
+    add_default_arguments(find_unfollow_parser)
+    add_model_argument(find_unfollow_parser, True)
+
+    # Send private messages
+    send_pm_parser = command_subparser.add_parser("send-private-message")
+    add_default_arguments(send_pm_parser)
+    add_model_argument(send_pm_parser, True)
+
+    # Find quotes to respond to
+    find_quotes_parser = command_subparser.add_parser("find-quotes")
+    add_default_arguments(find_quotes_parser)
+    add_model_argument(find_quotes_parser)
+
+    # Create data set and train models
     train_parser = command_subparser.add_parser("train")
     add_default_arguments(train_parser)
+    add_model_argument(train_parser, False)
     train_parser.add_argument("--action", type=str,
                               help="Create a data set (dataset), train or test a model (train/test)")
-    train_parser.add_argument("--model", type=str, help="Path to model's file")
     train_parser.add_argument("--dataset", type=str, help="Input/output data set file")
     train_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
     train_parser.add_argument("--rss", type=str, help="Specific RSS stream to capture", default="")
@@ -96,12 +140,13 @@ if __name__ == "__main__":
                               help="Information source to classify (rss, news, tweets, friends, user)")
 
     # User's statistics
-    user_statistics = command_subparser.add_parser("statistics")
-    add_default_arguments(user_statistics)
-    user_statistics.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
-    user_statistics.add_argument("--stats-file", type=str, help="Twitter statistics file")
-    user_statistics.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
-    user_statistics.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
+    user_statistics_parser = command_subparser.add_parser("statistics")
+    add_default_arguments(user_statistics_parser)
+    add_model_argument(user_statistics_parser, False)
+    user_statistics_parser.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
+    user_statistics_parser.add_argument("--stats-file", type=str, help="Twitter statistics file")
+    user_statistics_parser.add_argument("--stream", type=str, help="Stream (timeline, user)", default="timeline")
+    user_statistics_parser.add_argument("--n-pages", type=int, help="Number of page to take into account", default=-1)
 
     # List command
     list_actions_parser = command_subparser.add_parser("actions")
@@ -109,9 +154,10 @@ if __name__ == "__main__":
     list_actions_parser.add_argument("--type", type=str, help="Action type (tweet, retweet, like, follow, unfollow",
                                      default="all")
 
-    # List followers
+    # List and update followers/friends list
     list_friends_parser = command_subparser.add_parser("friends")
     add_default_arguments(list_friends_parser)
+    list_friends_parser.add_argument("--update", action='store_true', help="Update followers/friends in the DB")
     list_friends_parser.add_argument("--obsolete", action='store_true', help="Show only obsolete friends")
     list_friends_parser.add_argument("--friends", action='store_true', help="Show only friends")
 
