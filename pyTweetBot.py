@@ -60,7 +60,7 @@ def add_default_arguments(p):
     # Configuration and log
     p.add_argument("--config", type=str, help="Configuration file", required=True)
     p.add_argument("--log-level", type=int, help="Log level", default=20)
-    p.add_argument("--log-file", type=str, help="Log file", default=None)
+    p.add_argument("--log-file", type=str, help="Log file", default="")
 # end add_default_arguments
 
 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     # Find quotes to respond to
     find_quotes_parser = command_subparser.add_parser("find-quotes")
     add_default_arguments(find_quotes_parser)
-    add_model_argument(find_quotes_parser)
+    add_model_argument(find_quotes_parser, True)
 
     # Send private messages
     send_pm_parser = command_subparser.add_parser("send-private-message")
