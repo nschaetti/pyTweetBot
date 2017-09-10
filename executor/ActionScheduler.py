@@ -279,13 +279,17 @@ class ActionScheduler(Thread):
     # end exec_next_action
 
     # List actions in the reservoir
-    def list_actions(self):
+    def list_actions(self, action_type=""):
         """
         List actions in the reservoir
         :return:
         """
         # Get actions
-        return self._session.query(Action).order_by(Action.action_id).all()
+        if action_type == "":
+            return self._session.query(Action).order_by(Action.action_id).all()
+        else:
+            return self._session.query(Action).filter(Action.action_type == action_type).order_by(Action.action_id).all()
+        # end if
     # end list_actions
 
     # Is reservoir empty
