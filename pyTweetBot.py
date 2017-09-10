@@ -44,6 +44,7 @@ from model_testing import model_testing
 from statistics_generator import statistics_generator
 from list_actions import list_actions
 from tweet.TweetFactory import TweetFactory
+from execute_actions import execute_actions
 
 ####################################################
 # Functions
@@ -113,7 +114,7 @@ def create_logger(name, log_level=logging.INFO, log_format="%(asctime)s :: %(lev
 if __name__ == "__main__":
 
     # Argument parser
-    parser = argparse.ArgumentParser(prog="pyTweetBot", description="pyTweetBot - Smart Twitter Bot")
+    parser = argparse.ArgumentParser(prog="pyTweetBot", description="pyTweetBot - A smart Twitter bot to replace yourself")
 
     # Command subparser
     command_subparser = parser.add_subparsers(dest="command")
@@ -190,7 +191,7 @@ if __name__ == "__main__":
     list_actions_parser = command_subparser.add_parser("actions")
     add_default_arguments(list_actions_parser)
     list_actions_parser.add_argument("--type", type=str, help="Action type (tweet, retweet, like, follow, unfollow",
-                                     default="all")
+                                     default="")
 
     # List and update followers/friends list
     list_friends_parser = command_subparser.add_parser("friends")
@@ -273,11 +274,10 @@ if __name__ == "__main__":
         statistics_generator(twitter_connector, args.stats_file, args.n_pages, args.stream, args.info)
     # Executor
     elif args.command == "execute":
-        #execute_actions(config, twitter_connector, action_scheduler)
-        pass
+        execute_actions(action_scheduler)
     # List future action
     elif args.command == "actions":
-        list_actions(action_scheduler)
+        list_actions(action_scheduler, args.type)
     # List friends
     elif args.command == "friends":
         pass
