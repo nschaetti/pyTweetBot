@@ -41,7 +41,7 @@ class StatisticalModel(Model):
     """
 
     # Constructor
-    def __init__(self, name, classes, last_update, smoothing, smoothing_param):
+    def __init__(self, features, name, classes, last_update, smoothing, smoothing_param):
         """
         Constructor
         :param name: Model's name
@@ -49,7 +49,7 @@ class StatisticalModel(Model):
         :param tokens_prob: Array of dictionaries of tokens probabilities
         """
         # Superclass
-        super(StatisticalModel, self).__init__()
+        super(StatisticalModel, self).__init__(features=features)
 
         # Properties
         self._name = name
@@ -66,9 +66,6 @@ class StatisticalModel(Model):
         # Smoothing
         self._smoothing = smoothing
         self._smoothing_param = smoothing_param
-
-        # Regex
-        self._token_filter = u"+\"*ç%&/()=?§°!£.,±“#Ç[]|{}≠¿¢«…Ç∞”‹⁄[]\ÒÔÚÿÆ•÷»<>≤≥\\_;:\n\r@∑€®†Ω°¡øπ¬∆ºª@ƒ∂ßå¥≈©√∫~'"
     # end __init__
 
     #####################################################
@@ -85,19 +82,16 @@ class StatisticalModel(Model):
     # end get_token_count
 
     # Train the model
-    def train(self, text, c, lang='en'):
+    def train(self, x, y):
         """
-        Train the model
-        :param text: Training text
-        :param c: Text's class
+        Train the model on a sample
+        :param x: Training text
+        :param y: Text's class
         """
-        # Tokens
-        tokens = spacy.load(lang)(text)
-
         # For each token
-        for token in tokens:
-            token_text = token.text.lower().replace(u" ", u"").replace(u"\t", u"")
-            if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
+        for token in x:
+            token_text = token.replace(u" ", u"").replace(u"\t", u" ")
+            if len(token_text) > 1 and len(token_text) < 25:
                 # Token counters
                 try:
                     self._token_counters[token_text] += 1.0
@@ -115,9 +109,9 @@ class StatisticalModel(Model):
 
                 # Class counters
                 if c in self._class_counters[token_text].keys():
-                    self._class_counters[token_text][c] += 1.0
+                    self._class_counters[token_text][y] += 1.0
                 else:
-                    self._class_counters[token_text][c] = 1.0
+                    self._class_counters[token_text][y] = 1.0
                 # end if
 
                 # One more token
@@ -141,11 +135,11 @@ class StatisticalModel(Model):
         probs = dict()
 
         # Set default
-        for c in self._classes:
+        for y in self._classes:
             try:
-                probs[c] = self._class_counters[item][c] / self._token_counters[item]
+                probs[y] = self._class_counters[item][y] / self._token_counters[item]
             except KeyError:
-                probs[c] = 0.0
+                probs[y] = 0.0
             # end try
         # end for
 
@@ -170,10 +164,10 @@ class StatisticalModel(Model):
     ####################################################
 
     # Prediction
-    def _predict(self, text, lang='en'):
+    def _predict(self, x):
         """
         Prediction
-        :param text: Text to classify
+        :param x: Sample to classify
         :return: Resulting class number
         """
         # Text's probabilities
@@ -229,16 +223,6 @@ class StatisticalModel(Model):
 
         return result_class, text_probs
     # end _predict
-
-    # Filter tokens
-    def _filter_token(self, token):
-        for sym in self._token_filter:
-            if sym in token:
-                return False
-            # end if
-        # end for
-        return True
-    # end _filter_token
 
     ####################################################
     # Static
