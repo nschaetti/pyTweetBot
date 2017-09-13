@@ -57,10 +57,15 @@ class Model(object):
     _finalized = False
 
     # Constructor
-    def __init__(self, features):
+    def __init__(self, features, name, classes):
         """
         Constructor
         """
+        # Properties
+        self._name = name
+        self._classes = classes
+        self._n_classes = len(classes)
+
         # Texts trained
         self._samples = list()
 
