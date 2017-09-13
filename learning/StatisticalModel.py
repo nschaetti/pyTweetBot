@@ -49,13 +49,9 @@ class StatisticalModel(Model):
         :param tokens_prob: Array of dictionaries of tokens probabilities
         """
         # Superclass
-        super(StatisticalModel, self).__init__(features=features)
+        super(StatisticalModel, self).__init__(features=features, name=name, classes=classes)
 
         # Properties
-        self._name = name
-        self._classes = classes
-        self._n_classes = len(classes)
-        self._last_update = last_update
         self._n_token = 0
         self._n_total_token = 0
 
@@ -90,33 +86,30 @@ class StatisticalModel(Model):
         """
         # For each token
         for token in x:
-            token_text = token.replace(u" ", u"").replace(u"\t", u" ")
-            if len(token_text) > 1 and len(token_text) < 25:
-                # Token counters
-                try:
-                    self._token_counters[token_text] += 1.0
-                except KeyError:
-                    self._token_counters[token_text] = 1.0
-                    self._n_token += 1.0
-                # end try
+            # Token counters
+            try:
+                self._token_counters[token] += 1.0
+            except KeyError:
+                self._token_counters[token] = 1.0
+                self._n_token += 1.0
+            # end try
 
-                # Create entry in class counter
-                try:
-                    probs = self._class_counters[token_text]
-                except KeyError:
-                    self._class_counters[token_text] = dict()
-                # end try
+            # Create entry in class counter
+            try:
+                probs = self._class_counters[token]
+            except KeyError:
+                self._class_counters[token] = dict()
+            # end try
 
-                # Class counters
-                if c in self._class_counters[token_text].keys():
-                    self._class_counters[token_text][y] += 1.0
-                else:
-                    self._class_counters[token_text][y] = 1.0
-                # end if
-
-                # One more token
-                self._n_total_token += 1.0
+            # Class counters
+            if c in self._class_counters[token].keys():
+                self._class_counters[token][y] += 1.0
+            else:
+                self._class_counters[token][y] = 1.0
             # end if
+
+            # One more token
+            self._n_total_token += 1.0
         # end token
     # end train
 
@@ -142,7 +135,6 @@ class StatisticalModel(Model):
                 probs[y] = 0.0
             # end try
         # end for
-
         return probs
     # end __getitem__
 
@@ -157,6 +149,19 @@ class StatisticalModel(Model):
             .format(self._name, self._n_classes,self._last_update, self.get_token_count(),
                     getsizeof(self), round(getsizeof(self._token_counters)/1073741824.0, 4),
                     round(getsizeof(self._class_counters)/1073741824.0, 4), self._n_total_token)
+    # end __str__
+
+    # To String
+    def __unicode__(self):
+        """
+        To string
+        :return:
+        """
+        return u"StatisticalModel(name={}, n_classes={}, last_training={}, n_tokens={}, mem_size={}o, " \
+               u"token_counters_mem_size={} Go, class_counters_mem_size={} Go, n_total_token={})" \
+            .format(self._name, self._n_classes, self._last_update, self.get_token_count(),
+                    getsizeof(self), round(getsizeof(self._token_counters) / 1073741824.0, 4),
+                    round(getsizeof(self._class_counters) / 1073741824.0, 4), self._n_total_token)
     # end __str__
 
     ####################################################
@@ -178,37 +183,22 @@ class StatisticalModel(Model):
             text_probs[c] = decimal.Decimal(1.0)
         # end for
 
-        # Parse text
-        text_tokens = spacy.load(lang)(text)
-
-        # Get all tokens
-        tokens = list()
-        for token in text_tokens:
-            tokens.append(token)
-        # end for
-
         # For each token
-        for token in tokens:
-            token_text = token.text.lower()
-            if len(token_text) > 1 and len(token_text) < 25 and self._filter_token(token_text):
-                # Get token probs for each class
-                try:
-                    token_probs = self[token_text]
-                    collection_prob = self._token_counters[token_text] / self._n_total_token
-                except KeyError:
-                    continue
-                # end try
-                #print(u"#" + token_text + u"#")
-                #print(token_probs)
-                #print(collection_prob)
-                # For each class
-                for c in self._classes:
-                    smoothed_value = StatisticalModel.smooth(self._smoothing, token_probs[c], collection_prob, len(tokens),
-                                                             param=self._smoothing_param)
-                    #print(c + ":" + str(smoothed_value))
-                    text_probs[c] *= decimal.Decimal(smoothed_value)
-                # end for
-            # end if
+        for token in x:
+            # Get token probs for each class
+            try:
+                token_probs = self[token]
+                collection_prob = self._token_counters[token] / self._n_total_token
+            except KeyError:
+                continue
+            # end try
+
+            # For each class
+            for c in self._classes:
+                smoothed_value = StatisticalModel.smooth(self._smoothing, token_probs[c], collection_prob, len(x),
+                                                         param=self._smoothing_param)
+                text_probs[c] *= decimal.Decimal(smoothed_value)
+            # end for
         # end for
 
         # Get highest prob
@@ -218,7 +208,7 @@ class StatisticalModel(Model):
             if text_probs[c] > max:
                 max = text_probs[c]
                 result_class = c
-                # end if
+            # end if
         # end for
 
         return result_class, text_probs
@@ -227,79 +217,6 @@ class StatisticalModel(Model):
     ####################################################
     # Static
     ####################################################
-
-    # Load the model
-    @staticmethod
-    def load(opt):
-        """
-        Load the model from DB or file
-        :param opt: Loading option
-        :return: The model class
-        """
-        # Get from DB
-        model = DbModel.get_by_name(opt)
-
-        # Check if exists
-        if model is not None:
-            # Array with an entry for each class
-            class_tokens = list()
-
-            # For each classes
-            for i in range(model.model_n_classes):
-                class_tokens.append(ModelToken.get_tokens(model=model, c=i))
-            # end for
-
-            return StatisticalModel(model.model_name, model.model_n_classes, class_tokens)
-        else:
-            raise ModelNotFoundException(u"Statistical model {} not found in the database".format(opt))
-        # end if
-    # end load
-
-    # Load the model from file
-    @staticmethod
-    def load_from_file(filename):
-        """
-        Load the model from a Pickle file
-        :param filename: Pickle file
-        :return: The loaded class
-        """
-        with open(filename, 'r') as f:
-            return pickle.load(f)
-        # end with
-    # end load_from_file
-
-    # create a new model
-    @staticmethod
-    def create(opt, n_classes=None):
-        """
-        create a new model in db or file
-        :param opt: model options
-        :param n_classes: Number of classes to classify.
-        :return: the newly created model
-        """
-        # Check if model already exists
-        if not DbModel.exists(opt):
-            model = DbModel(model_name=opt, model_n_classes=n_classes)
-            DBConnector().get_session().add(model)
-            DBConnector().get_session().commit()
-        else:
-            raise ModelAlreadyExistsException("This model's name already exists in the database!")
-        # end if
-
-        return model
-    # end create
-
-        # Model exists?
-
-    @staticmethod
-    def exists(name):
-        """
-        Does a model exists?
-        :param name: Model's name
-        :return: True or False
-        """
-        return DbModel.exists(name)
-    # end exists
 
     # Dirichlet prior smoothing function
     @staticmethod
