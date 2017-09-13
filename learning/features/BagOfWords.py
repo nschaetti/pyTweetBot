@@ -61,14 +61,25 @@ class BagOfWords(object):
         # Filter each token
         if self._filters is not None:
             for token in self._nlp(text):
-                found = False
-                for c in self._filters:
-                    if c in token:
-                        found = True
+                # No space/tab/return
+                token = token.replace(u" ", u"").replace(u"\t", u"").replace(u"\n", u"")
+
+                # Lower case?
+                if not self._uppercase:
+                    token = token.lower()
+                # end if
+
+                # No empty
+                if len(token) > 1:
+                    found = False
+                    for c in self._filters:
+                        if c in token:
+                            found = True
+                        # end if
+                    # end for
+                    if not found:
+                        result.append(token)
                     # end if
-                # end for
-                if not found:
-                    result.append(token)
                 # end if
             # end for
             return result
