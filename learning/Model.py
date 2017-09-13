@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # File : Model.py
-# Description : pyTweetBot learning model abstract céass
+# Description : pyTweetBot learning model abstract class
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -24,6 +24,8 @@
 
 # Imports
 import pickle
+import md5
+import spacy
 from db.obj.Model import Model as DbModel
 
 
@@ -55,9 +57,15 @@ class Model(object):
     _finalized = False
 
     # Constructor
-    def __init__(self):
-        # URL trained
-        self._urls = list()
+    def __init__(self, features):
+        """
+        Constructor
+        """
+        # Texts trained
+        self._samples = list()
+
+        # Features
+        self._features = features
     # end __init__
 
     #################################################
@@ -65,13 +73,19 @@ class Model(object):
     #################################################
 
     # Train the model
-    def train(self, text, c):
+    def update(self, x, y):
         """
         Train the model
-        :param text: Training text
-        :param c: Text's class
+        :param x: Training text
+        :param y: Text's class
         """
-        pass
+        if not self.is_sample_seen(x):
+            # Call training method
+            self._train(self._features(x), y)
+
+            # Add to memory
+            self.add_sample(x)
+        # end if
     # end train
 
     # Save the model
@@ -87,27 +101,26 @@ class Model(object):
     # end save
 
     # Is trained on that example
-    def is_example_seen(self, url):
+    def is_sample_seen(self, x):
         """
         Is example already seen
-        :param url:
+        :param x: Training text
         :return:
         """
-        if url in self._urls:
+        if md5.new(u' '.join(x)).digest() in self._samples:
             return True
         else:
             return False
         # end if
     # end is_example_seen
 
-    # Add to url list
-    def add_url(self, url):
+    # Add to sample list
+    def add_sample(self, x):
         """
-        Add to URL list
-        :param url:
-        :return:
+        Add to text list
+        :param x:
         """
-        self._urls.append(url)
+        self._samples.append(md5.new(u' '.join(x)).digest())
     # end add_url
 
     #################################################
@@ -115,17 +128,13 @@ class Model(object):
     #################################################
 
     # Call the model
-    def __call__(self, text, lang='en'):
+    def __call__(self, x):
         """
         Call the model to classify new text
-        :param text: Text to classify
+        :param x: Text to classify
         :return: Resulting class number
         """
-        if not self._finalized:
-            self._finalize()
-            self._finalized = True
-        # end if
-        return self._predict(text, lang=lang)
+        return self._predict(self._features(x))
     # end __call__
 
     #################################################
@@ -133,23 +142,25 @@ class Model(object):
     #################################################
 
     # Predict
-    def _predict(self, text, lang='en'):
+    def _predict(self, x):
         """
         Predict
-        :param text: Text to classify
+        :param x: Text to classify
         :return:
         """
         pass
     # end _predict
 
-    # Finalize the model
-    def _finalize(self):
+    # Train an example
+    def _train(self, x, y):
         """
-        Finalize the model
+        Train on a sample
+        :param x: The text sample
+        :param y: The class to predict
         :return:
         """
         pass
-    # end _finalize
+    # end _train
 
     #################################################
     # Static
@@ -165,27 +176,5 @@ class Model(object):
         """
         return pickle.load(open(opt, 'r'))
     # end load
-
-    # Create a new model
-    @staticmethod
-    def create(opt, n_classes=None):
-        """
-        Create a new model in DB or file
-        :param opt: Model options
-        :param n_classes: Classes count if classification model.
-        :return: The newly created model
-        """
-        pass
-    # end create
-
-    @staticmethod
-    def exists(name):
-        """
-        Does a model exists?
-        :param name: Model's name
-        :return: True or False
-        """
-        return DbModel.exists(name)
-    # end exists
 
 # end Model
