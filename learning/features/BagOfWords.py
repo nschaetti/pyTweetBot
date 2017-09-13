@@ -33,13 +33,15 @@ class BagOfWords(object):
     """
 
     # Constructor
-    def __init__(self, lang='en'):
+    def __init__(self, lang='en', filters=None, uppercase=False):
         """
         Constructor
         """
         # Properties
         self._lang = lang
         self._nlp = spacy.load(lang)
+        self._filters = filters
+        self._uppercase = uppercase
     # end __init__
 
     ########################################
@@ -53,7 +55,26 @@ class BagOfWords(object):
         :param text:
         :return:
         """
-        return self._nlp(text)
+        # Result
+        result = list()
+
+        # Filter each token
+        if self._filters is not None:
+            for token in self._nlp(text):
+                found = False
+                for c in self._filters:
+                    if c in token:
+                        found = True
+                    # end if
+                # end for
+                if not found:
+                    result.append(token)
+                # end if
+            # end for
+            return result
+        else:
+            return self._nlp(text)
+        # end if
     # end __call__
 
 # end BagOfWords
