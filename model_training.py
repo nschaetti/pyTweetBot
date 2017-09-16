@@ -27,6 +27,7 @@ import logging
 import os
 import datetime
 import sys
+import nsNLP
 from learning.Model import Model
 from learning.StatisticalModel import StatisticalModel
 from learning.Statistical2GramModel import Statistical2GramModel
@@ -44,31 +45,61 @@ from learning.Dataset import Dataset
 
 
 # Train a classifier on a dataset
-def model_training(data_set_file, model_file="", param='dp', model_type='NaiveBayes'):
+def model_training(data_set_file, model_file="", model_type='NaiveBayes', features='word'):
     """
     Train a classifier on a dataset.
     :param data_set_file: Path to the dataset file
     :param model_file: Path to model file if needed
-    :param param: Model parameter (dp, ...)
     :param model_type: Model's type (stat, tfidf, stat2, textblob)
+    :param features: Features
     """
     # Load model or create
     if os.path.exists(model_file):
         model = Model.load(model_file)
     else:
         if model_type == "stat":
-            model = StatisticalModel("tweet_stat_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow(),
-                                     smoothing=param, smoothing_param=0.5)
+            model = nsNLP.statistical_models.SLTextClassifier(
+                classes=['pos', 'neg'],
+                smoothing='dp',
+                smoothing_param=0.05
+            )
         elif model_type == "tfidf":
-            model = TFIDFModel("tweet_tfidf_model", ['tweet', 'skip'], last_update=datetime.datetime.utcnow())
-        elif model_type == "stat2":
-            model = Statistical2GramModel("tweet_stat2_model", ['tweet', 'skip'],
-                                          last_update=datetime.datetime.utcnow(), smoothing=param,
-                                          smoothing_param=0.5)
+            model = nsNLP.statistical_models.TFIDFTextClassifier(
+                classes=['pos', 'neg']
+            )
         elif model_type == "NaiveBayes":
-            model = TextBlobModel()
+            model = nsNLP.statistical_models.NaiveBayesClassifier(
+                classes=['pos', 'neg'],
+                smoothing='dp',
+                smoothing_param=0.05
+            )
         # end if
     # end if
+
+    # Tokenizer
+    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+
+    # Parse features
+    feature_list = features.split('+')
+
+    # Join features
+    bow = nsNLP.features.BagOfGrams()
+
+    # For each features
+    for bag in feature_list:
+        # Select features
+        if bag == 'words':
+            b = nsNLP.features.BagOfWords()
+        elif bag == 'bigrams':
+            b = nsNLP.features.BagOf2Grams()
+        elif bag == 'trigrams':
+            b = nsNLP.features.BagOf3Grams()
+        else:
+            sys.stderr.write(u"Unknown features type {}".format(features))
+            exit()
+        # end if
+        bow.add(b)
+    # end for
 
     # Load dataset
     if os.path.exists(data_set_file):
@@ -78,32 +109,40 @@ def model_training(data_set_file, model_file="", param='dp', model_type='NaiveBa
         exit()
     # end if
 
-    try:
+    # Finalized?
+    if not model.finalized():
         # For each text in the dataset
-        """index = 1
+        index = 1
         for text, c in dataset:
+            # Tokens
+            tokens = tokenizer(text)
+
             # Log
-            logging.getLogger(u"pyTweetBot").info(
-                u"Training model on example {}/{} with c={}".format(index, len(dataset), c))
+            logging.getLogger(u"pyTweetBot").info\
+            (
+                u"Training model on example {}/{} with c={} and {} tokens".format(index, len(dataset), c, len(tokens))
+            )
 
             # Add training example
-            model.train(text, c)
+            model.train(bow(tokens), c)
 
-            # Save
-            if index % 100 == 0:
-                logging.getLogger(u"pyTweetBot").info(u"Saving model to {}".format(model_file))
-                model.save(model_file)
-            # end if
+            # Info
+            logging.getLogger(u"pyTweetBot").info\
+            (
+                u"Model with {} tokens (neg={}/pos={})".format(model.get_n_tokens(), model.get_n_tokens('neg'), model.get_n_tokens('pos'))
+            )
 
             # Index
             index += 1
-        # end for"""
-        # Train
-        print(u"Training...")
-        model.update(dataset.get_texts())
-    except (KeyboardInterrupt, SystemExit):
-        pass
-    # end try
+        # end for
+    else:
+        logging.getLogger(u"pyTweetBot").error(u"Model already finalized...")
+        exit()
+    # end if
+
+    # Finalize training
+    logging.getLogger(u"pyTweetBot").info(u"Finalizing training...")
+    model.finalize()
 
     # Show performance
     logging.getLogger(u"pyTweetBot").info(u"Training finished... Saving model to {}".format(model_file))
