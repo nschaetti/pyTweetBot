@@ -112,6 +112,11 @@ def model_testing(data_set_file, model_file, features='words'):
         # Compare
         print(u"Predicted {} for observation {}".format(prediction, c))
 
+        # Show false positive
+        if prediction == 'pos' and c == 'neg':
+            print(text)
+        # end if
+
         # Index
         index += 1
     # end for
