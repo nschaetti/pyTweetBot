@@ -25,11 +25,12 @@
 # Import
 import logging
 import os
-
+import sys
 from learning.Dataset import Dataset
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.RSSHunter import RSSHunter
 from tweet.TweetFinder import TweetFinder
+from news.PageParser import PageParser, PageParserRetrievalError
 
 
 ####################################################
@@ -83,8 +84,16 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
 
     # For each tweet
     for tweet in tweet_finder:
+        # Get page's text
+        try:
+            page_text = PageParser.get_text(tweet.get_url())
+        except PageParserRetrievalError as e:
+            sys.stderr.write(u"Page retrieval error : {}".format(e))
+            continue
+        # end try
+
         # Not already in dataset
-        if not dataset.is_in(tweet.get_text(), tweet.get_url()):
+        if not dataset.is_in(page_text):
             # Ask
             print(u"Would you classify the following element as negative(n) or positive(p)?")
             print(u"Text : {}".format(tweet.get_text()))
@@ -95,9 +104,9 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
             if observed == 'q':
                 break
             elif observed == 'p':
-                dataset.add_pos(tweet.get_text(), tweet.get_url())
+                dataset.add_positive(page_text)
             elif observed == 'n':
-                dataset.add_neg(tweet.get_text(), tweet.get_url())
+                dataset.add_negative(page_text)
             # end if
 
             # Save dataset
