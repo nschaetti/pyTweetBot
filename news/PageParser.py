@@ -72,7 +72,7 @@ class PageParser(object):
         for tag in ['h1', 'h2', 'h3', 'h4', 'p']:
             # Find all occurencies
             for html_tag in soup.find_all(tag):
-                html_text += html_tag.text
+                html_text += html_tag.text + u". "
             # end for
         # end for
 
