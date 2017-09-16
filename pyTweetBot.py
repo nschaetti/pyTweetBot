@@ -174,7 +174,8 @@ if __name__ == "__main__":
     train_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
     train_parser.add_argument("--classifier", type=str, help="Classifier type (NaiveBayes, MaxEnt, TFIDF, etc)",
                               default="NaiveBayes")
-    train_parser.add_argument("--param", type=float, help="Classifier parameter", default=1.0)
+    train_parser.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words")
+    train_parser.add_argument("--param", type=float, help="Classifier parameter", default="")
     train_parser.add_argument("--source", type=str,
                               help="Information source to classify (rss, news, tweets, friends, user)")
 
