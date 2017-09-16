@@ -88,6 +88,7 @@ def create_logger(name, log_level=logging.INFO, log_format="%(asctime)s :: %(lev
     :return: The logger object
     """
     # New logger
+    logging.basicConfig()
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
 
@@ -175,7 +176,6 @@ if __name__ == "__main__":
     train_parser.add_argument("--classifier", type=str, help="Classifier type (NaiveBayes, MaxEnt, TFIDF, etc)",
                               default="NaiveBayes")
     train_parser.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words")
-    train_parser.add_argument("--param", type=float, help="Classifier parameter", default="")
     train_parser.add_argument("--source", type=str,
                               help="Information source to classify (rss, news, tweets, friends, user)")
 
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Logging
-    logger = create_logger(__name__, log_level=args.log_level, log_file=args.log_file)
+    logger = create_logger(u"pyTweetBot", log_level=args.log_level, log_file=args.log_file)
 
     # Load configuration file
     config = BotConfig.load(args.config)
@@ -263,9 +263,15 @@ if __name__ == "__main__":
         if args.action == u"dataset":
             tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
         elif args.action == u"test":
-            model_testing(data_set_file=args.dataset, model_file=args.model)
+            model_testing(data_set_file=args.dataset, model_file=args.model, features=args.features)
         elif args.action == u"train":
-            model_training(data_set_file=args.dataset, model_file=args.model, param=args.param, model_type=args.classifier)
+            model_training\
+            (
+                data_set_file=args.dataset,
+                model_file=args.model,
+                model_type=args.classifier,
+                features=args.features
+            )
         else:
             sys.stderr.write(u"Unknown training action {}".format(args.action))
             exit()
