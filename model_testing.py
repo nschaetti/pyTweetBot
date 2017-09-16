@@ -23,6 +23,7 @@
 #
 
 # Import
+import nsNLP
 import logging
 import os
 import sys
@@ -43,15 +44,16 @@ from learning.Dataset import Dataset
 
 
 # Test a classifier
-def model_testing(data_set_file, model_file):
+def model_testing(data_set_file, model_file, features='words'):
     """
     Test a classifier
     :param data_set_file: Path to the dataset file
     :param model_file: Path to model file if needed
+    :param features: Features
     """
     # Load model or create
     if os.path.exists(model_file):
-        model = Model.load(model_file)
+        model = nsNLP.classifiers.TextClassifier.load(model_file)
     else:
         sys.stderr.write(u"Can't open model file {}\n".format(model_file))
         exit()
@@ -64,31 +66,55 @@ def model_testing(data_set_file, model_file):
         logging.error(u"Cannot find dataset file {}".format(data_set_file))
     # end if
 
+    # Tokenizer
+    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+
+    # Parse features
+    feature_list = features.split('+')
+
+    # Join features
+    bow = nsNLP.features.BagOfGrams()
+
+    # For each features
+    for bag in feature_list:
+        # Select features
+        if bag == 'words':
+            b = nsNLP.features.BagOfWords()
+        elif bag == 'bigrams':
+            b = nsNLP.features.BagOf2Grams()
+        elif bag == 'trigrams':
+            b = nsNLP.features.BagOf3Grams()
+        else:
+            sys.stderr.write(u"Unknown features type {}".format(features))
+            exit()
+        # end if
+        bow.add(b)
+    # end for
+
     # Stats
     confusion_matrix = {'pos': {'pos': 0.0, 'neg': 0.0}, 'neg': {'pos': 0.0, 'neg': 0.0}}
 
-    try:
-        # For each URL in the dataset
-        index = 1
-        for text, c in dataset:
-            # Log
-            logging.info(u"Testing sample {}/{}".format(index, len(dataset)))
+    # Print model
+    print(u"Using model {}".format(model))
 
-            # Predict
-            prediction, probs = model(text)
+    # For each URL in the dataset
+    index = 1
+    for text, c in dataset:
+        # Log
+        print(u"Testing sample {}/{}".format(index, len(dataset)))
 
-            # Save result
-            confusion_matrix[prediction][c] += 1.0
+        # Predict
+        prediction, probs = model(bow(tokenizer(text)))
 
-            # Compare
-            logging.info(u"Predicted {} for observation {}".format(prediction, c))
+        # Save result
+        confusion_matrix[prediction][c] += 1.0
 
-            # Index
-            index += 1
-        # end for
-    except (KeyboardInterrupt, SystemExit):
-        pass
-    # end try
+        # Compare
+        print(u"Predicted {} for observation {}".format(prediction, c))
+
+        # Index
+        index += 1
+    # end for
 
     # False positive/negative
     false_positive = confusion_matrix['pos']['neg'] / float(len(dataset))
@@ -96,8 +122,10 @@ def model_testing(data_set_file, model_file):
     success_rate = (confusion_matrix['pos']['pos'] + confusion_matrix['neg']['neg']) / float(len(dataset))
 
     # Show performance
-    logging.info(
-        u"Success rate of {} on dataset, {} false positive, {} false negative".format(success_rate, false_positive,
-                                                                                      false_negative))
+    print\
+    (
+        u"Success rate of {} on dataset, {} false positive, {} false negative"
+            .format(success_rate*100.0, false_positive*100.0, false_negative*100.0)
+    )
 
 # end if
