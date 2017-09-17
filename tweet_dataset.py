@@ -98,14 +98,16 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
             print(u"Would you classify the following element as negative(n) or positive(p)?")
             print(u"Text : {}".format(tweet.get_text()))
             print(u"URL : {}".format(tweet.get_url()))
-            observed = raw_input(u"Positive or negative (p/n) (q for quit) : ").lower()
+            observed = raw_input(u"Positive or negative (p/n) (q for quit, s for skip) : ").lower()
 
             # Add as example
             if observed == 'q':
                 break
             elif observed == 'p':
                 dataset.add_positive(page_text)
-            elif observed == 'n':
+            elif observed == 's':
+                pass
+            else:
                 dataset.add_negative(page_text)
             # end if
 
