@@ -39,6 +39,7 @@ from find_follows import find_follows
 from find_unfollows import find_unfollows
 from find_quotes import find_quotes
 from tweet_dataset import tweet_dataset
+from retweet_dataset import retweet_dataset
 from model_training import model_training
 from model_testing import model_testing
 from statistics_generator import statistics_generator
@@ -177,7 +178,8 @@ if __name__ == "__main__":
                               default="NaiveBayes")
     train_parser.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words")
     train_parser.add_argument("--source", type=str,
-                              help="Information source to classify (rss, news, tweets, friends, user)")
+                              help="Information source to classify (news, tweets, friends, followers)")
+    train_parser.add_argument("--search", type=str, help="Tweet search term", default="")
 
     # User's statistics
     user_statistics_parser = command_subparser.add_parser("statistics")
@@ -261,7 +263,14 @@ if __name__ == "__main__":
     elif args.command == "train":
         # Action
         if args.action == u"dataset":
-            tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
+            if args.source == u"news":
+                tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
+            elif args.source == u"tweets":
+                retweet_dataset(args.dataset, args.search, args.info)
+            else:
+                sys.stderr.write(u"Unknown source {}!\n".format(args.source))
+                exit()
+            # end if
         elif args.action == u"test":
             model_testing(data_set_file=args.dataset, model_file=args.model, features=args.features)
         elif args.action == u"train":
@@ -273,7 +282,7 @@ if __name__ == "__main__":
                 features=args.features
             )
         else:
-            sys.stderr.write(u"Unknown training action {}".format(args.action))
+            sys.stderr.write(u"Unknown training action {}\n".format(args.action))
             exit()
         # end if
     # Statistics generator
