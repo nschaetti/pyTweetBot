@@ -190,6 +190,8 @@ class GoogleNewsClient(object):
                 logging.error(u"Error with SSL Certificate while retrieving {} : {}".format(url, e))
             except ssl.SSLError as e:
                 logging.error(u"Error with SSL while retrieving {} : {}".format(url, e))
+            except ValueError as e:
+                logging.error(u"Error with URL value while retrieving {} : {}".format(url, e))
             # end try
         # end for
         return news
