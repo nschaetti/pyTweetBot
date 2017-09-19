@@ -73,20 +73,26 @@ class ActionScheduler(Thread):
     """
 
     # Constructor
-    def __init__(self, n_actions=None, update_delay=timedelta(minutes=10), reservoir_size=timedelta(days=3),
-                 purge_delay=timedelta(weeks=2), config=None, stats=None):
+    def __init__(self, config, n_actions=None, update_delay=timedelta(minutes=10), reservoir_size=timedelta(days=3),
+                 purge_delay=timedelta(weeks=2), stats=None):
         """
         Constructor
-        :param n_exec:
+        :param config:
+        :param n_actions:
+        :param update_delay:
+        :param reservoir_size:
         :param purge_delay:
+        :param stats:
         """
         # Properties
         self._session = DBConnector().get_session()
+
         if n_actions == None:
             self._n_actions = {"Follow": 1, "Unfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
         else:
             self._n_actions = n_actions
         # end if
+
         self._purge_delay = purge_delay
         self._reservoir_size = reservoir_size
         self._update_delay = update_delay
@@ -96,11 +102,11 @@ class ActionScheduler(Thread):
         # Purge the reservoir
         self._purge_reservoir()
 
-        # Thread control and stats
-        if config is not None and stats is not None:
-            Thread.__init__(self)
-            self._stats_manager = stats
-        # end if
+        # Tread
+        Thread.__init__(self)
+
+        # Stats
+        self._stats_manager = stats
     # end __init__
 
     ##############################################
@@ -114,11 +120,23 @@ class ActionScheduler(Thread):
         :return:
         """
         while True:
-            print("run!!")
-            # Wait
+            # Execute actions
+            self()
+
+            # Config
             scheduler_config = self._config.get_scheduler_config()
-            waiting_seconds = self._stats_manager(datetime.datetime.utcnow(), scheduler_config['slope'], scheduler_config['beta'])
+
+            # Waiting time
+            if self._stats_manager is not None:
+                waiting_seconds = self._stats_manager(datetime.datetime.utcnow(), scheduler_config['slope'], scheduler_config['beta'])
+            else:
+                waiting_seconds = 900
+            # end if
+
+            # Log
             logging.getLogger(u"pyTweetBot").info(u"Waiting {0:.{1}f} minutes for next run".format(waiting_seconds/60.0, 0))
+
+            # Wait
             time.sleep(waiting_seconds)
         # end while
     # end run
@@ -345,9 +363,7 @@ class ActionScheduler(Thread):
     # end set_factory
 
     ##############################################
-    #
     # Private functions
-    #
     ##############################################
 
     # Purge reservoir
