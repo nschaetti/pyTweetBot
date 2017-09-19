@@ -142,7 +142,7 @@ def model_testing(data_set_file, model_file, features='words'):
     )
 
     # Show prob stats
-    print(u"Higher 'positive' probability for a false positive is {}".format(higher_false_prob))
-    print(u"for the text {}".format(higher_false_text))
+    print(u"Higher 'positive' probability for a false positive is {}".format(higher_pos_prob))
+    print(u"for the text {}".format(higher_pos_text))
 
 # end if
