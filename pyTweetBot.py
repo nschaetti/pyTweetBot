@@ -26,6 +26,7 @@
 import argparse
 import logging
 import sys
+import os
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler
@@ -46,6 +47,8 @@ from statistics_generator import statistics_generator
 from list_actions import list_actions
 from tweet.TweetFactory import TweetFactory
 from execute_actions import execute_actions
+from stats.TweetStatistics import TweetStatistics, TweetAlreadyCountedException
+
 
 ####################################################
 # Functions
@@ -75,6 +78,8 @@ def add_model_argument(p, required):
     """
     # Model
     p.add_argument("--model", type=str, help="Classification model's file", required=required)
+    p.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words",
+                   required=required)
 # end add_model_argument
 
 
@@ -130,6 +135,8 @@ if __name__ == "__main__":
     add_default_arguments(find_tweet_parser)
     add_model_argument(find_tweet_parser, True)
     find_tweet_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=5)
+    find_tweet_parser.add_argument("--text-size", type=int, help="Minimum test size to take into account for the test",
+                                   default=2000)
 
     # Find retweets
     find_retweet_parser = command_subparser.add_parser("find-retweets")
@@ -176,10 +183,11 @@ if __name__ == "__main__":
     train_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
     train_parser.add_argument("--classifier", type=str, help="Classifier type (NaiveBayes, MaxEnt, TFIDF, etc)",
                               default="NaiveBayes")
-    train_parser.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words")
     train_parser.add_argument("--source", type=str,
                               help="Information source to classify (news, tweets, friends, followers)")
     train_parser.add_argument("--search", type=str, help="Tweet search term", default="")
+    train_parser.add_argument("--text-size", type=int, help="Minimum test size to take into account for the test",
+                              default=2000)
 
     # User's statistics
     user_statistics_parser = command_subparser.add_parser("statistics")
@@ -206,6 +214,7 @@ if __name__ == "__main__":
     # Executor
     executor_parser = command_subparser.add_parser("execute")
     add_default_arguments(executor_parser)
+    executor_parser.add_argument("--stats-file", type=str, help="Twitter statistics file", required=True, default=None)
     executor_parser.add_argument("--daemon", action='store_true', help="Run executor in daemon mode", default=False)
     executor_parser.add_argument("--break-time", action='store_true',
                                  help="Show break duration between execution for the current time", default=False)
@@ -230,8 +239,19 @@ if __name__ == "__main__":
     # Friends
     friends_manager = FriendsManager()
 
+    # Load stats file?
+    stats_manager = None
+    if 'stats_file' in args.__dict__.keys() and args.stats_file is not None:
+        if os.path.exists(args.stats_file):
+            stats_manager = TweetStatistics.load(args.stats_file)
+        else:
+            sys.stderr.write(u"Can not load stat file {}!\n".format(args.stats_file))
+            exit()
+        # end if
+    # end if
+
     # Action scheduler
-    action_scheduler = ActionScheduler()
+    action_scheduler = ActionScheduler(config=config, stats=stats_manager)
 
     # Tweet factory
     tweet_factory = TweetFactory(config.get_hashtags())
@@ -243,7 +263,7 @@ if __name__ == "__main__":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
-        find_tweets(config, args.model, action_scheduler)
+        find_tweets(config, args.model, args.features, action_scheduler)
     # Find retweets
     elif args.command == "find-retweets":
         find_retweets(config, args.model, action_scheduler)
@@ -272,7 +292,8 @@ if __name__ == "__main__":
                 exit()
             # end if
         elif args.action == u"test":
-            model_testing(data_set_file=args.dataset, model_file=args.model, features=args.features)
+            model_testing(data_set_file=args.dataset, model_file=args.model, features=args.features,
+                          text_size=args.text_size)
         elif args.action == u"train":
             model_training\
             (
