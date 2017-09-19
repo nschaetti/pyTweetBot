@@ -94,6 +94,10 @@ def model_testing(data_set_file, model_file, features='words'):
     # Stats
     confusion_matrix = {'pos': {'pos': 0.0, 'neg': 0.0}, 'neg': {'pos': 0.0, 'neg': 0.0}}
 
+    # Higher false positive probs
+    higher_false_prob = 0.0
+    higher_false_text = ""
+
     # Print model
     print(u"Using model {}".format(model))
 
@@ -114,7 +118,11 @@ def model_testing(data_set_file, model_file, features='words'):
 
         # Show false positive
         if prediction == 'pos' and c == 'neg':
-            print(text)
+            #print(text)
+            if probs['pos'] > higher_false_prob:
+                higher_false_prob = probs['pos']
+                higher_false_text = text
+            # end if
         # end if
 
         # Index
@@ -132,5 +140,9 @@ def model_testing(data_set_file, model_file, features='words'):
         u"Success rate of {} on dataset, {} false positive, {} false negative"
             .format(success_rate*100.0, false_positive*100.0, false_negative*100.0)
     )
+
+    # Show prob stats
+    print(u"Higher 'positive' probability for a false negative is {}".format(higher_false_prob))
+    print(u"for the text {}".format(higher_false_text))
 
 # end if
