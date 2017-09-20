@@ -25,22 +25,23 @@ class TweetFactory(object):
     ##########################################
 
     # Create tweet text
-    def __call__(self, tweet):
+    def __call__(self, text):
         """
         Create tweet text.
-        :param tweet:
+        :param text:
         :return:
         """
         # Clean
-        cleaned_text = tweet.get_text().replace(u'\n', u'').replace(u'\r', u'')
+        cleaned_text = text.replace(u'\n', u'').replace(u'\r', u'')
 
         # Replace words by hashtags
         hashtags_text = self._replace_hashtags(cleaned_text)
 
         # Change
-        tweet.set_text(hashtags_text)
+        #tweet.set_text(hashtags_text)
 
-        return tweet
+        #return tweet
+        return text
     # end __call__
 
     ##########################################
