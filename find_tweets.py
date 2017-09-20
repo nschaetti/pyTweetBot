@@ -67,7 +67,7 @@ def signal_handler(signum, frame):
 # Main function
 ####################################################
 
-def find_tweets(config, model, features, action_scheduler):
+def find_tweets(config, model, action_scheduler, features):
     """
     Find tweet in the hunters
     :param config:
@@ -77,12 +77,8 @@ def find_tweets(config, model, features, action_scheduler):
     """
 
     # Set the signal handler and a 5-second alarm
-    signal.signal(signal.SIGQUIT, signal_handler)
-    signal.signal(signal.SIGINT, signal_handler)
-
-    # Tweet factory
-    tweet_factory = TweetFactory(config.get_hashtags())
-    action_scheduler.set_factory(tweet_factory)
+    #signal.signal(signal.SIGQUIT, signal_handler)
+    #signal.signal(signal.SIGINT, signal_handler)
 
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
@@ -139,8 +135,10 @@ def find_tweets(config, model, features, action_scheduler):
     while cont_loop:
         # For each tweet
         for tweet in tweet_finder:
+            print(tweet.get_text())
+            exit()
             # Get page's text
-            try:
+            """try:
                 page_text = PageParser.get_text(tweet.get_url())
             except PageParserRetrievalError as e:
                 logging.getLogger(u"pyTweetBot").error(u"Page retrieval error : {}".format(e))
@@ -167,7 +165,7 @@ def find_tweets(config, model, features, action_scheduler):
                         tweet.get_tweet().encode('ascii', errors='ignore')))
                     pass
                 # end try
-            # end if
+            # end if"""
         # end for
     # end while
 

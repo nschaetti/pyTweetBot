@@ -78,8 +78,12 @@ def add_model_argument(p, required):
     """
     # Model
     p.add_argument("--model", type=str, help="Classification model's file", required=required)
+<<<<<<< HEAD
     p.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words",
                    required=required)
+=======
+    p.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words")
+>>>>>>> 6090fd4d9f3a0837c78cc3adbbe52ff3550c9525
 # end add_model_argument
 
 
@@ -263,7 +267,11 @@ if __name__ == "__main__":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
+<<<<<<< HEAD
         find_tweets(config, args.model, args.features, action_scheduler)
+=======
+        find_tweets(config, args.model, action_scheduler, args.features)
+>>>>>>> 6090fd4d9f3a0837c78cc3adbbe52ff3550c9525
     # Find retweets
     elif args.command == "find-retweets":
         find_retweets(config, args.model, action_scheduler)
