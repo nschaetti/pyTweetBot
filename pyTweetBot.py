@@ -75,6 +75,7 @@ def add_model_argument(p, required):
     """
     # Model
     p.add_argument("--model", type=str, help="Classification model's file", required=required)
+    p.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words")
 # end add_model_argument
 
 
@@ -176,7 +177,6 @@ if __name__ == "__main__":
     train_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
     train_parser.add_argument("--classifier", type=str, help="Classifier type (NaiveBayes, MaxEnt, TFIDF, etc)",
                               default="NaiveBayes")
-    train_parser.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words")
     train_parser.add_argument("--source", type=str,
                               help="Information source to classify (news, tweets, friends, followers)")
     train_parser.add_argument("--search", type=str, help="Tweet search term", default="")
@@ -243,7 +243,7 @@ if __name__ == "__main__":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
-        find_tweets(config, args.model, action_scheduler)
+        find_tweets(config, args.model, action_scheduler, args.features)
     # Find retweets
     elif args.command == "find-retweets":
         find_retweets(config, args.model, action_scheduler)
