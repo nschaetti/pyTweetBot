@@ -42,6 +42,10 @@ class RetweetFinder(object):
 
     # Iterator
     def __iter__(self):
+        """
+        Iterator
+        :return:
+        """
         return self
     # end __iter__
 

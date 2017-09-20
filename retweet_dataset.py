@@ -43,7 +43,7 @@ import time
 
 
 # Get retweet data
-def retweet_dataset(dataset_file, search, info=False):
+def retweet_dataset(dataset_file, search="", info=False):
     """
     Get retweet data
     :param config:
@@ -68,7 +68,9 @@ def retweet_dataset(dataset_file, search, info=False):
     # end if
 
     # Retweet finder
-    retweet_finder = RetweetFinder(search_keywords=search, languages=['en', 'fr'])
+    if search != "":
+        retweet_finder = RetweetFinder(search_keywords=search, languages=['en', 'fr'])
+    # end if
 
     # For each tweet
     for tweet, polarity, subjectivity in retweet_finder:
