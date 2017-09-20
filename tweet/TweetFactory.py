@@ -32,7 +32,7 @@ class TweetFactory(object):
         :return:
         """
         # Clean
-        cleaned_text = tweet.get_text().replace(u'\n', '').replace(u'\r', '')
+        cleaned_text = tweet.get_text().replace(u'\n', u'').replace(u'\r', u'')
 
         # Replace words by hashtags
         hashtags_text = self._replace_hashtags(cleaned_text)

@@ -195,9 +195,9 @@ class ActionScheduler(Thread):
         :param tweet: Text of the Tweet or Tweet object.
         """
         if tweet is unicode or tweet is str:
-            self._add_text_action("Tweet", tweet)
+            self._add_text_action("Tweet", self._factory(tweet))
         elif self._factory is not None:
-            self._add_text_action("Tweet", tweet.get_tweet())
+            self._add_text_action("Tweet", self._factory(tweet.get_tweet()))
         else:
             raise NoFactory(u"No factory given to create Tweets")
         # end if
