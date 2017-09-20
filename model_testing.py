@@ -27,6 +27,7 @@ import nsNLP
 import logging
 import os
 import sys
+import decimal
 import urllib
 from bs4 import BeautifulSoup
 from learning.Model import Model
@@ -44,7 +45,7 @@ from learning.Dataset import Dataset
 
 
 # Test a classifier
-def model_testing(data_set_file, model_file, features='words'):
+def model_testing(data_set_file, model_file, features='words', text_size=2000):
     """
     Test a classifier
     :param data_set_file: Path to the dataset file
@@ -94,39 +95,35 @@ def model_testing(data_set_file, model_file, features='words'):
     # Stats
     confusion_matrix = {'pos': {'pos': 0.0, 'neg': 0.0}, 'neg': {'pos': 0.0, 'neg': 0.0}}
 
-    # Higher false positive probs
-    higher_pos_prob = 0.0
-    higher_pos_text = ""
-
     # Print model
     print(u"Using model {}".format(model))
 
     # For each URL in the dataset
     index = 1
     for text, c in dataset:
-        # Log
-        print(u"Testing sample {}/{}".format(index, len(dataset)))
+        if len(text) > text_size:
+            # Log
+            print(u"Testing sample {}/{}".format(index, len(dataset)))
 
-        # Predict
-        prediction, probs = model(bow(tokenizer(text)))
+            # Predict
+            prediction, probs = model(bow(tokenizer(text)))
 
-        # Save result
-        confusion_matrix[prediction][c] += 1.0
+            # Save result
+            confusion_matrix[prediction][c] += 1.0
 
-        # Compare
-        print(u"Predicted {} for observation {}".format(prediction, c))
+            # Compare
+            print(u"Predicted {} for observation {}".format(prediction, c))
 
-        # Show false positive
-        if prediction == 'pos' and c == 'neg':
-            #print(text)
-            if probs['pos'] > higher_pos_prob:
-                higher_pos_prob = probs['pos']
-                higher_pos_text = text
+            # Print false positive
+            if prediction == 'pos' and c == 'neg':
+                print(u"")
+                print(text)
+                print(u"")
             # end if
-        # end if
 
-        # Index
-        index += 1
+            # Index
+            index += 1
+        # end if
     # end for
 
     # False positive/negative
@@ -140,9 +137,5 @@ def model_testing(data_set_file, model_file, features='words'):
         u"Success rate of {} on dataset, {} false positive, {} false negative"
             .format(success_rate*100.0, false_positive*100.0, false_negative*100.0)
     )
-
-    # Show prob stats
-    print(u"Higher 'positive' probability for a false positive is {}".format(higher_pos_prob))
-    print(u"for the text {}".format(higher_pos_text))
 
 # end if

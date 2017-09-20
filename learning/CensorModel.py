@@ -28,13 +28,10 @@ from .Model import Model
 
 
 # Forbidden words classifier
-class CensorModel(Model):
+class CensorModel(object):
     """
     Forbidden words
     """
-
-    # Variables
-    _finalized = False
 
     # Constructor
     def __init__(self, config):
@@ -42,8 +39,6 @@ class CensorModel(Model):
         Constructor
         :param config: Settings
         """
-        super(CensorModel, self).__init__()
-
         # Forbidden words
         self._forbidden_words = config.get_forbidden_words()
     # end __init__
@@ -56,26 +51,26 @@ class CensorModel(Model):
     # Override
     #################################################
 
-    #################################################
-    # Private
-    #################################################
-
     # Predict
-    def _predict(self, text, lang='en'):
+    def __call__(self, x):
         """
         Predict
-        :param text: Text to classify
+        :param x: Text to classify
         :return:
         """
         # For each forbidden word
         for word in self._forbidden_words:
-            if word.lower() in text.lower():
-                return "skip", None
+            if word.lower() in x.lower():
+                return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
         # end for
 
-        return "tweet", None
+        return 'pos', {'neg': 0.0, 'pos': 1.0}
     # end _predict
+
+    #################################################
+    # Private
+    #################################################
 
     #################################################
     # Static

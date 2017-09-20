@@ -23,22 +23,19 @@
 #
 
 # Import
-import argparse
 import logging
-import signal, os
+import signal
+import os
 import time
 import sys
-from config.BotConfig import BotConfig
-from db.DBConnector import DBConnector
-from executor.ActionScheduler import ActionScheduler, ActionReservoirFullError, ActionAlreadyExists
-from friends.FriendsManager import FriendsManager
+import nsNLP
+from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
-from twitter.TweetBotConnect import TweetBotConnector
 from tweet.TweetFactory import TweetFactory
-from learning.Model import Model
 from learning.CensorModel import CensorModel
+from news.PageParser import PageParser, PageParserRetrievalError
 
 ####################################################
 # Globals
@@ -86,14 +83,39 @@ def find_tweets(config, model, action_scheduler):
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
 
-    # Load model or create
+    # Load model
     if model is not None and os.path.exists(model):
-        model = Model.load(model)
+        model = nsNLP.classifiers.TextClassifier.load(model)
         censor = CensorModel(config)
     else:
-        sys.stderr.write(u"Mode file {} does not exists\n".format(model))
+        sys.stderr.write(u"Can't open model file {}\n".format(model))
         exit()
     # end if
+
+    # Tokenizer
+    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+
+    # Parse features
+    feature_list = features.split('+')
+
+    # Join features
+    bow = nsNLP.features.BagOfGrams()
+
+    # For each features
+    for bag in feature_list:
+        # Select features
+        if bag == 'words':
+            b = nsNLP.features.BagOfWords()
+        elif bag == 'bigrams':
+            b = nsNLP.features.BagOf2Grams()
+        elif bag == 'trigrams':
+            b = nsNLP.features.BagOf3Grams()
+        else:
+            sys.stderr.write(u"Unknown features type {}".format(features))
+            exit()
+        # end if
+        bow.add(b)
+    # end for
 
     # Add RSS streams
     for rss_stream in config.get_rss_streams():
@@ -113,29 +135,35 @@ def find_tweets(config, model, action_scheduler):
     while cont_loop:
         # For each tweet
         for tweet in tweet_finder:
-            print(tweet.get_text())
-            exit()
+            # Get page's text
+            try:
+                page_text = PageParser.get_text(tweet.get_url())
+            except PageParserRetrievalError as e:
+                logging.getLogger(u"pyTweetBot").error(u"Page retrieval error : {}".format(e))
+                continue
+            # end try
+
             # Predict class
-            """prediction, _ = model(tweet.get_text())
-            censor_prediction, _ = censor(tweet.get_text())
+            prediction, probs = model(bow(tokenizer(page_text)))
+            censor_prediction, _ = censor(page_text)
 
             # Predicted as tweet
-            if prediction == "tweet" and censor_prediction == "tweet" and not tweet.already_tweeted():
+            if prediction == "pos" and censor_prediction == "pos" and not tweet.already_tweeted():
                 # Try to add
                 try:
-                    logging.info(u"Adding Tweet \"{}\" to the scheduler".format(
+                    logging.getLogger(u"pyTweetBot").info(u"Adding Tweet \"{}\" to the scheduler".format(
                         tweet.get_tweet()))
                     action_scheduler.add_tweet(tweet)
                 except ActionReservoirFullError:
-                    logging.error(u"Reservoir full for Tweet action, waiting for one hour")
-                    time.sleep(3600)
+                    logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
+                    exit()
                     pass
                 except ActionAlreadyExists:
-                    logging.error(u"Tweet \"{}\" already exists in the database".format(
+                    logging.getLogger(u"pyTweetBot").error(u"Tweet \"{}\" already exists in the database".format(
                         tweet.get_tweet().encode('ascii', errors='ignore')))
                     pass
                 # end try
-            # end if"""
+            # end if
         # end for
     # end while
 

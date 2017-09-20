@@ -22,7 +22,7 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import db.obj.Statistic
+import db.obj
 from sqlalchemy import create_engine
 
 # Create an engine that stores data in the local directory's
