@@ -67,7 +67,7 @@ def signal_handler(signum, frame):
 # Main function
 ####################################################
 
-def find_tweets(config, model, action_scheduler):
+def find_tweets(config, model, action_scheduler, features):
     """
     Find tweet in the hunters
     :param config:
