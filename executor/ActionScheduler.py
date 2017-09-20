@@ -421,7 +421,7 @@ class ActionScheduler(Thread):
             action = Action(action_type=action_type, action_tweet_id=the_id)
             self.add(action)
         else:
-            logging.getLogger("pyTweetBot").warning(u"{} action for friend/tweet {} already in database"
+            logging.getLogger(u"pyTweetBot").warning(u"{} action for friend/tweet {} already in database"
                                                     .format(action_type, the_id))
             raise ActionAlreadyExists(u"{} action for friend/tweet {} already in database".format(action_type, the_id))
         # end if
@@ -438,7 +438,7 @@ class ActionScheduler(Thread):
             action = Action(action_type=action_type, action_tweet_text=the_text)
             self.add(action)
         else:
-            logging.getLogger("pyTweetBot").warning(u"{} action for text {} already in database"
+            logging.getLogger(u"pyTweetBot").warning(u"{} action for text {} already in database"
                                                     .format(action_type, the_text))
             raise ActionAlreadyExists(u"{} action for text {} already in database".format(action_type, the_text))
         # end if
