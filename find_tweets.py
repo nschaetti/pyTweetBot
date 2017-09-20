@@ -136,7 +136,6 @@ def find_tweets(config, model, action_scheduler, features):
         # For each tweet
         for tweet in tweet_finder:
             print(tweet.get_text())
-            exit()
             # Get page's text
             """try:
                 page_text = PageParser.get_text(tweet.get_url())
