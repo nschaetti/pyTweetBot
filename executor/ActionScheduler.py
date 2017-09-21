@@ -96,7 +96,6 @@ class ActionScheduler(Thread):
         self._purge_delay = purge_delay
         self._reservoir_size = reservoir_size
         self._update_delay = update_delay
-        self._factory = None
         self._config = config
 
         # Purge the reservoir
@@ -195,11 +194,9 @@ class ActionScheduler(Thread):
         :param tweet: Text of the Tweet or Tweet object.
         """
         if tweet is unicode or tweet is str:
-            self._add_text_action("Tweet", self._factory(tweet))
-        elif self._factory is not None:
-            self._add_text_action("Tweet", self._factory(tweet.get_tweet()))
+            self._add_text_action("Tweet", tweet)
         else:
-            raise NoFactory(u"No factory given to create Tweets")
+            self._add_text_action("Tweet", tweet.get_tweet())
         # end if
     # end add_tweet
 
@@ -351,16 +348,6 @@ class ActionScheduler(Thread):
         """
         return TweetBotConnector().get_user().statuses_count
     # end n_statuses
-
-    # Set Tweet factory object
-    def set_factory(self, factory):
-        """
-        Set Tweet factory object
-        :param factory:
-        :return:
-        """
-        self._factory = factory
-    # end set_factory
 
     ##############################################
     # Private functions
