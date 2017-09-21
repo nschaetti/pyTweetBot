@@ -3,6 +3,7 @@
 
 # Imports
 import db
+from .TweetFactory import TweetFactory
 
 
 # Object representing a Tweet
@@ -18,7 +19,8 @@ class Tweet(object):
         :param text: Tweet's text
         :param url: Tweet's URL
         """
-        self._text = text
+        self._factory = TweetFactory()
+        self._text = self._factory(text)
         self._url = url
         self._hashtags = hashtags if hashtags is not None else list()
         self._via = via if via is not None else ""
