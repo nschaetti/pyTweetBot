@@ -85,7 +85,6 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
                     # Ask
                     print(u"Would you classify the following element as negative(n) or positive(p)?")
                     print(u"Text : {}".format(user.description))
-                    print(u"URL : {}".format(user.description))
                     observed = raw_input(u"Positive or negative (p/n) (q for quit, s for skip) : ").lower()
 
                     # Add as example
