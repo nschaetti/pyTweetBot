@@ -288,7 +288,7 @@ if __name__ == "__main__":
             elif args.source == u"tweets":
                 retweet_dataset(args.dataset, args.search, args.info)
             elif args.source == u"friends":
-                follower_dataset(twitter_connector, args.dataset, args.info)
+                follower_dataset(twitter_connector, args.dataset, args.info, u"following")
             else:
                 sys.stderr.write(u"Unknown source {}!\n".format(args.source))
                 exit()

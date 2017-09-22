@@ -26,6 +26,7 @@
 import argparse
 import logging
 import os
+import sys
 from config.BotConfig import BotConfig
 from db.DBConnector import DBConnector
 from tweet.RSSHunter import RSSHunter
@@ -35,97 +36,52 @@ from retweet.RetweetFinder import RetweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
 import pickle
 import time
+from learning.Dataset import Dataset
 
 ####################################################
 # Main function
 ####################################################
 
-if __name__ == "__main__":
 
-    # Argument parser
-    parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
-
-    # Argument
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--dataset", type=str, help="Dataset file", required=True)
-    parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    parser.add_argument("--info", action='store_true', help="Show dataset informations", default=False)
-    parser.add_argument("--search", type=str, help="Research term if needed", default="")
-    args = parser.parse_args()
-
-    # Logging
-    logging.basicConfig(level=args.log_level)
-    logger = logging.getLogger(name="pyTweetBot")
-
+# Create a dataset or add data from a list of Twitter users
+def follower_dataset(twitter_connect, dataset_file, info, source='followers'):
+    """
+    Create a dataset or add data from a list of Twitter users.
+    :param dataset_file:
+    :param info:
+    :return:
+    """
     # Load or create dataset
-    if os.path.exists(args.dataset):
-        with open(args.dataset, 'r') as f:
-            tweets = pickle.load(f)
-        # end with
+    if os.path.exists(dataset_file):
+        print(u"Opening dataset file {}".format(dataset_file))
+        dataset = Dataset.load(dataset_file)
     else:
-        tweets = dict()
+        dataset = Dataset()
     # end if
 
     # Show informations
-    if args.info:
-        # Compute statistics
-        examples_count = len(tweets.keys())
-        retweet_count = 0
-        skip_count = 0
-        for tweet in tweets.keys():
-            if tweets[tweet] == "tweet":
-                retweet_count += 1
-            else:
-                skip_count += 1
-                # end if
-        # end for
-
-        # Print info
-        print(u"{} examples in the dataset".format(examples_count))
-        print(u"{} examples in the retweet class".format(retweet_count))
-        print(u"{} examples in the skip class".format(skip_count))
+    if info:
+        print(dataset)
         exit()
     # end if
 
-    # Load configuration file
-    config = BotConfig.load(args.config)
-
-    # Connection to MySQL
-    dbc = config.get_database_config()
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
-
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
-
-    # Retweet finder
-    retweet_finder = RetweetFinder(search_keywords=args.search, languages=['en', 'fr'], polarity=-1, subjectivity=1)
-
-    # For each tweet
-    for tweet, polarity, subjectivity in retweet_finder:
-        if tweet.text not in tweets.keys() and not tweet.retweeted:
-            # Ask
-            print(tweet.text)
-            print(u"Polarity : {}".format(polarity))
-            print(u"Subjectivity : {}".format(subjectivity))
-            observed = raw_input("ReTweet or Skip (t/S/e)? ").lower()
-
-            # Add as example
-            if observed == "e":
-                break
-            elif observed == "t":
-                tweets[tweet.text] = "tweet"
-            else:
-                tweets[tweet.text] = "skip"
-            # end if
-
-            # Save dataset
-            with open(args.dataset, 'w') as f:
-                pickle.dump(tweets, f)
-            # end with
-        else:
-            logging.debug(u"Already in stock : {}".format(tweet.text))
-        # end if
+    # Get the cursor
+    if source == 'followers':
+        cursor = twitter_connect.get_followers_cursor()
+    elif source == 'following':
+        cursor = twitter_connect.get_following_cursor()
+    else:
+        sys.stderr.write(u"Unknown source {}\n".format(source))
+        exit()
     # end if
+
+    # For each page
+    for page in cursor.pages():
+        # For each user
+        for user in page:
+            print(user.description)
+        # end for
+        exit()
+    # end for
 
 # end if
