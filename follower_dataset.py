@@ -100,6 +100,8 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
 
                     # Save dataset
                     dataset.save(dataset_file)
+                else:
+                    sys.stderr.write(u"{} already is in the dataset\n".format(user.description))
                 # end if
             # end if
         # end for
