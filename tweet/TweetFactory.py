@@ -23,9 +23,7 @@ class TweetFactory(object):
     # end __init__
 
     ##########################################
-    #
     # Public functions
-    #
     ##########################################
 
     # Create tweet text
@@ -41,17 +39,11 @@ class TweetFactory(object):
         # Replace words by hashtags
         hashtags_text = self._replace_hashtags(cleaned_text)
 
-        # Change
-        #tweet.set_text(hashtags_text)
-
-        #return tweet
         return hashtags_text
     # end __call__
 
     ##########################################
-    #
     # Private functions
-    #
     ##########################################
 
     # Replace a word by a hashtag
