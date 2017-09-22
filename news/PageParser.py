@@ -57,6 +57,9 @@ class PageParser(object):
             except httplib.IncompleteRead:
                 count += 1
                 pass
+            except httplib.BadStatusLine:
+                count += 1
+                pass
             # end try
         # end while
 
