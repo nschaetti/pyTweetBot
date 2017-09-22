@@ -80,6 +80,7 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers'):
         # For each user
         for user in page:
             print(user.description)
+            print(len(user.description))
         # end for
         exit()
     # end for
