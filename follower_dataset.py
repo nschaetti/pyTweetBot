@@ -103,7 +103,7 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
         # end for
 
         # Wait 1 minutes for the next page
-        print(u"Waiting 1 minutes for the next page (Twitter rate limite)")
+        print(u"Waiting 1 minutes for the next page (Twitter rate limit)")
         time.sleep(60)
     # end for
 
