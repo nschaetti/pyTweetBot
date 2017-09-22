@@ -188,7 +188,7 @@ if __name__ == "__main__":
                               help="Information source to classify (news, tweets, friends, followers)")
     train_parser.add_argument("--search", type=str, help="Tweet search term", default="")
     train_parser.add_argument("--text-size", type=int, help="Minimum test size to take into account for the test",
-                              default=2000)
+                              required=True)
 
     # User's statistics
     user_statistics_parser = command_subparser.add_parser("statistics")
@@ -286,7 +286,7 @@ if __name__ == "__main__":
             if args.source == u"news":
                 tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
             elif args.source == u"tweets":
-                retweet_dataset(args.dataset, args.search, args.info)
+                retweet_dataset(args.dataset, args.search, args.info, args.text_size)
             elif args.source == u"friends":
                 follower_dataset(twitter_connector, args.dataset, args.info, u"following")
             else:

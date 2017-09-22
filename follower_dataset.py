@@ -44,7 +44,7 @@ from learning.Dataset import Dataset
 
 
 # Create a dataset or add data from a list of Twitter users
-def follower_dataset(twitter_connect, dataset_file, info, source='followers'):
+def follower_dataset(twitter_connect, dataset_file, info, source='followers', text_size=50):
     """
     Create a dataset or add data from a list of Twitter users.
     :param dataset_file:
@@ -79,8 +79,30 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers'):
     for page in cursor.pages():
         # For each user
         for user in page:
-            print(user.description)
-            print(len(user.description))
+            # Minimum text length
+            if len(user.description) >= text_size:
+                if not dataset.is_in(user.description):
+                    # Ask
+                    print(u"Would you classify the following element as negative(n) or positive(p)?")
+                    print(u"Text : {}".format(user.description))
+                    print(u"URL : {}".format(user.description))
+                    observed = raw_input(u"Positive or negative (p/n) (q for quit, s for skip) : ").lower()
+
+                    # Add as example
+                    if observed == 'q':
+                        break
+                    elif observed == 'p':
+                        dataset.add_positive(user.description)
+                    elif observed == 's':
+                        pass
+                    else:
+                        dataset.add_negative(user.description)
+                    # end if
+
+                    # Save dataset
+                    dataset.save(dataset_file)
+                # end if
+            # end if
         # end for
         exit()
     # end for
