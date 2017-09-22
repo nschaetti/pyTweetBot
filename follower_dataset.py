@@ -103,7 +103,6 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
                 # end if
             # end if
         # end for
-        exit()
     # end for
 
 # end if
