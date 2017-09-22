@@ -47,7 +47,8 @@ from statistics_generator import statistics_generator
 from list_actions import list_actions
 from tweet.TweetFactory import TweetFactory
 from execute_actions import execute_actions
-from stats.TweetStatistics import TweetStatistics, TweetAlreadyCountedException
+from stats.TweetStatistics import TweetStatistics
+from follower_dataset import follower_dataset
 
 
 ####################################################
@@ -286,6 +287,8 @@ if __name__ == "__main__":
                 tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
             elif args.source == u"tweets":
                 retweet_dataset(args.dataset, args.search, args.info)
+            elif args.source == u"friends":
+                follower_dataset(twitter_connector, args.dataset, args.info)
             else:
                 sys.stderr.write(u"Unknown source {}!\n".format(args.source))
                 exit()
