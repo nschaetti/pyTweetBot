@@ -85,7 +85,7 @@ class RetweetFinder(object):
 
         # Get all tweets
         for tweet in page:
-            if not tweet.retweet and 'RT @' not in tweet.text:
+            if not tweet.retweeted and 'RT @' not in tweet.text:
                 # Analyze text
                 tweet_blob = TextBlob(tweet.text)
 
@@ -95,11 +95,6 @@ class RetweetFinder(object):
                     tweet_blob.detect_language() in self._languages:
                     self._tweets.append((tweet, tweet_blob.sentiment.polarity, tweet_blob.sentiment.subjectivity))
                 # end if
-            else:
-                print(u"Is a retweet: {}".format(tweet.text))
-                print(tweet.retweet)
-                print(tweet.retweeted)
-            # end if
         # end for
 
         # Wait
