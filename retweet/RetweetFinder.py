@@ -56,7 +56,7 @@ class RetweetFinder(object):
         :return:
         """
         # Load if needed
-        if len(self._tweets) == 0:
+        while len(self._tweets) == 0:
             self._load_tweets()
         # end if
 
@@ -99,7 +99,7 @@ class RetweetFinder(object):
         # end for
 
         # Wait
-        logging.info(u"Waiting 60 seconds...")
+        logging.getLogger(u"pyTweetBot").info(u"Waiting 60 seconds...")
         time.sleep(60)
     # end _load_tweets
 
