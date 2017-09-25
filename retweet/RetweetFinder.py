@@ -97,6 +97,8 @@ class RetweetFinder(object):
                 # end if
             else:
                 print(u"Is a retweet: {}".format(tweet.text))
+                print(tweet.retweet)
+                print(tweet.retweeted)
             # end if
         # end for
 
