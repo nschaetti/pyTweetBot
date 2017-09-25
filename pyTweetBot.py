@@ -319,7 +319,10 @@ if __name__ == "__main__":
         list_actions(action_scheduler, args.type)
     # List friends
     elif args.command == "friends":
-        pass
+        # Update friends
+        if args.update:
+            friends_manager.update()
+        # end if
     # Unknown command
     else:
         sys.stderr.write(u"Unknown command {}\n".format(args.command))
