@@ -36,7 +36,7 @@ class FriendsManager(object):
         self._twitter_con = TweetBotConnector()
 
         # Logger
-        self._logger = logging.getLogger(name="pyTweetBot")
+        self._logger = logging.getLogger(name=u"pyTweetBot")
     # end __init__
 
     ######################################################
@@ -139,11 +139,11 @@ class FriendsManager(object):
         :return: New follower count, Lost follower count, New following count, Lost following count
         """
         # Update followers
-        self._logger.info("Updating followers...")
+        self._logger.info(u"Updating followers...")
         n_follower, d_follower = self._update_friends(self._twitter_con.get_followers_cursor(), follower=True)
 
         # Update following
-        self._logger.info("Updating followings...")
+        self._logger.info(u"Updating followings...")
         n_following, d_following = self._update_friends(self._twitter_con.get_following_cursor(), follower=False)
 
         # Insert a statistic
@@ -192,6 +192,24 @@ class FriendsManager(object):
         return self.n_followers(), self.n_following(), ActionScheduler().n_statuses()
     # end _insert_statistic
 
+    # Get followers
+    def get_followers(self):
+        """
+        Get followers
+        :return:
+        """
+        return self._session.query(Friend).filter(Friend.friend_follower).all()
+    # end get_followers
+
+    # Get following
+    def get_following(self):
+        """
+        Get following
+        :return:
+        """
+        return self._session.query(Friend).filter(Friend.friend_following).all()
+    # end get_following
+
     ######################################################
     # PRIVATE FUNCTIONS
     ######################################################
@@ -214,7 +232,7 @@ class FriendsManager(object):
                                 friend_location=location, friend_followers_count=followers_count,
                                 friend_friends_count=friends_count, friend_statuses_count=statuses_count)
             self._session.add(new_friend)
-            self._logger.info("New friend %s" % screen_name)
+            self._logger.info(u"New friend %s" % screen_name)
             return 1
         else:
             update(Friend).where(Friend.friend_screen_name == screen_name).\
@@ -236,7 +254,7 @@ class FriendsManager(object):
 
         # Log
         if follower and not friend.friend_follower:
-            self._logger.info("New follower %s" % screen_name)
+            self._logger.info(u"New follower %s" % screen_name)
         # end if
 
         # Counter and update
@@ -277,7 +295,7 @@ class FriendsManager(object):
 
         # Log
         if following and not friend.friend_following:
-            self._logger.info("New following %s" % screen_name)
+            self._logger.info(u"New following %s" % screen_name)
         # end if
 
         # Update
@@ -329,7 +347,7 @@ class FriendsManager(object):
         finished = False
         while not finished:
             try:
-                for page in cursor:
+                for page in cursor.pages():
                     # For each follower
                     for twf in page:
                         # Add this friend if necessary
