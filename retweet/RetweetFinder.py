@@ -85,11 +85,7 @@ class RetweetFinder(object):
 
         # Get all tweets
         for tweet in page:
-            print(tweet)
-            print(tweet.retweet)
-            print(tweet.retweeted)
-            exit()
-            if not tweet.retweet:
+            if not tweet.retweet and 'RT @' not in tweet.text:
                 # Analyze text
                 tweet_blob = TextBlob(tweet.text)
 
