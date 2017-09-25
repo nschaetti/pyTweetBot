@@ -95,7 +95,7 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes', featur
         elif bag == 'trigrams':
             b = nsNLP.features.BagOf3Grams()
         else:
-            sys.stderr.write(u"Unknown features type {}".format(features))
+            sys.stderr.write(u"Unknown features type {}\n".format(bag))
             exit()
         # end if
         bow.add(b)
