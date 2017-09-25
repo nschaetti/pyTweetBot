@@ -74,7 +74,7 @@ def retweet_dataset(dataset_file, search="", info=False):
 
     # For each tweet
     for tweet, polarity, subjectivity in retweet_finder:
-        if not dataset.is_in(tweet.text):
+        if not dataset.is_in(tweet.text) and tweet:
             # Ask
             print(u"Would you classify the following element as negative(n) or positive(p)?")
             print(tweet.text)
