@@ -286,7 +286,7 @@ if __name__ == "__main__":
             if args.source == u"news":
                 tweet_dataset(config, args.dataset, args.n_pages, args.info, args.rss)
             elif args.source == u"tweets":
-                retweet_dataset(args.dataset, args.search, args.info, args.text_size)
+                retweet_dataset(args.dataset, args.search, args.info)
             elif args.source == u"friends":
                 follower_dataset(twitter_connector, args.dataset, args.info, u"following")
             else:
