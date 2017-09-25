@@ -95,6 +95,8 @@ class RetweetFinder(object):
                     tweet_blob.detect_language() in self._languages:
                     self._tweets.append((tweet, tweet_blob.sentiment.polarity, tweet_blob.sentiment.subjectivity))
                 # end if
+            else:
+                print(u"Is a retweet: {}".format(tweet.text))
             # end if
         # end for
 
