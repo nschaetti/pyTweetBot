@@ -80,7 +80,7 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
         # For each user
         for user in page:
             # Minimum text length
-            if len(user.description) >= text_size:
+            if len(user.description) >= text_size and not dataset.is_in(user.description):
                 # Ask
                 print(u"Would you classify the following element as negative(n) or positive(p)?")
                 print(u"Text : {}".format(user.description))
@@ -101,6 +101,10 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
                 dataset.save(dataset_file)
             # end if
         # end for
+
+        # Wait 1 minutes for the next page
+        print(u"Waiting 1 minutes for the next page (Twitter rate limit)")
+        time.sleep(60)
     # end for
 
 # end if

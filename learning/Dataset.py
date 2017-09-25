@@ -104,14 +104,19 @@ class Dataset(object):
     # end save
 
     # Is in dataset
-    def is_in(self, text):
+    def is_in(self, ttext):
         """
         Is in dataset?
-        :param title:
-        :param url:
+        :param ttext:
         :return:
         """
-        return text in self._texts
+        found = False
+        for (text, c) in self._texts:
+            if text == ttext:
+                found = True
+            # end if
+        # end for
+        return found
     # end is_in
 
     # To JSON
@@ -175,10 +180,23 @@ class Dataset(object):
         To string
         :return:
         """
-        print(u"Total number of samples in the dataset : {}".format(self._n_texts))
-        print(u"Number of positive samples : {}".format(self._n_positive_texts))
-        print(u"Number of negative samples : {}".format(self._n_negative_texts))
+        str = "Total number of samples in the dataset : {}\n".format(self._n_texts)
+        str += "Number of positive samples : {}\n".format(self._n_positive_texts)
+        str += "Number of negative samples : {}".format(self._n_negative_texts)
+        return str
     # end __str__
+
+    # To unicode
+    def __unicode__(self):
+        """
+        To string
+        :return:
+        """
+        str = u"Total number of samples in the dataset : {}\n".format(self._n_texts)
+        str += u"Number of positive samples : {}\n".format(self._n_positive_texts)
+        str += u"Number of negative samples : {}".format(self._n_negative_texts)
+        return str
+    # end __unicode__
 
     #################################################
     # Private
