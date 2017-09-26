@@ -157,7 +157,7 @@ if __name__ == "__main__":
     find_follow_parser = command_subparser.add_parser("find-follows")
     add_default_arguments(find_follow_parser)
     add_model_argument(find_follow_parser, True)
-    find_retweet_parser.add_argument("--text-size", type=int,
+    find_follow_parser.add_argument("--text-size", type=int,
                                      help="Minimum test size to take into account for the test",
                                      default=50)
 
