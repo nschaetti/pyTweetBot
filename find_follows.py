@@ -136,6 +136,10 @@ def find_follows(config, model, action_scheduler, features, text_size, n_pages=2
                             # end try
                     # end if
                 # end if
+
+                # Wait 1 minute
+                logging.getLogger(u"pyTweetBot").info(u"Waiting for 1 minute (Twitter limits)")
+                time.sleep(60)
             # end for
         # end for
     # end for
