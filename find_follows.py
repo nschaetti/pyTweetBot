@@ -109,8 +109,15 @@ def find_follows(config, model, action_scheduler, features, text_size, n_pages=2
         for page in cursor:
             # For each tweet
             for tweet in page:
-                print(tweet)
+                # Tweet's author
+                author = tweet.author
+                print(author.screen_name)
+                print(author.description)
+                print(author.friends_count)
+                print(author.followers_count)
                 exit()
+                # Request not sent, n_following >= n_followers, description > text_size
+                #if not author.follow_request_sent and
             # end for
         # end for
     # end for
