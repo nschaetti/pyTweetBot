@@ -113,7 +113,7 @@ def find_unfollows(config, friends_manager, model, action_scheduler, features):
     # Find friends to unfollow
     logging.getLogger(u"pyTweetBot").info(u"Searching useless friends to unfollow")
     for friend in friends_manager.get_following():
-        if not FriendsManager.is_follower(friend.friend_screen_name):
+        if not friends_manager.is_follower(friend.friend_screen_name):
             # Predict class
             prediction, = model(bow(tokenizer(friend.friend_description)))
             censor_prediction, _ = censor(friend.friend_description)
