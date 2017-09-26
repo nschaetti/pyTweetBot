@@ -23,6 +23,16 @@
 #
 
 # Import
+import os
+import logging
+import time
+import sys
+import nsNLP
+from friends.FriendsManager import FriendsManager
+from learning.Model import Model
+from learning.CensorModel import CensorModel
+from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
+from twitter.TweetBotConnect import TweetBotConnector
 
 ####################################################
 # Globals
@@ -38,13 +48,70 @@
 
 
 # Find user to follow to and add it to the DB
-def find_follows(config, model, action_scheduler):
+def find_follows(config, model, action_scheduler, features, text_size, n_pages=20):
     """
     Find tweet to like and add it to the DB
     :param config: Bot's configuration object
     :param model: Classification model's file
     :param action_scheduler: Action scheduler object
-    :return: Number of retweets added.
+    :param features:
+    :param text_size:
     """
-    pass
+    # Load model
+    if model is not None and os.path.exists(model):
+        model = nsNLP.classifiers.TextClassifier.load(model)
+        censor = CensorModel(config)
+    else:
+        sys.stderr.write(u"Can't open model file {}\n".format(model))
+        exit()
+    # end if
+
+    # Tokenizer
+    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+
+    # Parse features
+    feature_list = features.split('+')
+
+    # Join features
+    bow = nsNLP.features.BagOfGrams()
+
+    # For each features
+    for bag in feature_list:
+        # Select features
+        if bag == 'words':
+            b = nsNLP.features.BagOfWords()
+        elif bag == 'bigrams':
+            b = nsNLP.features.BagOf2Grams()
+        elif bag == 'trigrams':
+            b = nsNLP.features.BagOf3Grams()
+        else:
+            sys.stderr.write(u"Unknown features type {}\n".format(bag))
+            exit()
+        # end if
+        bow.add(b)
+    # end for
+
+    # Unfollow interval in days
+    unfollow_day = int(config.get_friends_config()['unfollow_interval'] / 86400.0)
+
+    # Get keywords
+    search_keywords = config.get_retweet_config()['keywords']
+
+    # For each channel to research for new friends
+    for search_keyword in search_keywords:
+        # Log
+        logging.getLogger(u"pyTweetBot").info(u"Search new possible friends in the stream {}".format(search_keyword))
+
+        # Research this keyword
+        cursor = TweetBotConnector().search_tweets(search_keyword, n_pages)
+
+        # For each pages
+        for page in cursor.pages():
+            # For each tweet
+            for tweet in page:
+                print(tweet)
+                exit()
+            # end for
+        # end for
+    # end for
 # end find_follows

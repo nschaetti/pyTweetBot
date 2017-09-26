@@ -266,7 +266,7 @@ if __name__ == "__main__":
         find_tweets(config, args.model, action_scheduler, args.features)
     # Find retweets
     elif args.command == "find-retweets":
-        find_retweets(config, args.model, action_scheduler)
+        find_retweets(config, args.model, action_scheduler, args.features, args.text_size)
     # Find likes
     elif args.command == "find-likes":
         find_likes(config, args.model, action_scheduler)
