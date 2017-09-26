@@ -52,7 +52,8 @@ class FriendsManager(object):
         :param screen_name: Friend's screen name
         :return: True or False
         """
-        return len(self._session.query(Friend).filter(Friend.friend_screen_name == screen_name and Friend.friend_follower)) > 0
+        return self._session.query(Friend).filter(
+            Friend.friend_screen_name == screen_name and Friend.friend_follower).count > 0
     # end is_follower
 
     # Am I following this friend?
