@@ -115,7 +115,7 @@ def find_unfollows(config, friends_manager, model, action_scheduler, features):
     for friend in friends_manager.get_following():
         if not friend.friend_follower:
             # Predict class
-            prediction, = model(bow(tokenizer(friend.friend_description)))
+            prediction, _ = model(bow(tokenizer(friend.friend_description)))
             censor_prediction, _ = censor(friend.friend_description)
 
             # Predicted as unfollow
