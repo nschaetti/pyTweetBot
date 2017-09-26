@@ -157,6 +157,9 @@ if __name__ == "__main__":
     find_follow_parser = command_subparser.add_parser("find-follows")
     add_default_arguments(find_follow_parser)
     add_model_argument(find_follow_parser, True)
+    find_retweet_parser.add_argument("--text-size", type=int,
+                                     help="Minimum test size to take into account for the test",
+                                     default=50)
 
     # Find unfollow
     find_unfollow_parser = command_subparser.add_parser("find-unfollows")
@@ -274,7 +277,7 @@ if __name__ == "__main__":
         find_likes(config, args.model, action_scheduler)
     # Find follows
     elif args.command == "find-follows":
-        find_follows(config, args.model, action_scheduler)
+        find_follows(config, args.model, action_scheduler, args.features, args.text_size)
     # Find unfollows
     elif args.command == "find-unfollows":
         find_unfollows(config, friends_manager, args.model, action_scheduler, args.features)
