@@ -275,7 +275,7 @@ if __name__ == "__main__":
         find_follows(config, args.model, action_scheduler)
     # Find unfollows
     elif args.command == "find-unfollows":
-        find_unfollows(config, args.model, action_scheduler)
+        find_unfollows(config, friends_manager, args.model, action_scheduler, args.features)
     # Find quotes
     elif args.command == "find-quotes":
         find_quotes(config, args.model, action_scheduler)
