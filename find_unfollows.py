@@ -133,8 +133,6 @@ def find_unfollows(config, friends_manager, model, action_scheduler, features):
                         u"Unfollow action for \"{}\" already exists in the database".format(friend.friend_screen_name))
                     pass
                 # end try
-            else:
-                print(u"We keep {}".format(friend.friend_screen_name))
             # end if
         # end if
     # end for
