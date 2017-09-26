@@ -82,23 +82,23 @@ class TweetBotConnector(object):
     # end tweet
 
     # Unfollow
-    def unfollow(self, user_id):
+    def unfollow(self, screen_name):
         """
         Unfollow
         :param user_id: Twitter user's ID to follow.
         """
-        logging.getLogger(u"pyTweetBot").info(u"Unfollowing Twitter username {}".format(user_id))
-        self._api.destroy_friendship(user_id)
+        logging.getLogger(u"pyTweetBot").info(u"Unfollowing Twitter username {}".format(screen_name))
+        self._api.destroy_friendship(screen_name)
     # end unfollow
 
     # Follow
-    def follow(self, user_id):
+    def follow(self, screen_name):
         """
         Follow a user.
         :param user_id:
         """
-        logging.getLogger(u"pyTweetBot").info(u"Following Twitter username {}".format(user_id))
-        self._api.create_friendship(user_id)
+        logging.getLogger(u"pyTweetBot").info(u"Following Twitter username {}".format(screen_name))
+        self._api.create_friendship(screen_name)
     # end follow
 
     # Like

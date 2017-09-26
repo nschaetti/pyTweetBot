@@ -160,22 +160,22 @@ class ActionScheduler(Thread):
     # end add
 
     # Add a follow action in the DB
-    def add_follow(self, friend_id):
+    def add_follow(self, screen_name):
         """
         Add a "follow" action in the DB:
         :param friend_id:
         :return:
         """
-        self._add_id_action("Follow", friend_id)
+        self._add_text_action("Follow", screen_name)
     # end add_follow
 
     # Add an unfollow action in the DB
-    def add_unfollow(self, friend_id):
+    def add_unfollow(self, screen_name):
         """
         Add an "unfollow" action in the DB:
         :param friend_id: Twitter account0's ID.
         """
-        self._add_id_action("Unfollow", friend_id)
+        self._add_text_action("Unfollow", screen_name)
     # end add_unfollow
 
     # Add a like action in the DB
