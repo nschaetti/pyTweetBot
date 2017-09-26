@@ -89,16 +89,19 @@ def find_unfollows(config, friends_manager, model, action_scheduler, features):
         bow.add(b)
     # end for
 
+    # Unfollow interval in days
+    unfollow_day = int(config.get_friends_config()['unfollow_interval'] / 86400.0)
+
     # First unfollow obsolete friends
     logging.getLogger(u"pyTweetBot").info(u"Searching obsolete friends to unfollow")
-    for friend in friends_manager.get_obsolete_friends():
+    for friend in friends_manager.get_obsolete_friends(unfollow_day):
         try:
             logging.getLogger(u"pyTweetBot").info(
                 u"Adding obsolete Friend \"{}\" to unfollow to the scheduler".format(friend.friend_screen_name))
             action_scheduler.add_unfollow(friend.friend_screen_name)
         except ActionReservoirFullError:
-            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Unfollow action, waiting for one hour")
-            time.sleep(3600)
+            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Unfollow action, exiting...")
+            exit()
             pass
         except ActionAlreadyExists:
             logging.getLogger(u"pyTweetBot").error(
