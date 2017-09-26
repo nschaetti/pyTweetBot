@@ -106,7 +106,7 @@ def find_follows(config, model, action_scheduler, features, text_size, n_pages=2
         cursor = TweetBotConnector().search_tweets(search_keyword, n_pages)
 
         # For each pages
-        for page in cursor.pages():
+        for page in cursor:
             # For each tweet
             for tweet in page:
                 print(tweet)
