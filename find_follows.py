@@ -111,13 +111,31 @@ def find_follows(config, model, action_scheduler, features, text_size, n_pages=2
             for tweet in page:
                 # Tweet's author
                 author = tweet.author
-                print(author.screen_name)
-                print(author.description)
-                print(author.friends_count)
-                print(author.followers_count)
-                exit()
+
                 # Request not sent, n_following >= n_followers, description > text_size
-                #if not author.follow_request_sent and
+                if not author.follow_request_sent and author.friends_count >= author.followers_count and len(author.description) > text_size:
+                    # Predict class
+                    prediction, _ = model(bow(tokenizer(author.description)))
+                    censor_prediction, _ = censor(author.description)
+
+                    # Predicted as unfollow
+                    if prediction == 'pos' or censor_prediction == 'pos':
+                        try:
+                            logging.getLogger(u"pyTweetBot").info(
+                                u"Adding Friend \"{}\" to follow to the scheduler".format(author.screen_name))
+                            action_scheduler.add_follow(author.screen_name)
+                        except ActionReservoirFullError:
+                            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for follow action, exiting...")
+                            exit()
+                            pass
+                        except ActionAlreadyExists:
+                            logging.getLogger(u"pyTweetBot").error(
+                                u"Follow action for \"{}\" already exists in the database".format(
+                                    author.screen_name))
+                            pass
+                            # end try
+                    # end if
+                # end if
             # end for
         # end for
     # end for
