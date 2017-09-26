@@ -144,6 +144,8 @@ if __name__ == "__main__":
     add_default_arguments(find_retweet_parser)
     add_model_argument(find_retweet_parser, True)
     find_retweet_parser.add_argument("--n-pages", type=int, help="Number of pages in hashtags feed", default=10)
+    find_retweet_parser.add_argument("--text-size", type=int, help="Minimum test size to take into account for the test",
+                              required=True)
 
     # Find likes
     find_like_parser = command_subparser.add_parser("find-likes")
