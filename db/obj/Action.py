@@ -59,9 +59,9 @@ class Action(Base):
         :return:
         """
         if self.action_type == "Follow":
-            TweetBotConnector().follow(self.action_tweet_id)
+            TweetBotConnector().follow(self.action_tweet_text)
         elif self.action_type == "Unfollow":
-            TweetBotConnector().unfollow(self.action_tweet_id)
+            TweetBotConnector().unfollow(self.action_tweet_text)
         elif self.action_type == "Like":
             TweetBotConnector().like(self.action_tweet_id)
         elif self.action_type == "Tweet":
