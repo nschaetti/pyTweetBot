@@ -215,12 +215,16 @@ class TweetBotConnector(object):
     # end get_followers_cursor
 
     # Get the user
-    def get_user(self):
+    def get_user(self, screen_name=None):
         """
         Get the user
         :return: The Twitter user object.
         """
-        return self._api.get_user(self._config['user'])
+        if screen_name is None:
+            return self._api.get_user(self._config['user'])
+        else:
+            return self._api.get_user(screen_name)
+        # end if
     # end get_user
 
     ###########################################
