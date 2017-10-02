@@ -9,6 +9,10 @@ A Twitter bot written in Python to replace yourself, search and publish news abo
 
 ## Find new tweets
 
+`python pyTweetBot find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p --features words+bigrams+trigram`
+
 ## Find new retweets
+
+`python pyTweetBot find-retweets`
 
 ## Automatise execution with crontab
