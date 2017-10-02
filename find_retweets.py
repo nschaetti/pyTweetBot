@@ -27,6 +27,7 @@ import logging
 import sys
 import os
 import time
+import random
 from db.obj.Tweeted import Tweeted
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from retweet.RetweetFinder import RetweetFinder
@@ -47,7 +48,7 @@ from learning.CensorModel import CensorModel
 
 
 # Find retweets and add it to the DB
-def find_retweets(config, model, action_scheduler):
+def find_retweets(config, model, action_scheduler, retweets_likes_probs=[0.5, 0.5]):
     """
     Find retweets and add it to the DB
     :param config: Bot's configuration object
@@ -72,6 +73,9 @@ def find_retweets(config, model, action_scheduler):
         exit()
     # end if
 
+    # Actions
+    actions = [u"retweet", u"like"]
+
     # For each retweet finders
     for retweet_finder in retweet_finders:
         # For each tweet
@@ -82,11 +86,20 @@ def find_retweets(config, model, action_scheduler):
 
             # Predicted as tweet
             if prediction == "tweet" and censor_prediction == "tweet" and not Tweeted.exists(retweet.id):
+                # Decide which action (retweet, like)
+                random_action = random.randint(0, 2)
+
                 # Try to add
                 try:
-                    logging.info(u"Adding Tweet \"{}\" to the scheduler".format(
+                    logging.info(u"Adding {} \"{}\" to the scheduler".format(random_action,
                         retweet.tweet.encode('ascii', errors='ignore')))
-                    action_scheduler.add_retweet(retweet.id)
+
+                    # Add action
+                    if random_action == u"retweet":
+                        action_scheduler.add_retweet(retweet.id)
+                    else:
+                        action_scheduler.add_like(retweet.id)
+                    # end if
                 except ActionReservoirFullError:
                     logging.error(u"Reservoir full for Retweet action, waiting for one hour")
                     time.sleep(3600)
