@@ -85,8 +85,10 @@ def find_tweets(config, model, action_scheduler, features):
 
     # Load model
     if model is not None and os.path.exists(model):
+        logging.getLogger(u"pyTweetBot").info(u"Loading model {}".format(model))
         model = nsNLP.classifiers.TextClassifier.load(model)
         censor = CensorModel(config)
+        logging.getLogger(u"pyTweetBot").info(u"Model {} loaded".format(model))
     else:
         sys.stderr.write(u"Can't open model file {}\n".format(model))
         exit()
