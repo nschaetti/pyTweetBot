@@ -120,7 +120,11 @@ class FriendsManager(object):
         :param screen_name: User's screen name
         :return: True or False if succeeded
         """
-        pass
+        # Following on Twitter
+        TweetBotConnector().follow(screen_name)
+
+        # Change DB
+        self._set_following(screen_name, True)
     # end follow
 
     # Unfollow a Twitter account
@@ -130,7 +134,11 @@ class FriendsManager(object):
         :param screen_name: User's scree name
         :return: True of False if succeeded
         """
-        pass
+        # Unfollowing on Twitter
+        TweetBotConnector().unfollow(screen_name)
+
+        # Change DB
+        self._set_following(screen_name, False)
     # end unfollow
 
     # Update followers and following
@@ -256,12 +264,17 @@ class FriendsManager(object):
         # Log
         if follower and not friend.friend_follower:
             self._logger.info(u"New follower %s" % screen_name)
+        elif friend.friend_follower and not follower:
+            self._logger.info(u"Lost a follower %s" % screen_name)
         # end if
 
         # Counter and update
         if not friend.friend_follower and follower:
             count = 1
-            friend.friend_follower = follower
+            friend.friend_follower = True
+        elif friend.friend_follower and not follower:
+            count = -1
+            friend.friend_follower = False
         else:
             count = 0
         # end if
@@ -287,27 +300,23 @@ class FriendsManager(object):
         # Friend
         friend = self.get_friend_by_name(screen_name)
 
-        # Counter and change
-        if not friend.friend_following and following:
-            count = 1
-        else:
-            count = 0
-        # end if
-
         # Log
         if following and not friend.friend_following:
             self._logger.info(u"New following %s" % screen_name)
+        elif not following and friend.friend_following:
+            self._logger.info(u"Stopped following %s" % screen_name)
         # end if
-
-        # Update
 
         # Counter and change
         if not friend.friend_following and following:
-            friend.friend_following = following
+            friend.friend_following = True
             count = 1
+        elif friend.friend_following and not following:
+            friend.friend_following = False
+            count = -1
         else:
             count = 0
-            # end if
+        # end if
 
         # Update follower time if necessary
         if not following:
