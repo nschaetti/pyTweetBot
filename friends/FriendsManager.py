@@ -123,6 +123,13 @@ class FriendsManager(object):
         # Following on Twitter
         TweetBotConnector().follow(screen_name)
 
+        # Get the Twitter user
+        twf = TweetBotConnector().get_user(screen_name)
+
+        # Add friend in the DB
+        self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
+                         twf.friends_count, twf.statuses_count)
+
         # Change DB
         self._set_following(screen_name, True)
     # end follow
