@@ -43,7 +43,7 @@ import time
 
 
 # Get retweet data
-def retweet_dataset(dataset_file, search="", info=False):
+def retweet_dataset(config, dataset_file, search="", info=False, source="tweets"):
     """
     Get retweet data
     :param config:
@@ -67,36 +67,48 @@ def retweet_dataset(dataset_file, search="", info=False):
         exit()
     # end if
 
+    # Finders
+    retweet_finders = list()
+
     # Retweet finder
-    if search != "":
-        retweet_finder = RetweetFinder(search_keywords=search, languages=['en', 'fr'])
+    if search != "" and source == "tweets":
+        retweet_finders = [RetweetFinder(search_keywords=search, languages=['en', 'fr'])]
+    elif search == "" and source == "timeline":
+        pass
+    else:
+        # Get all finders
+        for keyword in config.get_retweet_config()['keywords']:
+            retweet_finders.append(RetweetFinder(search_keywords=keyword))
+        # end for
     # end if
 
     # For each tweet
-    for tweet, polarity, subjectivity in retweet_finder:
-        if not dataset.is_in(tweet.text) and tweet:
-            # Ask
-            print(u"Would you classify the following element as negative(n) or positive(p)?")
-            print(tweet.text)
-            print(u"Polarity : {}".format(polarity))
-            print(u"Subjectivity : {}".format(subjectivity))
-            observed = raw_input(u"Positive or negative (p/n) (q for quit, s for skip) : ").lower()
+    for retweet_finder in retweet_finders:
+        for tweet, polarity, subjectivity in retweet_finder:
+            if not dataset.is_in(tweet.text) and tweet:
+                # Ask
+                print(u"Would you classify the following element as negative(n) or positive(p)?")
+                print(tweet.text)
+                print(u"Polarity : {}".format(polarity))
+                print(u"Subjectivity : {}".format(subjectivity))
+                observed = raw_input(u"Positive or negative (p/n) (q for quit, s for skip) : ").lower()
 
-            # Add as example
-            if observed == 'q':
-                break
-            elif observed == 'p':
-                dataset.add_positive(tweet.text)
-            elif observed == 's':
-                pass
+                # Add as example
+                if observed == 'q':
+                    break
+                elif observed == 'p':
+                    dataset.add_positive(tweet.text)
+                elif observed == 's':
+                    pass
+                else:
+                    dataset.add_negative(tweet.text)
+                # end if
+
+                # Save dataset
+                dataset.save(dataset_file)
             else:
-                dataset.add_negative(tweet.text)
+                logging.debug(u"Already in stock : {}".format(tweet.text))
             # end if
-
-            # Save dataset
-            dataset.save(dataset_file)
-        else:
-            logging.debug(u"Already in stock : {}".format(tweet.text))
         # end if
     # end if
 
