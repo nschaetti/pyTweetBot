@@ -3,6 +3,7 @@
 #
 
 # Imports
+import itertools
 from patterns.singleton import singleton
 
 
@@ -58,13 +59,37 @@ class TweetFactory(object):
         if hashtag not in text:
             text = text.replace(prefix + word + suffix, prefix + hashtag + suffix)
             if not case_sensitive:
-                text = text.replace(prefix + word.lower() + suffix, prefix + hashtag + suffix)
+                upper_lower_combi = map(''.join, itertools.product(*((c.upper(), c.lower()) for c in word)))
+                for upper_lower_inst in upper_lower_combi:
+                    text = text.replace(prefix + upper_lower_inst + suffix, prefix + hashtag + suffix)
+                # end for
+                """text = text.replace(prefix + word.lower() + suffix, prefix + hashtag + suffix)
                 text = text.replace(prefix + word.upper() + suffix, prefix + hashtag + suffix)
-                text = text.replace(prefix + word.title() + suffix, prefix + hashtag + suffix)
+                text = text.replace(prefix + word.title() + suffix, prefix + hashtag + suffix)"""
             # end if
         # end if
         return text
     # end _word_to_hashtag
+
+    # Replace hashtag
+    def _replace_hashtag(self, text, word, hashtag, prefix_suffix, case_sensitive):
+        """
+        Replace hashtag
+        :param text:
+        :param prefix_suffix:
+        :return:
+        """
+        # Replace with each combinaison of suffix
+        for prefix in prefix_suffix:
+            for suffix in prefix_suffix:
+                text = self._word_to_hashtag(word=word, hashtag=hashtag, prefix=prefix, suffix=suffix, text=text,
+                                             case_sensitive=case_sensitive)
+            # end for
+        # end for
+
+        # Return with no # doublon
+        return text.replace(u"##", u"#").replace(u"##", u"#").replace(u"##", u"#")
+    # end _replace_hashtag
 
     # Replace hashtags
     def _replace_hashtags(self, text):
@@ -77,8 +102,12 @@ class TweetFactory(object):
             # Case sensitive
             case_sensitive = hashtag['case_sensitive'] if 'case_sensitive' in hashtag.keys() else False
 
+            # Replace hashtags
+            self._replace_hashtag(text=text, word=hashtag['from'], hashtag=hashtag['to'],
+                                  prefix_suffix=['', ' ', '\'', '(', ')', ':', ',', '?', '!', '.', '`', ';'],
+                                  case_sensitive=case_sensitive)
             # Replace
-            text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u' ', suffix=u'',
+            """text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u' ', suffix=u'',
                                          text=text, case_sensitive=case_sensitive)
             text = self._word_to_hashtag(word=hashtag['from'], hashtag=hashtag['to'], prefix=u'', suffix=u' ',
                                          text=text, case_sensitive=case_sensitive)
@@ -117,7 +146,7 @@ class TweetFactory(object):
             text = self._word_to_hashtag(word=hashtag['from'].replace(u'-', u''), hashtag=hashtag['to'], prefix=u'',
                                          suffix=u',', text=text, case_sensitive=case_sensitive)
             text = self._word_to_hashtag(word=hashtag['from'].replace(u' ', u''), hashtag=hashtag['to'], prefix=u'(',
-                                         suffix=u')', text=text, case_sensitive=case_sensitive)
+                                         suffix=u')', text=text, case_sensitive=case_sensitive)"""
         # end for
         return text.replace(u"##", u"#").replace(u"##", u"#").replace(u"##", u"#")
     # end replace_hashtags
