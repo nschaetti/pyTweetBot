@@ -76,8 +76,8 @@ class TweetBotConnector(object):
         try:
             logging.getLogger(u"pyTweetBot").info(u"Tweeting \"{}\"".format(text))
             self._api.update_status(status=text)
-        except tweepy.error.TweepError:
-            pass
+        except tweepy.error.TweepError as e:
+            logging.getLogger(u"pyTweetBot").info(u"Twitter API error \"{}\"".format(e))
         # end try
     # end tweet
 
