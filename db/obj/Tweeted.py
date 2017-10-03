@@ -62,13 +62,13 @@ class Tweeted(Base):
 
     # Insert a new retweeted
     @staticmethod
-    def insert_retweet(tweet_id, tweet_text):
+    def insert_retweet(tweet_id):
         """
         Insert a new retweeted
         :param tweet_id: Tweet's ID
         :param tweet_text: Tweet's text
         """
-        DBConnector().get_session().add(Tweeted(tweet_tweet_id=tweet_id, tweet_tweet_text=tweet_text))
+        DBConnector().get_session().add(Tweeted(tweet_tweet_id=tweet_id, tweet_tweet_text=u""))
     # end insert_tweet
 
     # Tweet exists
