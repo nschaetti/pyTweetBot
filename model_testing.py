@@ -103,7 +103,7 @@ def model_testing(data_set_file, model_file, features='words', text_size=2000):
     for text, c in dataset:
         if len(text) > text_size:
             # Log
-            print(u"Testing sample {}/{}".format(index, len(dataset)))
+            print(u"Testing sample {}".format(index))
 
             # Predict
             prediction, probs = model(bow(tokenizer(text)))
@@ -127,9 +127,9 @@ def model_testing(data_set_file, model_file, features='words', text_size=2000):
     # end for
 
     # False positive/negative
-    false_positive = confusion_matrix['pos']['neg'] / float(len(dataset))
-    false_negative = confusion_matrix['neg']['pos'] / float(len(dataset))
-    success_rate = (confusion_matrix['pos']['pos'] + confusion_matrix['neg']['neg']) / float(len(dataset))
+    false_positive = confusion_matrix['pos']['neg'] / float(index-1)
+    false_negative = confusion_matrix['neg']['pos'] / float(index-1)
+    success_rate = (confusion_matrix['pos']['pos'] + confusion_matrix['neg']['neg']) / float(index-1)
 
     # Show performance
     print\
