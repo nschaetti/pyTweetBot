@@ -42,13 +42,38 @@ from twitter.TweetBotConnect import TweetBotConnector
 # Functions
 ####################################################
 
+
+# Add follow action
+def add_follow_action(action_scheduler, friend):
+    """
+    Add follow action
+    :param action_scheduler:
+    :param friend:
+    :return:
+    """
+    try:
+        logging.getLogger(u"pyTweetBot").info(
+            u"Adding Friend \"{}\" to follow to the scheduler".format(friend.screen_name))
+        action_scheduler.add_follow(friend.screen_name)
+    except ActionReservoirFullError:
+        logging.getLogger(u"pyTweetBot").error(u"Reservoir full for follow action, exiting...")
+        exit()
+        pass
+    except ActionAlreadyExists:
+        logging.getLogger(u"pyTweetBot").error(
+            u"Follow action for \"{}\" already exists in the database".format(
+                friend.screen_name))
+        pass
+    # end try
+# end add_follow_action
+
 ####################################################
 # Main function
 ####################################################
 
 
 # Find user to follow to and add it to the DB
-def find_follows(config, model, action_scheduler, features, text_size, n_pages=20):
+def find_follows(config, model, action_scheduler, friends_manager, features, text_size, n_pages=20):
     """
     Find tweet to like and add it to the DB
     :param config: Bot's configuration object
@@ -91,11 +116,24 @@ def find_follows(config, model, action_scheduler, features, text_size, n_pages=2
         bow.add(b)
     # end for
 
-    # Unfollow interval in days
-    unfollow_day = int(config.get_friends_config()['unfollow_interval'] / 86400.0)
+    # For each followers
+    for follower in friends_manager.get_followers():
+        # He follows me, but I don't
+        if not follower.friend_following:
+            # Censor prediction
+            censor_prediction, _ = censor(follower.friend_description)
 
-    # Get keywords
+            # If positive prediction
+            if censor_prediction == 'pos':
+                # Add
+                add_follow_action(action_scheduler, follower)
+            # end if
+        # end if
+    # end for
+
+    # Get options
     search_keywords = config.get_retweet_config()['keywords']
+    ratio = config.get_retweet_config()['ratio']
 
     # For each channel to research for new friends
     for search_keyword in search_keywords:
@@ -113,27 +151,15 @@ def find_follows(config, model, action_scheduler, features, text_size, n_pages=2
                 author = tweet.author
 
                 # Request not sent, n_following >= n_followers, description > text_size
-                if not author.follow_request_sent and author.friends_count >= author.followers_count and len(author.description) > text_size:
+                if not author.follow_request_sent and author.friends_count >= (author.followers_count * ratio) and len(author.description) > text_size:
                     # Predict class
                     prediction, _ = model(bow(tokenizer(author.description)))
                     censor_prediction, _ = censor(author.description)
 
                     # Predicted as unfollow
                     if prediction == 'pos' or censor_prediction == 'pos':
-                        try:
-                            logging.getLogger(u"pyTweetBot").info(
-                                u"Adding Friend \"{}\" to follow to the scheduler".format(author.screen_name))
-                            action_scheduler.add_follow(author.screen_name)
-                        except ActionReservoirFullError:
-                            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for follow action, exiting...")
-                            exit()
-                            pass
-                        except ActionAlreadyExists:
-                            logging.getLogger(u"pyTweetBot").error(
-                                u"Follow action for \"{}\" already exists in the database".format(
-                                    author.screen_name))
-                            pass
-                            # end try
+                        # Add
+                        add_follow_action(action_scheduler, author)
                     # end if
                 # end if
 
