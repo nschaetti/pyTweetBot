@@ -28,6 +28,7 @@ import logging
 import time
 import sys
 import nsNLP
+import random
 from friends.FriendsManager import FriendsManager
 from learning.Model import Model
 from learning.CensorModel import CensorModel
@@ -134,6 +135,9 @@ def find_follows(config, model, action_scheduler, friends_manager, features, tex
     # Get options
     search_keywords = config.get_retweet_config()['keywords']
     ratio = config.get_retweet_config()['ratio']
+
+    # Shuffle keywords
+    random.shuffle(search_keywords)
 
     # For each channel to research for new friends
     for search_keyword in search_keywords:
