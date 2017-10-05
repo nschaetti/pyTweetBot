@@ -27,7 +27,7 @@ import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
 from twitter.TweetBotConnect import TweetBotConnector
-#from friends.FriendsManager import FriendsManager
+from friends.FriendsManager import FriendsManager
 from db.obj.Tweeted import Tweeted
 
 
@@ -48,9 +48,7 @@ class Action(Base):
     action_date = Column(DateTime, nullable=False, default=datetime.datetime.utcnow())
 
     ############################################
-    #
     # Public Functions
-    #
     ############################################
 
     # Execute the action
@@ -74,5 +72,35 @@ class Action(Base):
             Tweeted.insert_retweet(self.action_tweet_id)
         # end if
     # end
+
+    ############################################
+    # Static functions
+    ############################################
+
+    # To string
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        return "Action(id={}, type={}, tweet_id={}, tweet_text={}, tweet_date={})".format(self.action_id,
+                                                                                          self.action_type,
+                                                                                          self.action_tweet_id,
+                                                                                          self.action_tweet_text,
+                                                                                          self.action_date)
+    # end __str__
+
+    # To unicode
+    def __unicode__(self):
+        """
+        To unicode
+        :return:
+        """
+        return u"Action(id={}, type={}, tweet_id={}, tweet_text={}, tweet_date={})".format(self.action_id,
+                                                                                           self.action_type,
+                                                                                           self.action_tweet_id,
+                                                                                           self.action_tweet_text,
+                                                                                           self.action_date)
+    # end __unicode__
 
 # end Action
