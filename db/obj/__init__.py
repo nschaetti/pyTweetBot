@@ -4,8 +4,10 @@
 
 # Import
 from .Base import Base
-"""from .Action import Action
-from .Base import Base
+from .Action import Action
+from .Friend import Friend
+from .Statistic import Statistic
+"""from .Base import Base
 from .Follower import Follower
 from .Following import Following
 from .Friend import Friend
