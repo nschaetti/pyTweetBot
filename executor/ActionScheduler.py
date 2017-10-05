@@ -25,8 +25,8 @@
 import sqlalchemy
 import datetime
 from datetime import timedelta
-from db.obj.Action import Action
-from db.DBConnector import DBConnector
+import db
+import db.obj
 from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import desc
 from sqlalchemy import and_
@@ -35,6 +35,7 @@ from patterns.singleton import singleton
 import tweet.Tweet as tw
 import sys
 import time
+import tweepy
 from threading import Thread
 
 
@@ -85,7 +86,7 @@ class ActionScheduler(Thread):
         :param stats:
         """
         # Properties
-        self._session = DBConnector().get_session()
+        self._session = db.DBConnector().get_session()
 
         if n_actions == None:
             self._n_actions = {"Follow": 1, "Unfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
@@ -220,20 +221,20 @@ class ActionScheduler(Thread):
         """
         try:
             if action_tweet_id is None and action_tweet_text is None:
-                self._session.query(Action).filter(Action.action_type == action_type).one()
+                self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).one()
                 return True
             elif action_tweet_id is not None and action_tweet_text is None:
-                self._session.query(Action).filter(
-                    and_(Action.action_type == action_type, Action.action_tweet_id == action_tweet_id)).one()
+                self._session.query(db.obj.Action).filter(
+                    and_(db.obj.Action.action_type == action_type, db.obj.Action.action_tweet_id == action_tweet_id)).one()
                 return True
             elif action_tweet_id is None and action_tweet_text is not None:
-                self._session.query(Action).filter(
-                    and_(Action.action_type == action_type, Action.action_tweet_text == action_tweet_text)).one()
+                self._session.query(db.obj.Action).filter(
+                    and_(db.obj.Action.action_type == action_type, db.obj.Action.action_tweet_text == action_tweet_text)).one()
                 return True
             else:
-                self._session.query(Action).filter(
-                    and_(Action.action_type == action_type, Action.action_tweet_id == action_tweet_id,
-                         Action.action_tweet_text == action_tweet_text)).one()
+                self._session.query(db.obj.Action).filter(
+                    and_(db.obj.Action.action_type == action_type, db.obj.Action.action_tweet_id == action_tweet_id,
+                         db.obj.Action.action_tweet_text == action_tweet_text)).one()
                 return True
             # end if
         except sqlalchemy.orm.exc.NoResultFound:
@@ -247,7 +248,7 @@ class ActionScheduler(Thread):
         Delete an action
         :param action: Action to delete.
         """
-        self._session.query(Action).filter(Action.action_id == action.action_id).delete()
+        self._session.query(db.obj.Action).filter(db.obj.Action.action_id == action.action_id).delete()
         self._session.commit()
     # end delete
 
@@ -261,7 +262,14 @@ class ActionScheduler(Thread):
         for action_type in ["Follow", "Unfollow", "Like", "Tweet", "Retweet"]:
             # Get actions to be executed
             for action in self._get_exec_action(action_type):
-                action.execute()
+                # Try to execute
+                try:
+                    action.execute()
+                except tweepy.TweepError as e:
+                    logging.getLogger(u"pyTweetBot").error(u"Error while executing action {} : {}".format(action, e))
+                # end try
+
+                # Delete the action
                 self.delete(action)
             # end for
         # end for
@@ -287,8 +295,8 @@ class ActionScheduler(Thread):
         :return:
         """
         # Get all actions
-        action = self._session.query(Action).filter(Action.action_type == action_type) \
-            .order_by(Action.action_id).all()[0]
+        action = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type) \
+            .order_by(db.obj.Action.action_id).all()[0]
         action.execute()
         self.delete(action)
     # end exec_next_action
@@ -301,9 +309,9 @@ class ActionScheduler(Thread):
         """
         # Get actions
         if action_type == "":
-            return self._session.query(Action).order_by(Action.action_id).all()
+            return self._session.query(db.obj.Action).order_by(db.obj.Action.action_id).all()
         else:
-            return self._session.query(Action).filter(Action.action_type == action_type).order_by(Action.action_id).all()
+            return self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).order_by(db.obj.Action.action_id).all()
         # end if
     # end list_actions
 
@@ -358,7 +366,7 @@ class ActionScheduler(Thread):
         """
         Purge the reservoir of obsolete actions.
         """
-        self._session.query(Action).filter(Action.action_date <= datetime.datetime.utcnow() - self._purge_delay)
+        self._session.query(db.obj.Action).filter(db.obj.Action.action_date <= datetime.datetime.utcnow() - self._purge_delay)
     # end _purge_reservoir
 
     # Get reservoir levels
@@ -382,7 +390,7 @@ class ActionScheduler(Thread):
         :param action_type: Action's type.
         :return: Reservoir level for this action
         """
-        return len(self._session.query(Action).filter(Action.action_type == action_type).all())
+        return len(self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).all())
     # end _get_reservoir_level
 
     # Get action to execute
@@ -392,8 +400,8 @@ class ActionScheduler(Thread):
         :return: Action to execute as a list()
         """
         # Get all actions
-        exec_actions = self._session.query(Action).filter(Action.action_type == action_type)\
-            .order_by(Action.action_id).all()
+        exec_actions = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type)\
+            .order_by(db.obj.Action.action_id).all()
         return exec_actions[:self._n_actions[action_type]]
     # end _get_exec_action
 
@@ -405,7 +413,7 @@ class ActionScheduler(Thread):
         :param the_id: Action's ID
         """
         if not self.exists(action_type, the_id):
-            action = Action(action_type=action_type, action_tweet_id=the_id)
+            action = db.obj.Action(action_type=action_type, action_tweet_id=the_id)
             self.add(action)
         else:
             logging.getLogger(u"pyTweetBot").warning(u"{} action for friend/tweet {} already in database"
@@ -422,7 +430,7 @@ class ActionScheduler(Thread):
         :param the_text: Action's text.
         """
         if not self.exists(action_type=action_type, action_tweet_text=the_text):
-            action = Action(action_type=action_type, action_tweet_text=the_text)
+            action = db.obj.Action(action_type=action_type, action_tweet_text=the_text)
             self.add(action)
         else:
             logging.getLogger(u"pyTweetBot").warning(u"{} action for text {} already in database"
