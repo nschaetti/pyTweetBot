@@ -63,6 +63,7 @@ class TweetBotConnector(object):
         Retweet
         :param tweet_id: Tweet's ID.
         """
+        # Log
         logging.getLogger(u"pyTweetBot").info(u"Retweeting {}".format(tweet_id))
         self._api.retweet(tweet_id)
     # end retweet
