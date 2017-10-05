@@ -3,10 +3,12 @@
 #
 
 import datetime
-from db.DBConnector import DBConnector
-from executor.ActionScheduler import ActionScheduler
-from db.obj.Friend import Friend
-from db.obj.Statistic import Statistic
+#from db.DBConnector import DBConnector
+import executor
+import db
+import db.obj
+#from db.obj.Friend import Friend
+#from db.obj.Statistic import Statistic
 from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import update, delete, select
@@ -30,7 +32,7 @@ class FriendsManager(object):
         Constructor
         """
         # DB session
-        self._session = DBConnector().get_session()
+        self._session = db.DBConnector().get_session()
 
         # Twitter connection
         self._twitter_con = TweetBotConnector()
@@ -52,8 +54,8 @@ class FriendsManager(object):
         :param screen_name: Friend's screen name
         :return: True or False
         """
-        return self._session.query(Friend).filter(
-            Friend.friend_screen_name == screen_name and Friend.friend_follower).count > 0
+        return self._session.query(db.obj.Friend).filter(
+            db.obj.Friend.friend_screen_name == screen_name and db.obj.Friend.friend_follower).count > 0
     # end is_follower
 
     # Am I following this friend?
@@ -63,7 +65,7 @@ class FriendsManager(object):
         :param screen_name: Friend's screen name
         :return: True or False
         """
-        return len(self._session.query(Friend).filter(Friend.friend_screen_name == screen_name and Friend.friend_following)) > 0
+        return len(self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name and db.obj.Friend.friend_following)) > 0
     # end is_following
 
     # Get obsolete friends
@@ -78,9 +80,9 @@ class FriendsManager(object):
         datetime_limit = datetime.datetime.utcnow() - timedelta(days=days)
 
         # Get all
-        return self._session.query(Friend).filter(and_(Friend.friend_following == True,
-                                                  not_(Friend.friend_follower == True),
-                                                  Friend.friend_following_date <= datetime_limit)).all()
+        return self._session.query(db.obj.Friend).filter(and_(db.obj.Friend.friend_following == True,
+                                                  not_(db.obj.Friend.friend_follower == True),
+                                                  db.obj.Friend.friend_following_date <= datetime_limit)).all()
     # end get_obsolete_friends
 
     # Get a friend from the DB
@@ -90,7 +92,7 @@ class FriendsManager(object):
         :param friend_id: The friend to get as a Tweepy object.
         :return: The friend DB object.
         """
-        return self._session.query(Friend).filter(Friend.friend_id == friend_id).one()
+        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_id == friend_id).one()
     # end get_friend_by_id
 
     # Get a friend from the DB
@@ -100,7 +102,7 @@ class FriendsManager(object):
         :param screen_name: The friend to get as a Tweepy object.
         :return: The friend DB object.
         """
-        return self._session.query(Friend).filter(Friend.friend_screen_name == screen_name).one()
+        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name).one()
     # end get_friend_by_name
 
     # Friend exists
@@ -110,7 +112,7 @@ class FriendsManager(object):
         :param screen_name: Account's screen name
         :return: True or False
         """
-        return len(self._session.query(Friend).filter(Friend.friend_screen_name == screen_name).all()) > 0
+        return len(self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name).all()) > 0
     # end exists
 
     # Follow a Twitter account
@@ -200,12 +202,12 @@ class FriendsManager(object):
         """
         Insert a value in the statistics table.
         """
-        statistic = Statistic(statistic_friends_count=self.n_following(),
-                              statistic_followers_count=self.n_followers(),
-                              statistic_statuses_count=ActionScheduler().n_statuses())
+        statistic = db.obj.Statistic(statistic_friends_count=self.n_following(),
+                                     statistic_followers_count=self.n_followers(),
+                                     statistic_statuses_count=executor.ActionScheduler().n_statuses())
         self._session.add(statistic)
         self._session.commit()
-        return self.n_followers(), self.n_following(), ActionScheduler().n_statuses()
+        return self.n_followers(), self.n_following(), executor.ActionScheduler().n_statuses()
     # end _insert_statistic
 
     # Get followers
@@ -214,7 +216,7 @@ class FriendsManager(object):
         Get followers
         :return:
         """
-        return self._session.query(Friend).filter(Friend.friend_follower).all()
+        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_follower).all()
     # end get_followers
 
     # Get following
@@ -223,7 +225,7 @@ class FriendsManager(object):
         Get following
         :return:
         """
-        return self._session.query(Friend).filter(Friend.friend_following).all()
+        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_following).all()
     # end get_following
 
     ######################################################
@@ -244,14 +246,14 @@ class FriendsManager(object):
         :return: 1 if a new friends created, 0 if updated only.
         """
         if not self.exists(screen_name):
-            new_friend = Friend(friend_screen_name=screen_name, friend_description=description,
+            new_friend = db.obj.Friend(friend_screen_name=screen_name, friend_description=description,
                                 friend_location=location, friend_followers_count=followers_count,
                                 friend_friends_count=friends_count, friend_statuses_count=statuses_count)
             self._session.add(new_friend)
             self._logger.info(u"New friend %s" % screen_name)
             return 1
         else:
-            update(Friend).where(Friend.friend_screen_name == screen_name).\
+            update(db.obj.Friend).where(db.obj.Friend.friend_screen_name == screen_name).\
                 values(friend_last_update=datetime.datetime.now())
             return 0
         # end if
@@ -345,9 +347,9 @@ class FriendsManager(object):
         """
         # Get current friends.
         if follower:
-            friends = self._session.query(Friend).options(load_only('friend_screen_name')).filter(Friend.friend_follower).all()
+            friends = self._session.query(db.obj.Friend).options(load_only('friend_screen_name')).filter(db.obj.Friend.friend_follower).all()
         else:
-            friends = self._session.query(Friend).options(load_only('friend_screen_name')).filter(Friend.friend_following).all()
+            friends = self._session.query(db.obj.Friend).options(load_only('friend_screen_name')).filter(db.obj.Friend.friend_following).all()
         # end if
 
         # Counter
@@ -422,11 +424,11 @@ class FriendsManager(object):
         :return:
         """
         # Select friend with no links
-        no_links = self._session.query(Friend).filter(not Friend.friend_follower and not Friend.friend_following).all()
+        no_links = self._session.query(db.obj.Friend).filter(not db.obj.Friend.friend_follower and not db.obj.Friend.friend_following).all()
 
         # Delete
         for no_link in no_links:
-            delete(Friend).where(Friend.friend_screen_name == no_link.friend_screen_name)
+            delete(db.obj.Friend).where(db.obj.Friend.friend_screen_name == no_link.friend_screen_name)
         # end for
     # end _clean_friendship
 
