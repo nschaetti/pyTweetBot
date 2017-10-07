@@ -70,6 +70,24 @@ class TweetFactory(object):
         :param text:
         :return:
         """
+        # Beginning
+        if text[:len(word)] == word:
+            text = hashtag + text[len(word):]
+        # end if
+
+        # Case sensitive
+        if not case_sensitive:
+            # Capitalized words
+            upper_lower_combi = self._capitalized_set(word)
+            for upper_lower_inst in upper_lower_combi:
+                # Beginning
+                if text[:len(word)] == upper_lower_inst or text[:len(word)] == upper_lower_inst.replace(u' ', u'') or text[:len(word)] == upper_lower_inst.replace(u'-', u''):
+                    text = hashtag + text[len(word):]
+                # end if
+            # end for
+        # end if
+
+        # Inside
         if hashtag not in text:
             if len(prefix) > 0 or len(suffix) > 0:
                 text = text.replace(prefix + word + suffix, prefix + hashtag + suffix)
@@ -84,6 +102,24 @@ class TweetFactory(object):
                 # end if
             # end if
         # end if
+
+        # Outside
+        if text[-len(word):] == word:
+            text = text[:-len(word)] + hashtag
+        # end if
+
+        # Case sensitive
+        if not case_sensitive:
+            # Capitalized words
+            upper_lower_combi = self._capitalized_set(word)
+            for upper_lower_inst in upper_lower_combi:
+                # Beginning
+                if text[-len(word):] == upper_lower_inst or text[-len(word):] == upper_lower_inst.replace(u' ', u'') or text[-len(word):] == upper_lower_inst.replace(u'-', u''):
+                    text = text[:-len(word)] + hashtag
+                # end if
+            # end for
+        # end if
+
         return text
     # end _word_to_hashtag
 
@@ -121,7 +157,7 @@ class TweetFactory(object):
 
             # Replace hashtags
             text = self._replace_hashtag(text=text, word=hashtag['from'], hashtag=hashtag['to'],
-                                  prefix_suffix=['', ' ', '\'', '(', ')', ':', ',', '?', '!', '.', '`', ';', '\t', '/'],
+                                  prefix_suffix=[u' ', u'\'', u'(', u')', u':', u',', u'?', u'!', u'.', u'`', u';', u'\t', u'/', u'’'],
                                   case_sensitive=case_sensitive)
         # end for
         return text.replace(u"##", u"#").replace(u"##", u"#").replace(u"##", u"#")
