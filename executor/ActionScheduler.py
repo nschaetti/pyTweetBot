@@ -180,12 +180,12 @@ class ActionScheduler(Thread):
     # end add_unfollow
 
     # Add a like action in the DB
-    def add_like(self, tweet_id):
+    def add_like(self, tweet_id, tweet_text):
         """
         Add a "like" action in the DB.
         :param tweet_id: Tweet's ID.
         """
-        self._add_id_action("Like", tweet_id)
+        self._add_action("Like", tweet_id, tweet_text)
     # end add_like
 
     # Add a tweet action in the DB
@@ -202,12 +202,12 @@ class ActionScheduler(Thread):
     # end add_tweet
 
     # Add a "Retweet" action in the DB
-    def add_retweet(self, tweet_id):
+    def add_retweet(self, tweet_id, tweet_text):
         """
         Add a "retweet" action in the DB
         :param tweet_id: Tweet's ID
         """
-        self._add_id_action("Retweet", tweet_id)
+        self._add_action("Retweet", tweet_id, tweet_text)
     # end add_retweet
 
     # Does an action already exists in the DB?
@@ -438,5 +438,25 @@ class ActionScheduler(Thread):
             raise ActionAlreadyExists(u"{} action for text {} already in database".format(action_type, the_text))
         # end if
     # end _add_text_action
+
+    # Add action with text and ID
+    def _add_action(self, action_type, the_id, the_text):
+        """
+        Add action with text and ID
+        :param action_type:
+        :param the_id:
+        :param the_text:
+        :return:
+        """
+        if not self.exists(action_type=action_type, action_tweet_id=the_id, action_tweet_text=the_text):
+            action = db.obj.Action(action_type=action_type, action_tweet_id=the_id, action_tweet_text=the_text)
+            self.add(action)
+        else:
+            logging.getLogger(u"pyTweetBot").warning(u"{} action for id {} and text {} already in database"
+                                                     .format(action_type, the_id, the_text))
+            raise ActionAlreadyExists(
+                u"{} action for id {} and text {} already in database".format(action_type, the_id, the_text))
+        # end if
+    # end _add_action
 
 # end ActionScheduler
