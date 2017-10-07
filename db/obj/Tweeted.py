@@ -87,7 +87,7 @@ class Tweeted(Base):
         if type(tweet) is tw.Tweet:
             return db.DBConnector().get_session().query(Tweeted).filter(
                 or_(Tweeted.tweet_tweet_text == tweet.get_text(),
-                    Tweeted.tweet_tweet_url == tweet.get_url(),
+                    Tweeted.tweet_tweet_text == tweet.get_url(),
                     Tweeted.tweet_tweet_text == tweet.get_tweet())).count() > 0
         elif type(tweet) is unicode:
             return db.DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_text == tweet).count() > 0
