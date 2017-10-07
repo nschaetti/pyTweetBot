@@ -54,8 +54,8 @@ def add_follow_action(action_scheduler, friend):
     """
     try:
         logging.getLogger(u"pyTweetBot").info(
-            u"Adding Friend \"{}\" to follow to the scheduler".format(friend.screen_name))
-        action_scheduler.add_follow(friend.screen_name)
+            u"Adding Friend \"{}\" to follow to the scheduler".format(friend.friend_screen_name))
+        action_scheduler.add_follow(friend.friend_screen_name)
     except ActionReservoirFullError:
         logging.getLogger(u"pyTweetBot").error(u"Reservoir full for follow action, exiting...")
         exit()
@@ -63,7 +63,7 @@ def add_follow_action(action_scheduler, friend):
     except ActionAlreadyExists:
         logging.getLogger(u"pyTweetBot").error(
             u"Follow action for \"{}\" already exists in the database".format(
-                friend.screen_name))
+                friend.friend_screen_name))
         pass
     # end try
 # end add_follow_action
@@ -139,7 +139,7 @@ def find_follows(config, model, action_scheduler, friends_manager, features, tex
     # Shuffle keywords
     random.shuffle(search_keywords)
 
-    # For each channel to research for new friends
+    # For each channel research for new friends
     for search_keyword in search_keywords:
         # Log
         logging.getLogger(u"pyTweetBot").info(u"Search new possible friends in the stream {}".format(search_keyword))
