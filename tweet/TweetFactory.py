@@ -121,7 +121,7 @@ class TweetFactory(object):
 
             # Replace hashtags
             text = self._replace_hashtag(text=text, word=hashtag['from'], hashtag=hashtag['to'],
-                                  prefix_suffix=['', ' ', '\'', '(', ')', ':', ',', '?', '!', '.', '`', ';'],
+                                  prefix_suffix=['', ' ', '\'', '(', ')', ':', ',', '?', '!', '.', '`', ';', '\t', '/'],
                                   case_sensitive=case_sensitive)
         # end for
         return text.replace(u"##", u"#").replace(u"##", u"#").replace(u"##", u"#")
