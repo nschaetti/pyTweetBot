@@ -63,13 +63,13 @@ class Action(Base):
             FriendsManager().unfollow(self.action_tweet_text)
         elif self.action_type == "Like":
             TweetBotConnector().like(self.action_tweet_id)
-            Tweeted.insert_retweet(self.action_tweet_id)
+            Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
         elif self.action_type == "Tweet":
             TweetBotConnector().tweet(self.action_tweet_text)
             Tweeted.insert_tweet(self.action_tweet_text)
         elif self.action_type == "Retweet":
             TweetBotConnector().retweet(self.action_tweet_id)
-            Tweeted.insert_retweet(self.action_tweet_id)
+            Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
         # end if
     # end
 
