@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Imports
-import db
+import db.obj
 from .TweetFactory import TweetFactory
 
 
@@ -140,7 +140,7 @@ class Tweet(object):
         Already tweeted?
         :return: True/False
         """
-        return db.Tweeted.exists(self)
+        return db.obj.Tweeted.exists(self)
     # end already_tweeted
 
     ######################################
