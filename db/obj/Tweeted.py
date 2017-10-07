@@ -28,6 +28,7 @@ from sqlalchemy import Column, String, BigInteger, DateTime, or_
 from .Base import Base
 import tweet as tw
 import db
+import tweepy
 
 
 # Tweet
@@ -62,13 +63,13 @@ class Tweeted(Base):
 
     # Insert a new retweeted
     @staticmethod
-    def insert_retweet(tweet_id):
+    def insert_retweet(tweet_id, tweet_text):
         """
         Insert a new retweeted
         :param tweet_id: Tweet's ID
         :param tweet_text: Tweet's text
         """
-        db.DBConnector().get_session().add(Tweeted(tweet_tweet_id=tweet_id, tweet_tweet_text=u""))
+        db.DBConnector().get_session().add(Tweeted(tweet_tweet_id=tweet_id, tweet_tweet_text=tweet_text))
     # end insert_tweet
 
     # Tweet exists
@@ -79,13 +80,17 @@ class Tweeted(Base):
         :param tweet:
         :return:
         """
-        if tweet is tw.Tweet:
+        if type(tweet) is tweepy.models.Status:
+            return db.DBConnector().get_session().query(Tweeted).filter(
+                or_(Tweeted.tweet_tweet_text == tweet.text,
+                    Tweeted.tweet_tweet_id == tweet.id)).count() > 0
+        if type(tweet) is tw.Tweet:
             return db.DBConnector().get_session().query(Tweeted).filter(
                 or_(Tweeted.tweet_tweet_text == tweet.get_text(),
                     Tweeted.tweet_tweet_url == tweet.get_url())).count() > 0
-        elif tweet is unicode:
+        elif type(tweet) is unicode:
             return db.DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_text == tweet).count() > 0
-        elif tweet is int:
+        elif type(tweet) is int:
             return db.DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_id == tweet).count() > 0
         # end if
     # end exists
