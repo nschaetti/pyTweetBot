@@ -230,6 +230,7 @@ if __name__ == "__main__":
     github_tweets_parser = command_subparser.add_parser("find-github-tweets")
     add_default_arguments(github_tweets_parser)
     github_tweets_parser.add_argument("--depth", type=int, help="Number of contributions to tweet per repo", default=-1)
+    github_tweets_parser.add_argument("--event-type", type=str, help="Event type to tweet (push, create)", default="push")
 
     # Parse
     args = parser.parse_args()
@@ -336,7 +337,7 @@ if __name__ == "__main__":
         # end if
     # Find Github tweets
     elif args.command == "find-github-tweets":
-        find_github_tweets(config, action_scheduler, args.depth)
+        find_github_tweets(config, action_scheduler, args.event_type, args.depth)
     # Unknown command
     else:
         sys.stderr.write(u"Unknown command {}\n".format(args.command))
