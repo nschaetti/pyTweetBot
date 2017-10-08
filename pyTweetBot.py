@@ -39,6 +39,7 @@ from find_likes import find_likes
 from find_follows import find_follows
 from find_unfollows import find_unfollows
 from find_quotes import find_quotes
+from find_github_tweets import find_github_tweets
 from tweet_dataset import tweet_dataset
 from retweet_dataset import retweet_dataset
 from model_training import model_training
@@ -225,6 +226,11 @@ if __name__ == "__main__":
     executor_parser.add_argument("--break-time", action='store_true',
                                  help="Show break duration between execution for the current time", default=False)
 
+    # GitHub tweets
+    github_tweets_parser = command_subparser.add_parser("find-github-tweets")
+    add_default_arguments(github_tweets_parser)
+    github_tweets_parser.add_argument("--depth", type=int, help="Number of contributions to tweet per repo", default=-1)
+
     # Parse
     args = parser.parse_args()
 
@@ -328,6 +334,9 @@ if __name__ == "__main__":
         if args.update:
             friends_manager.update()
         # end if
+    # Find Github tweets
+    elif args.command == "find-github-tweets":
+        find_github_tweets(config, action_scheduler, args.depth)
     # Unknown command
     else:
         sys.stderr.write(u"Unknown command {}\n".format(args.command))
