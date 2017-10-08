@@ -115,7 +115,7 @@ def create_tweet_text(contrib_counter, contrib_date, project_name, project_url, 
 # Main function
 ####################################################
 
-def find_github_tweets(config, action_scheduler, depth=-1):
+def find_github_tweets(config, action_scheduler, event_type="push", depth=-1):
     """
     Find tweet in the hunters
     :param config:
@@ -158,7 +158,7 @@ def find_github_tweets(config, action_scheduler, depth=-1):
             # For each events
             for event in repo.get_events():
                 # Only pushes
-                if event.type == u"PushEvent":
+                if event.type == u"PushEvent" and event_type == "push":
                     # Same day?
                     if contrib_date is not None and event.created_at.year == contrib_date.year and event.created_at.month == contrib_date.month and event.created_at.day == contrib_date.day:
                         contrib_counter += 1
@@ -194,6 +194,8 @@ def find_github_tweets(config, action_scheduler, depth=-1):
                         # Reset counter and date
                         contrib_counter = event.payload['size']
                         contrib_date = event.created_at
+                elif event.type == u"CreateEvent" and event_type == "create":
+                    pass
                 # end if
             # end for
         # end if
