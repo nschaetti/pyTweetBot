@@ -194,7 +194,7 @@ class ActionScheduler(Thread):
         Add a tweet action in the DB
         :param tweet: Text of the Tweet or Tweet object.
         """
-        if tweet is unicode or tweet is str:
+        if type(tweet) is unicode or type(tweet) is str:
             self._add_text_action("Tweet", tweet)
         else:
             self._add_text_action("Tweet", tweet.get_tweet())
