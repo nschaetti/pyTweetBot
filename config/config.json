@@ -65,5 +65,12 @@
         "login" : "",
         "password" : "",
         "hashtags" : []
-    }
+    },
+	"github" :
+	{
+		"login": "",
+		"password": "",
+		"exclude": [],
+		"topics" : []
+	}
 }
