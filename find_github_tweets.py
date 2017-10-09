@@ -111,10 +111,51 @@ def create_tweet_text(contrib_counter, contrib_date, project_name, project_url, 
 # end create_tweet_text
 
 
+# Create tweet text for repo creation
+def create_tweet_text_create(project_name, project_description, project_url, topics):
+    """
+    Create tweet text for repo creation
+    :param project_name:
+    :param project_description:
+    :param project_url:
+    :param topics:
+    :return:
+    """
+    # Tweet text
+    tweet_text = u"Check my project {} on #GitHub : {}".format \
+    (
+        project_name,
+        project_description
+    )
+
+    # Check Tweet length
+    if len(tweet_text) + 21 > 180:
+        # Not wanted chars
+        overflow_text = 180 - (len(tweet_text) + 21)
+
+        # Remove
+        tweet_text = tweet_text[:-overflow_text-3] + u"..."
+    # end if
+
+    # Add topics
+    for topic in topics:
+        if len(u"{} #{}".format(tweet_text, topic)) + 21 < 140:
+            tweet_text = u"{} #{}".format(tweet_text, topic)
+        else:
+            break
+        # end if
+    # end for
+
+    # Return with URL
+    return u"{} {}".format(tweet_text, project_url)
+# end create_tweet_text_create
+
+
 ####################################################
 # Main function
 ####################################################
 
+# Find Github informations to tweet
 def find_github_tweets(config, action_scheduler, event_type="push", depth=-1):
     """
     Find tweet in the hunters
@@ -142,6 +183,7 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1):
             # Project's name
             project_name = prepare_project_name(repo.name)
             project_url = u"https://github.com/{}/{}".format(project_name, login, repo.name)
+            project_description = repo.description
 
             # Topics
             if repo.name in topics:
@@ -195,29 +237,12 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1):
                         contrib_counter = event.payload['size']
                         contrib_date = event.created_at
                 elif event.type == u"CreateEvent" and event_type == "create":
-                    pass
+                    # Tweet text
+                    tweet_text = create_tweet_text_create(project_name, project_description, project_url, project_topics)
+                    print(tweet_text)
                 # end if
             # end for
         # end if
     # end for
 
-    # List repositories
-    """for repo in g.get_user().get_repos():
-        if not repo.private:
-            print(repo.name)
-            print(repo.description)
-            print(repo.contents_url)
-            print(repo.git_url)
-            print(repo.private)
-            print(repo.updated_at)
-            for event in repo.get_events():
-                if event.type == u"PushEvent":
-                    #print(u"Created at:{}, payload:{}, type:{}".format(event.created_at, event.payload, event.type))
-                    #print(event.type)
-                    print(u"{} contribution(s) at {}".format(event.payload['size'], event.created_at))
-                # end if
-            # end for
-            print(u"")
-        # end if
-    # end for"""
 # end if
