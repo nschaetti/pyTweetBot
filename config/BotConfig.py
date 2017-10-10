@@ -237,7 +237,7 @@ class BotConfig(object):
         :param key: Key of data
         :return: The value
         """
-        try
+        try:
             self._availability[key] = True
             return data[key]
         except KeyError:
