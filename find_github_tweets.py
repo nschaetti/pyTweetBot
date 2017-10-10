@@ -151,6 +151,33 @@ def create_tweet_text_create(project_name, project_description, project_url, top
 # end create_tweet_text_create
 
 
+# Add tweet to scheduler
+def add_tweet(action_scheduler, tweet_text):
+    """
+    Add tweet to scheduler
+    :param action_scheduler:
+    :param tweet_text:
+    :return:
+    """
+    # Add to scheduler
+    try:
+        logging.getLogger(u"pyTweetBot").info(u"Adding GitHub Tweet \"{}\" to the scheduler".format(
+            tweet_text))
+        action_scheduler.add_tweet(tweet_text)
+        return True
+    except ActionReservoirFullError:
+        logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
+        exit()
+        pass
+    except ActionAlreadyExists:
+        logging.getLogger(u"pyTweetBot").error(
+            u"Tweet \"{}\" already exists in the database".format(
+                tweet_text.encode('ascii', errors='ignore')))
+        return False
+    # end try
+# end add_tweet
+
+
 ####################################################
 # Main function
 ####################################################
@@ -211,20 +238,9 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1):
                             tweet_text = create_tweet_text(contrib_counter, contrib_date, project_name, project_url, project_topics)
 
                             # Add to scheduler
-                            try:
-                                logging.getLogger(u"pyTweetBot").info(u"Adding GitHub Tweet \"{}\" to the scheduler".format(
-                                    tweet_text))
-                                action_scheduler.add_tweet(tweet_text)
-                            except ActionReservoirFullError:
-                                logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
-                                exit()
-                                pass
-                            except ActionAlreadyExists:
-                                logging.getLogger(u"pyTweetBot").error(
-                                    u"Tweet \"{}\" already exists in the database".format(
-                                        tweet_text.encode('ascii', errors='ignore')))
+                            if not add_tweet(action_scheduler, tweet_text):
                                 break
-                            # end try
+                            # end if
 
                             # Check depth
                             tweet_count += 1
@@ -239,7 +255,9 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1):
                 elif event.type == u"CreateEvent" and event_type == "create":
                     # Tweet text
                     tweet_text = create_tweet_text_create(project_name, project_description, project_url, project_topics)
-                    print(tweet_text)
+
+                    # Add to scheduler
+                    add_tweet(action_scheduler, tweet_text)
                 # end if
             # end for
         # end if
