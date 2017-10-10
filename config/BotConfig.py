@@ -22,21 +22,63 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Imports
 import simplejson
 
+#############################################
+# Exceptions
+#############################################
 
-# Bot config
+# Exception raised when a required field is missing
+class MissingRequiredField(Exception):
+    """
+    Exception raised when a required field is missing
+    """
+    pass
+# end MissingRequiredField
+
+
+#############################################
+# CLASS
+#############################################
+
+# Read, parse and store configuration informations
 class BotConfig(object):
     """
-    Bot config
+    Read, parse and store configuration informations
     """
 
     # Constructor
-    def __init__(self, data=None):
+    def __init__(self, data):
         """
         Constructor.
-        :param data:
+        :param data: Dictionary containing settings
         """
+        # Required states
+        self._required_states = \
+        {
+            'database': True,
+            'twitter': True,
+            'friends': False,
+            'direct_message': False,
+            'news_settings': False,
+            'news': False,
+            'retweet': False,
+            'hashtags': False,
+            'rss': False,
+            'forbidden_words': False,
+            'email': False,
+            'scheduler': False,
+            'github': False
+        }
+
+        # Settings available
+        self._availability = dict()
+        for key in self._required_states:
+            self._availability[key] = False
+        # end for
+
+        # Load
         self._database = data['database']
         self._twitter = data['twitter']
         self._friends = data['friends']
@@ -56,19 +98,15 @@ class BotConfig(object):
     # Public
     ######################################
 
-    # Load configuration file.
-    @staticmethod
-    def load(config_file):
+    # Get database settings
+    @property
+    def database_settings(self):
         """
-        Load the configuration file
-        :param config_file: Configuration filename.
-        :return: PyTweetBotConfig object.
+        Get database settings
+        :return: Database settings (username, password, database)
         """
-        with open(config_file, 'r') as json_file:
-            data = simplejson.load(json_file)
-        # end with
-        return BotConfig(data)
-    # end load
+        return self._database
+    # end database_config
 
     # Get database information.
     def get_database_config(self):
@@ -192,19 +230,42 @@ class BotConfig(object):
     ######################################
 
     # Get a field
-    @staticmethod
-    def get_field(data, key):
+    def _get_field(self, data, key, required=False):
         """
         Get a field
         :param data: Data
         :param key: Key of data
         :return: The value
         """
-        try:
+        try
+            self._availability[key] = True
             return data[key]
         except KeyError:
-            return []
+            if not required:
+                self._availability[key] = False
+                return []
+            else:
+                raise MissingRequiredField(u"The required field {} is missing in configuration file".format(key))
+            # end if
         # end try
     # end _get_field
+
+    ######################################
+    # Static
+    ######################################
+
+    # Load configuration file.
+    @staticmethod
+    def load(config_file):
+        """
+        Load the configuration file
+        :param config_file: Configuration filename.
+        :return: PyTweetBotConfig object.
+        """
+        with open(config_file, 'r') as json_file:
+            data = simplejson.load(json_file)
+        # end with
+        return BotConfig(data)
+    # end load
 
 # end BotConfig
