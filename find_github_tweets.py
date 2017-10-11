@@ -37,6 +37,8 @@ from tweet.TweetFinder import TweetFinder
 from tweet.TweetFactory import TweetFactory
 from learning.CensorModel import CensorModel
 from news.PageParser import PageParser, PageParserRetrievalError
+from twitter.TweetBotConnect import TweetBotConnector
+import db.obj
 
 ####################################################
 # Globals
@@ -183,7 +185,7 @@ def add_tweet(action_scheduler, tweet_text):
 ####################################################
 
 # Find Github informations to tweet
-def find_github_tweets(config, action_scheduler, event_type="push", depth=-1):
+def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, instantaneous=False, waiting_time=0):
     """
     Find tweet in the hunters
     :param config:
@@ -238,8 +240,19 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1):
                             tweet_text = create_tweet_text(contrib_counter, contrib_date, project_name, project_url, project_topics)
 
                             # Add to scheduler
-                            if not add_tweet(action_scheduler, tweet_text):
-                                break
+                            # if not instantaneous
+                            if not instantaneous:
+                                if not add_tweet(action_scheduler, tweet_text):
+                                    break
+                                # end if
+                            else:
+                                TweetBotConnector.tweet(tweet_text)
+                                db.obj.Tweeted.insert_tweet(tweet_text)
+                            # end if
+
+                            # Waiting time
+                            if waiting_time > 0:
+                                time.sleep(waiting_time)
                             # end if
 
                             # Check depth
