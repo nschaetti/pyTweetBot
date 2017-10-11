@@ -29,6 +29,7 @@ import simplejson
 # Exceptions
 #############################################
 
+
 # Exception raised when a required field is missing
 class MissingRequiredField(Exception):
     """
@@ -82,15 +83,15 @@ class BotConfig(object):
         self._database = data['database']
         self._twitter = data['twitter']
         self._friends = data['friends']
-        self._direct_message = BotConfig.get_field(data, 'direct_message')
-        self._news_settings = BotConfig.get_field(data, 'news_settings')
-        self._news = BotConfig.get_field(data, 'news')
-        self._retweet = BotConfig.get_field(data, 'retweet')
-        self._hashtags = BotConfig.get_field(data, 'hashtags')
-        self._rss = BotConfig.get_field(data, 'rss')
-        self._forbidden_words = BotConfig.get_field(data, 'forbidden_words')
+        self._direct_message = self._get_field(data, 'direct_message')
+        self._news_settings = self._get_field(data, 'news_settings')
+        self._news = self._get_field(data, 'news')
+        self._retweet = self._get_field(data, 'retweet')
+        self._hashtags = self._get_field(data, 'hashtags')
+        self._rss = self._get_field(data, 'rss')
+        self._forbidden_words = self._get_field(data, 'forbidden_words')
         self._email = data['email']
-        self._scheduler_config = BotConfig.get_field(data, 'scheduler')
+        self._scheduler_config = self._get_field(data, 'scheduler')
         self._github_config = data['github']
     # end __init__
 
