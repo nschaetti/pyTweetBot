@@ -67,7 +67,7 @@ def signal_handler(signum, frame):
 # Main function
 ####################################################
 
-def find_tweets(config, model, action_scheduler, features):
+def find_tweets(config, model, action_scheduler, features, n_pages=2):
     """
     Find tweet in the hunters
     :param config:
@@ -128,7 +128,7 @@ def find_tweets(config, model, action_scheduler, features):
     for news in config.get_news_config():
         for language in news['languages']:
             for country in news['countries']:
-                tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country))
+                tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, hashtags=news['hashtags'], n_pages=n_pages))
             # end for
         # end for
     # end for
