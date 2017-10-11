@@ -38,12 +38,9 @@ class TweetFactory(object):
         cleaned_text = text.replace(u'\n', u'').replace(u'\r', u'')
 
         # Replace words by hashtags
-        hashtags_text = self._replace_hashtags(cleaned_text)
+        cleaned_text = self._replace_hashtags(cleaned_text)
 
-        # Add hashtags
-        hashtags_text = self._add_hashtags(cleaned_text)
-
-        return hashtags_text
+        return cleaned_text
     # end __call__
 
     ##########################################
@@ -165,21 +162,5 @@ class TweetFactory(object):
         # end for
         return text.replace(u"##", u"#").replace(u"##", u"#").replace(u"##", u"#")
     # end replace_hashtags
-
-    # Add hashtags
-    def _add_hashtags(self, text):
-        """
-        Add hashtags
-        :param text:
-        :return:
-        """
-        # For each hashtag
-        for hashtag in self._hashtags:
-            if len(u"{} #{}".format(tweet_text, topic)) + 21 < 140:
-                tweet_text = u"{} #{}".format(tweet_text, topic)
-            else:
-                break
-            # end if
-        # end for
 
 # end TweetPreparator
