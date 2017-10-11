@@ -231,6 +231,8 @@ if __name__ == "__main__":
     add_default_arguments(github_tweets_parser)
     github_tweets_parser.add_argument("--depth", type=int, help="Number of contributions to tweet per repo", default=-1)
     github_tweets_parser.add_argument("--event-type", type=str, help="Event type to tweet (push, create)", default="push")
+    github_tweets_parser.add_argument("--instantaneous", action='store_true', help="Directly post tweets?", default=False)
+    github_tweets_parser.add_argument("--waiting-time", type=int, help="Waiting time between each tweets (default=0)", default=0)
 
     # Parse
     args = parser.parse_args()
@@ -337,7 +339,7 @@ if __name__ == "__main__":
         # end if
     # Find Github tweets
     elif args.command == "find-github-tweets":
-        find_github_tweets(config, action_scheduler, args.event_type, args.depth)
+        find_github_tweets(config, action_scheduler, args.event_type, args.depth, args.instantaneous, args.waiting_time)
     # Unknown command
     else:
         sys.stderr.write(u"Unknown command {}\n".format(args.command))
