@@ -102,9 +102,9 @@ class Tweet(object):
 
         # Add hashtags
         for hashtag in self._hashtags:
-            if total_length + len(hashtag) <= 140:
+            if total_length + len(hashtag) + 1 <= 140:
                 final_text += " " + hashtag
-                total_length += len(hashtag)
+                total_length += len(hashtag) + 1
             # end if
         # end for
 
