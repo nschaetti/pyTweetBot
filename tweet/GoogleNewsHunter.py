@@ -16,7 +16,7 @@ class GoogleNewsHunter(Hunter):
     """
 
     # Constructor
-    def __init__(self, search_term, lang, country, n_pages=2):
+    def __init__(self, search_term, lang, country, hashtags, n_pages=2):
         """
         Constructor
         :param search_term: Search term
@@ -26,6 +26,7 @@ class GoogleNewsHunter(Hunter):
         self._search_term = search_term
         self._lang = lang
         self._country = country
+        self._hashtags = hashtags
         self._n_pages = n_pages
         self._google_news_client = GoogleNewsClient(search_term, lang, country)
         self._news = list()
@@ -65,10 +66,12 @@ class GoogleNewsHunter(Hunter):
                                                                                    self._country))
             return self.next()
         # end try
+
+        # Remove from list
         self._news.remove(current_news)
 
         # Return
-        return Tweet(text=current_news[1], url=current_news[0])
+        return Tweet(text=current_news[1], url=current_news[0], hashtags=self._hashtags)
     # end next
 
 # end GoogleNewsHunter
