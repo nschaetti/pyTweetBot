@@ -93,7 +93,7 @@ def create_tweet_text(contrib_counter, contrib_date, project_name, project_url, 
     :return:
     """
     # Tweet text
-    tweet_text = u"I made {} contributions on {} to #{}, #GitHub".format\
+    tweet_text = u"I made {} contributions on {} to project #{}, #GitHub".format\
     (
             contrib_counter,
             contrib_date.strftime('%B %d'),
@@ -211,7 +211,7 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, in
         if not repo.private and repo.name not in exclude:
             # Project's name
             project_name = prepare_project_name(repo.name)
-            project_url = u"https://github.com/{}/{}".format(project_name, login, repo.name)
+            project_url = u"https://github.com/{}/{}".format(login, project_name, repo.name)
             project_description = repo.description
 
             # Topics
@@ -246,7 +246,7 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, in
                                     break
                                 # end if
                             else:
-                                TweetBotConnector.tweet(tweet_text)
+                                TweetBotConnector().tweet(tweet_text)
                                 db.obj.Tweeted.insert_tweet(tweet_text)
                             # end if
 
