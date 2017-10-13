@@ -248,7 +248,7 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, in
                                     # end if
                                 else:
                                     TweetBotConnector().tweet(tweet_text)
-                                    db.obj.Tweeted.insert_tweet(tweet_text)
+                                    db.obj.Tweeted().insert_tweet(tweet_text)
                                 # end if
                             # end if
 
