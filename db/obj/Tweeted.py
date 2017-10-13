@@ -59,6 +59,7 @@ class Tweeted(Base):
         :return:
         """
         db.DBConnector().get_session().add(Tweeted(tweet_tweet_text=tweet_text))
+        db.DBConnector().get_session().commit()
     # end insert_tweet
 
     # Insert a new retweeted
@@ -70,6 +71,7 @@ class Tweeted(Base):
         :param tweet_text: Tweet's text
         """
         db.DBConnector().get_session().add(Tweeted(tweet_tweet_id=tweet_id, tweet_tweet_text=tweet_text))
+        db.DBConnector().get_session().commit()
     # end insert_tweet
 
     # Tweet exists
