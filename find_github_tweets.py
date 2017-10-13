@@ -241,13 +241,15 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, in
 
                             # Add to scheduler
                             # if not instantaneous
-                            if not instantaneous:
-                                if not add_tweet(action_scheduler, tweet_text):
-                                    break
+                            if not db.obj.Tweeted.exists(tweet_text):
+                                if not instantaneous:
+                                    if not add_tweet(action_scheduler, tweet_text):
+                                        break
+                                    # end if
+                                else:
+                                    TweetBotConnector().tweet(tweet_text)
+                                    db.obj.Tweeted.insert_tweet(tweet_text)
                                 # end if
-                            else:
-                                TweetBotConnector().tweet(tweet_text)
-                                db.obj.Tweeted.insert_tweet(tweet_text)
                             # end if
 
                             # Waiting time
