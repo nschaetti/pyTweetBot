@@ -138,7 +138,7 @@ class FriendsManager(object):
         :param screen_name: Friend's screen name
         :return: True or False
         """
-        return len(self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name and db.obj.Friend.friend_following)) > 0
+        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name and db.obj.Friend.friend_following).count > 0
     # end is_following
 
     # Get obsolete friends
