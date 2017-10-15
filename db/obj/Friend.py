@@ -29,10 +29,10 @@ from sqlalchemy.types import Enum
 from .Base import Base
 
 
-# Friend
+# Friend (follower/following) in the database
 class Friend(Base):
     """
-    Friend
+    Friend (follower/following) in the database
     """
 
     # Table name
@@ -52,5 +52,80 @@ class Friend(Base):
     friend_statuses_count = Column(Integer, nullable=False, default=0)
     friend_special = Column(Boolean, nullable=False, default=False)
     friend_last_update = Column(DateTime, nullable=False, default=datetime.datetime.now())
+
+    ######################################################
+    # PROPERTIES
+    ######################################################
+
+    # Is the friend a follower?
+    @property
+    def follower(self):
+        """
+        Is the friend a follower?
+        :return: True if follower, False otherwise
+        """
+        return self.friend_follower
+    # end follower
+
+    # Set the friend as follower
+    @follower.setter
+    def follower(self, follow):
+        """
+        Set the friend as follower
+        :param follow: True if set as follower, False if not
+        """
+        # Something to change?
+        if follow != self.follower:
+            # Change
+            self.friend_follower = follow
+        # end if
+    # end follower
+
+    # Is the friend a following
+    @property
+    def following(self):
+        """
+        Is the friend a following
+        :return: True if following, False otherwise
+        """
+        return self.friend_following
+    # end is_following
+
+    # Set the friend as following
+    @following.setter
+    def following(self, following):
+        """
+        Set the friend as following
+        :param following: True if following, False otherwise
+        """
+        # Something to change
+        if following != self.following:
+            # Change
+            self.friend_following = following
+        # end if
+    # end following
+
+    ######################################################
+    # PUBLIC FUNCTIONS
+    ######################################################
+
+    ######################################################
+    # STATIC FUNCTIONS
+    ######################################################
+
+    # Get a friend by it's screen name or id
+    @staticmethod
+    def get_friend(name_or_id):
+        """
+        Get a friend by it's screen name
+        :param name_or_id:
+        :return:
+        """
+        if type(name_or_id) == int:
+            pass
+        elif type(name_or_id) == str or type(name_or_id) == unicode:
+            pass
+        # end if
+    # end get_friend
 
 # end Friend

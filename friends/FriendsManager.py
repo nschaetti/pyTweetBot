@@ -1,29 +1,50 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+# File : FriendsManager.py
+# Description : A class to manage followers and following in the database and the links
+# between the DB and the Twitter manager class.
+# Auteur : Nils Schaetti <n.schaetti@gmail.com>
+# Lieu : Nyon, Suisse
+#
+# This file is part of the pyTweetBot.
+# The pyTweetBot is a set of free software:
+# you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# pyTweetBot is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import datetime
-#from db.DBConnector import DBConnector
 import executor
 import db
 import db.obj
-#from db.obj.Friend import Friend
-#from db.obj.Statistic import Statistic
 from patterns.singleton import singleton
 from twitter.TweetBotConnect import TweetBotConnector
-from sqlalchemy import update, delete, select
+import twitter
+from sqlalchemy import update, delete
 from sqlalchemy.orm import load_only
-from sqlalchemy import or_, and_, not_
+from sqlalchemy import and_, not_
 import time
 import logging
 from datetime import timedelta
 import tweepy
 
 
+# The class manage followers and following in the database and do
+# the links between the DB and the Twitter management part.
 @singleton
 class FriendsManager(object):
     """
-    Class to manager friendships
+    The class manage followers and following in the database and do
+    the links between the DB and the Twitter management part.
     """
 
     # Constructor
@@ -35,16 +56,68 @@ class FriendsManager(object):
         self._session = db.DBConnector().get_session()
 
         # Twitter connection
-        self._twitter_con = TweetBotConnector()
+        self._twitter_con = twitter.TweetBotConnector()
 
         # Logger
         self._logger = logging.getLogger(name=u"pyTweetBot")
     # end __init__
 
     ######################################################
-    #
+    # PROPERTIES
+    ######################################################
+
+    # Get the number of followers
+    @property
+    def n_followers(self):
+        """
+        Get the nunber of followers.
+        :return: The number of followers.
+        """
+        return TweetBotConnector().get_user().followers_count
+    # end n_followers
+
+    # Get the number of following
+    @property
+    def n_followings(self):
+        """
+        Get the number of following.
+        :return: The number of following.
+        """
+        return TweetBotConnector().get_user().friends_count
+    # end n_followers
+
+    # Get followers cursor
+    @property
+    def followers_cursor(self):
+        """
+        Get followers cursor
+        :return: Followers cursor
+        """
+        return tweepy.Cursor(self._api.followers)
+    # end followers_cursor
+
+    # Get followers
+    @property
+    def followers(self):
+        """
+        Get followers
+        :return: A list of Friend objects
+        """
+        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_follower).all()
+    # end get_followers
+
+    # Get following
+    @property
+    def followings(self):
+        """
+        Get following
+        :return: A list of friend objects
+        """
+        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_following).all()
+    # end get_following
+
+    ######################################################
     # PUBLIC FUNCTIONS
-    #
     ######################################################
 
     # Is friend a follower?
@@ -120,20 +193,29 @@ class FriendsManager(object):
         """
         Follow a Twitter account
         :param screen_name: User's screen name
-        :return: True or False if succeeded
+        :return: True if followed, False is already followed
         """
-        # Following on Twitter
-        TweetBotConnector().follow(screen_name)
+        # Follow if needed
+        if not self.is_following(screen_name=screen_name):
+            # Following on Twitter
+            TweetBotConnector().follow(screen_name)
 
-        # Get the Twitter user
-        twf = TweetBotConnector().get_user(screen_name)
+            # Get the Twitter user
+            twf = TweetBotConnector().get_user(screen_name)
 
-        # Add friend in the DB
-        self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
-                         twf.friends_count, twf.statuses_count)
+            # Add friend in the DB (if needed)
+            self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
+                             twf.friends_count, twf.statuses_count)
 
-        # Change DB
-        self._set_following(screen_name, True)
+            # Change DB
+            self._set_following(screen_name, True)
+
+            # Followed
+            return True
+        # end if
+
+        # Nothing
+        return False
     # end follow
 
     # Unfollow a Twitter account
@@ -143,11 +225,20 @@ class FriendsManager(object):
         :param screen_name: User's scree name
         :return: True of False if succeeded
         """
-        # Unfollowing on Twitter
-        TweetBotConnector().unfollow(screen_name)
+        # Unfollow if possible
+        if self.is_following(screen_name=screen_name):
+            # Unfollowing on Twitter
+            TweetBotConnector().unfollow(screen_name)
 
-        # Change DB
-        self._set_following(screen_name, False)
+            # Change DB
+            self._set_following(screen_name, False)
+
+            # Unfollowed
+            return True
+        # end if
+
+        # Nothing
+        return False
     # end unfollow
 
     # Update followers and following
@@ -170,24 +261,6 @@ class FriendsManager(object):
         return n_follower, d_follower, n_following, d_following
     # end update
 
-    # Get the number of followers
-    def n_followers(self):
-        """
-        Get the nunber of followers.
-        :return: The number of followers.
-        """
-        return TweetBotConnector().get_user().followers_count
-    # end n_followers
-
-    # Get the number of following
-    def n_following(self):
-        """
-        Get the nunber of following.
-        :return: The number of following.
-        """
-        return TweetBotConnector().get_user().friends_count
-    # end n_followers
-
     # Get followers cursor
     def get_followers_cursor(self):
         """
@@ -201,13 +274,19 @@ class FriendsManager(object):
     def update_statistics(self):
         """
         Insert a value in the statistics table.
+        :return:
         """
+        # New statistic object
         statistic = db.obj.Statistic(statistic_friends_count=self.n_following(),
                                      statistic_followers_count=self.n_followers(),
                                      statistic_statuses_count=executor.ActionScheduler().n_statuses())
+
+        # Add the statistic
         self._session.add(statistic)
+
+        # Commit changes
         self._session.commit()
-        return self.n_followers(), self.n_following(), executor.ActionScheduler().n_statuses()
+        return self.n_followers, self.n_following, executor.ActionScheduler().n_statuses()
     # end _insert_statistic
 
     # Get followers
@@ -304,7 +383,7 @@ class FriendsManager(object):
         Set this friend as following.
         :param screen_name:
         :param following:
-        :return:
+        :return: Counter of new following (-1 <= 0 <= 1)
         """
         # Friend
         friend = self.get_friend_by_name(screen_name)
@@ -341,9 +420,9 @@ class FriendsManager(object):
     def _update_friends(self, cursor, follower=True):
         """
         Update friends
-        :param cursor: Tweepy cursor.
-        :param follower: Update followers?
-        :return: Number of new entries
+        :param cursor: Tweepy cursor
+        :param follower: Update followers (True) or following (False)?
+        :return: New entries counter, Deleted entries counter
         """
         # Get current friends.
         if follower:
@@ -367,7 +446,7 @@ class FriendsManager(object):
         while not finished:
             try:
                 for page in cursor.pages():
-                    # For each follower
+                    # For each friends
                     for twf in page:
                         # Add this friend if necessary
                         counter += self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
@@ -392,6 +471,7 @@ class FriendsManager(object):
                 # end for
                 finished = True
             except tweepy.error.RateLimitError:
+                # Rate limit reached, wait 5 minutes
                 time.sleep(300)
                 pass
             # end try
