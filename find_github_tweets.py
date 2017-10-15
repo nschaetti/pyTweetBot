@@ -131,17 +131,17 @@ def create_tweet_text_create(project_name, project_description, project_url, top
     )
 
     # Check Tweet length
-    if len(tweet_text) + 21 > 180:
+    if len(tweet_text) + 21 > 130:
         # Not wanted chars
-        overflow_text = 180 - (len(tweet_text) + 21)
+        overflow_text = 140 - (len(tweet_text) + 21)
 
         # Remove
-        tweet_text = tweet_text[:-overflow_text-3] + u"..."
+        tweet_text = tweet_text[:overflow_text-10] + u"..."
     # end if
 
     # Add topics
     for topic in topics:
-        if len(u"{} #{}".format(tweet_text, topic)) + 21 < 140:
+        if len(u"{} #{}".format(tweet_text, topic)) + 21 < 130:
             tweet_text = u"{} #{}".format(tweet_text, topic)
         else:
             break
@@ -178,6 +178,31 @@ def add_tweet(action_scheduler, tweet_text):
         return False
     # end try
 # end add_tweet
+
+
+# Compute tweet
+def compute_tweet(tweet_text, action_scheduler, instantaneous):
+    """
+
+    :param tweet_text:
+    :param action_scheduler:
+    :param instantaneous:
+    :return:
+    """
+    # if not instantaneous
+    if not db.obj.Tweeted.exists(tweet_text):
+        if not instantaneous:
+            if not add_tweet(action_scheduler, tweet_text):
+                return False
+            # end if
+        else:
+            TweetBotConnector().tweet(tweet_text)
+            db.obj.Tweeted().insert_tweet(tweet_text)
+        # end if
+    # end if
+
+    return True
+# end compute_tweet
 
 
 ####################################################
@@ -239,17 +264,9 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, in
                             # Tweet text
                             tweet_text = create_tweet_text(contrib_counter, contrib_date, project_name, project_url, project_topics)
 
-                            # Add to scheduler
-                            # if not instantaneous
-                            if not db.obj.Tweeted.exists(tweet_text):
-                                if not instantaneous:
-                                    if not add_tweet(action_scheduler, tweet_text):
-                                        break
-                                    # end if
-                                else:
-                                    TweetBotConnector().tweet(tweet_text)
-                                    db.obj.Tweeted().insert_tweet(tweet_text)
-                                # end if
+                            # Compute
+                            if not compute_tweet(tweet_text, action_scheduler, instantaneous):
+                                break
                             # end if
 
                             # Waiting time
@@ -267,12 +284,17 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, in
                         # Reset counter and date
                         contrib_counter = event.payload['size']
                         contrib_date = event.created_at
-                elif event.type == u"CreateEvent" and event_type == "create":
+                elif event.type == u"CreateEvent" and event_type == "create" and event.payload['ref_type'] == u"repository":
                     # Tweet text
-                    tweet_text = create_tweet_text_create(project_name, project_description, project_url, project_topics)
+                    tweet_text = TweetFactory()(create_tweet_text_create(project_name, project_description, project_url, project_topics))
 
-                    # Add to scheduler
-                    add_tweet(action_scheduler, tweet_text)
+                    # Compute
+                    compute_tweet(tweet_text, action_scheduler, instantaneous)
+
+                    # Waiting time
+                    if waiting_time > 0:
+                        time.sleep(waiting_time)
+                    # end if
                 # end if
             # end for
         # end if
