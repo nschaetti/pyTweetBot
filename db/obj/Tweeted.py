@@ -58,6 +58,7 @@ class Tweeted(Base):
         :param tweet_text: Tweet's text
         :return:
         """
+        print(u"Insert tweet {}".format(tweet_text))
         db.DBConnector().get_session().add(Tweeted(tweet_tweet_text=tweet_text))
         db.DBConnector().get_session().commit()
     # end insert_tweet
