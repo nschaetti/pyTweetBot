@@ -9,7 +9,11 @@ from .Tweet import Tweet
 import logging
 
 
+# Find new tweets from RSS streams
 class RSSHunter(Hunter):
+    """
+    Find new tweets from RSS streams
+    """
 
     # Constructor
     def __init__(self, stream):
