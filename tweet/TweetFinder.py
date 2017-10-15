@@ -7,21 +7,31 @@ import random
 from textblob import TextBlob
 
 
+# Find new tweets from a set of
+# sources (Google News, RSS)
 class TweetFinder(Hunter):
+    """
+    Find new tweets from a set of
+    sources (Google News, RSS)
+    """
 
     # Constructor
-    def __init__(self, shuffle=False, polarity=0.0, subjectivity=0.5, languages=['en']):
+    def __init__(self, shuffle=False, tweet_factory=None):
         """
         Constructor
+        :param shuffle: Shuffle hunters before iterating?
+        :param tweet_factory: The tweet factory object
         """
         self._hunters = list()
         self._current = 0
         self._n_hunters = 0
         self._shuffle = shuffle
-        self._polarity = polarity
-        self._subjectivity = subjectivity
-        self._languages = languages
+        self._tweet_factory = tweet_factory
     # end __init__
+
+    ######################################################
+    # PUBLIC FUNCTIONS
+    ######################################################
 
     # Add an hunter
     def add(self, hunter):
@@ -48,8 +58,42 @@ class TweetFinder(Hunter):
         self._n_hunters -= 1
     # end remove
 
+    # Set the tweet factory
+    def set_factory(self, tweet_factory):
+        """
+        Set the tweet factory
+        :param tweet_factory: The tweet facgory
+        """
+        self._tweet_factory = tweet_factory
+    # end set_factory
+
+    ######################################################
+    # PRIVATE
+    ######################################################
+
+    # Generate the tweet
+    def _to_the_factory(self, tweet_text):
+        """
+        Generate the tweet
+        :param tweet_text: Text to transform
+        :return: The transformed text by factory
+        """
+        if self._tweet_factory is not None:
+            return self._tweet_factory(tweet_text)
+        # end if
+        return tweet_text
+    # end _to_the_factory
+
+    ######################################################
+    # OVERRIDE
+    ######################################################
+
     # Iterator
     def __iter__(self):
+        """
+        Iterator
+        :return:
+        """
         return self
     # end __iter__
 
@@ -63,10 +107,10 @@ class TweetFinder(Hunter):
             raise StopIteration
         else:
             try:
-                return self._hunters[self._current].next()
+                return self._to_the_factory(self._hunters[self._current].next())
             except StopIteration:
                 self._current += 1
-                return self.next()
+                return self._to_the_factory(self.next())
             # end try
         # end if
     # end next
