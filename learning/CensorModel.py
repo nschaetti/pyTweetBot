@@ -23,14 +23,12 @@
 #
 
 # Imports
-import pickle
-from .Model import Model
 
 
 # Forbidden words classifier
 class CensorModel(object):
     """
-    Forbidden words
+    Forbidden words classifier
     """
 
     # Constructor
@@ -66,7 +64,7 @@ class CensorModel(object):
         # end for
 
         return 'pos', {'neg': 0.0, 'pos': 1.0}
-    # end _predict
+    # end __call__
 
     #################################################
     # Private
