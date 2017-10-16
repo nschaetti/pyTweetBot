@@ -99,9 +99,6 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, retwe
         bow.add(b)
     # end for
 
-    # Actions
-    actions = [u"retweet", u"like"]
-
     # For each retweet finders
     for retweet_finder in retweet_finders:
         # For each tweet
@@ -114,27 +111,19 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, retwe
 
                 # Predicted as tweet
                 if prediction == "pos" and censor_prediction == "pos" and not Tweeted.exists(retweet):
-                    # Decide which action (retweet, like)
-                    random_action = actions[random.randint(0, 2)-1]
-
                     # Try to add
                     try:
                         logging.getLogger(u"pyTweetBot").\
                         info(
-                            u"Adding {} ({}, \"{}\") to the scheduler".
+                            u"Adding retweet ({}, \"{}\") to the scheduler".
                             format(
-                                random_action,
                                 retweet.id,
                                 retweet.text.encode('ascii', errors='ignore')
                             )
                         )
 
                         # Add action
-                        if random_action == u"retweet":
-                            action_scheduler.add_retweet(retweet.id, retweet.text)
-                        else:
-                            action_scheduler.add_like(retweet.id, retweet.text)
-                        # end if
+                        action_scheduler.add_retweet(retweet.id, retweet.text)
                     except ActionReservoirFullError:
                         logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Retweet action, exiting...")
                         exit()
