@@ -1,6 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+# File : TweetFinder.py
+# Description : Tweet finder object.
+# Auteur : Nils Schaetti <n.schaetti@gmail.com>
+# Date : 16.10.2017 22:28:00
+# Lieu : Nyon, Suisse
+#
+# This file is part of the pyTweetBot.
+# The pyTweetBot is a set of free software:
+# you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# pyTweetBot is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 from .Hunter import Hunter
 import random
@@ -27,6 +47,32 @@ class TweetFinder(Hunter):
         self._n_hunters = 0
         self._shuffle = shuffle
         self._tweet_factory = tweet_factory
+        self._classifiers = list()
+
+        # Tokenizer
+        tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+
+        # Parse features
+        feature_list = features.split('+')
+
+        # Join features
+        bow = nsNLP.features.BagOfGrams()
+
+        # For each features
+        for bag in feature_list:
+            # Select features
+            if bag == 'words':
+                b = nsNLP.features.BagOfWords()
+            elif bag == 'bigrams':
+                b = nsNLP.features.BagOf2Grams()
+            elif bag == 'trigrams':
+                b = nsNLP.features.BagOf3Grams()
+            else:
+                sys.stderr.write(u"Unknown features type {}".format(features))
+                exit()
+            # end if
+            bow.add(b)
+            # end for
     # end __init__
 
     ######################################################
@@ -66,6 +112,15 @@ class TweetFinder(Hunter):
         """
         self._tweet_factory = tweet_factory
     # end set_factory
+
+    # Set classifier
+    def add_classifier(self, classifier):
+        """
+        Add a classifier
+        :param classifier:
+        """
+        self._classifiers.append(classifier)
+    # end add_classifier
 
     ######################################################
     # PRIVATE
