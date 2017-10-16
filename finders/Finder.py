@@ -1,0 +1,161 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# File : Finder.py
+# Description : Finder base class
+# Auteur : Nils Schaetti <n.schaetti@gmail.com>
+# Date : 16.10.2017 22:28:00
+# Lieu : Nyon, Suisse
+#
+# This file is part of the pyTweetBot.
+# The pyTweetBot is a set of free software:
+# you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# pyTweetBot is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import random
+import nsNLP
+
+
+# Finder base class
+class Finder(object):
+    """
+    Finder base class
+    """
+
+    # Constructor
+    def __init__(self):
+        """
+        Constructor
+        """
+        # Tokenizer
+        tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+
+        # Parse features
+        feature_list = features.split('+')
+
+        # Join features
+        bow = nsNLP.features.BagOfGrams()
+
+        # For each features
+        for bag in feature_list:
+            # Select features
+            if bag == 'words':
+                b = nsNLP.features.BagOfWords()
+            elif bag == 'bigrams':
+                b = nsNLP.features.BagOf2Grams()
+            elif bag == 'trigrams':
+                b = nsNLP.features.BagOf3Grams()
+            else:
+                sys.stderr.write(u"Unknown features type {}".format(features))
+                exit()
+            # end if
+            bow.add(b)
+            # end for
+    # end __init__
+
+    ######################################################
+    # PUBLIC FUNCTIONS
+    ######################################################
+
+    # Add an hunter
+    def add(self, hunter):
+        """
+        Add an hunter to the list
+        :param hunter:
+        :return:
+        """
+        self._hunters.append(hunter)
+        self._n_hunters += 1
+        if self._shuffle:
+            random.shuffle(self._hunters)
+        # end if
+    # end add
+
+    # Remove hunter
+    def remove(self, hunter):
+        """
+        Remove hunter
+        :param hunter:
+        :return:
+        """
+        self._hunters.remove(hunter)
+        self._n_hunters -= 1
+    # end remove
+
+    # Set the tweet factory
+    def set_factory(self, tweet_factory):
+        """
+        Set the tweet factory
+        :param tweet_factory: The tweet facgory
+        """
+        self._tweet_factory = tweet_factory
+    # end set_factory
+
+    # Set classifier
+    def add_classifier(self, classifier):
+        """
+        Add a classifier
+        :param classifier:
+        """
+        self._classifiers.append(classifier)
+    # end add_classifier
+
+    ######################################################
+    # PRIVATE
+    ######################################################
+
+    # Generate the tweet
+    def _to_the_factory(self, tweet_text):
+        """
+        Generate the tweet
+        :param tweet_text: Text to transform
+        :return: The transformed text by factory
+        """
+        if self._tweet_factory is not None:
+            return self._tweet_factory(tweet_text)
+        # end if
+        return tweet_text
+    # end _to_the_factory
+
+    ######################################################
+    # OVERRIDE
+    ######################################################
+
+    # Iterator
+    def __iter__(self):
+        """
+        Iterator
+        :return:
+        """
+        return self
+    # end __iter__
+
+    # Next
+    def next(self):
+        """
+        Next element
+        :return:
+        """
+        if self._current >= self._n_hunters:
+            raise StopIteration
+        else:
+            try:
+                return self._to_the_factory(self._hunters[self._current].next())
+            except StopIteration:
+                self._current += 1
+                return self._to_the_factory(self.next())
+            # end try
+        # end if
+    # end next
+
+# end TweetFinder
