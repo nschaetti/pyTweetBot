@@ -28,15 +28,13 @@ from datetime import timedelta
 import db
 import db.obj
 from twitter.TweetBotConnect import TweetBotConnector
-from sqlalchemy import desc
 from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
-import tweet.Tweet as tw
-import sys
 import time
 import tweepy
 from threading import Thread
+import random
 
 
 # Reservoir full exception
@@ -119,18 +117,30 @@ class ActionScheduler(Thread):
         Thread running function
         :return:
         """
-        while True:
-            # Execute actions
-            self()
+        # Config
+        scheduler_config = self._config.get_scheduler_config()
 
-            # Config
-            scheduler_config = self._config.get_scheduler_config()
+        # Waiting time
+        (min_time, max_time) = scheduler_config['waiting_times']
+
+        # Sleep time
+        (sleep_time, wake_time) = scheduler_config['sleep']
+
+        # Main loop
+        while True:
+            # Now
+            now_time = datetime.datetime.utcnow()
+
+            # Execute actions
+            if now_time.hour < sleep_time or now_time.hour > wake_time:
+                self()
+            # end if
 
             # Waiting time
             if self._stats_manager is not None:
                 waiting_seconds = self._stats_manager(datetime.datetime.utcnow(), scheduler_config['slope'], scheduler_config['beta'])
             else:
-                waiting_seconds = 900
+                waiting_seconds = random.randint(min_time*60, max_time*60)
             # end if
 
             # Log
