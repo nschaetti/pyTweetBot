@@ -31,10 +31,11 @@ import logging
 
 
 # Execute actions
-def execute_actions(action_scheduler):
+def execute_actions(action_scheduler, action_type):
     """
     Execute actions
     :param action_scheduler:
+    :param action_type:
     """
     # Start executing action
     logging.getLogger(u"pyTweetBot").info(u"Start executing action with scheduler...")
