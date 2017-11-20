@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : pyTweetBot.py
-# Description : pyTweetBot main execution file.
+# File : model_testing.py
+# Description : Function to test a model on a given dataset.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -27,10 +27,6 @@ import nsNLP
 import logging
 import os
 import sys
-import decimal
-import urllib
-from bs4 import BeautifulSoup
-from learning.Model import Model
 from learning.Dataset import Dataset
 
 
@@ -45,12 +41,14 @@ from learning.Dataset import Dataset
 
 
 # Test a classifier
-def model_testing(data_set_file, model_file, features='words', text_size=2000):
+def model_testing(data_set_file, model_file, features='words', text_size=2000, threshold=0.5):
     """
     Test a classifier
     :param data_set_file: Path to the dataset file
     :param model_file: Path to model file if needed
     :param features: Features
+    :param text_size: Minimum text size
+    :param threshold: Probability threshold
     """
     # Load model or create
     if os.path.exists(model_file):
@@ -106,7 +104,14 @@ def model_testing(data_set_file, model_file, features='words', text_size=2000):
             print(u"Testing sample {}".format(index))
 
             # Predict
-            prediction, probs = model(bow(tokenizer(text)))
+            _, probs = model(bow(tokenizer(text)))
+
+            # Threshold
+            if probs['pos'] > threshold:
+                prediction = 'pos'
+            else:
+                prediction = 'neg'
+            # end if
 
             # Save result
             confusion_matrix[prediction][c] += 1.0
