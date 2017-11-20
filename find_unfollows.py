@@ -47,13 +47,16 @@ from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullErr
 
 
 # Find user to unfollow to and add it to the DB
-def find_unfollows(config, friends_manager, model, action_scheduler, features):
+def find_unfollows(config, friends_manager, model, action_scheduler, features, threshold=0.5):
     """
     Find tweet to like and add it to the DB
-    :param config: Bot's configuration object
-    :param model: Classification model's file
-    :param action_scheduler: Action scheduler object
-    :return: Number of retweets added.
+    :param config:
+    :param friends_manager:
+    :param model:
+    :param action_scheduler:
+    :param features:
+    :param threshold:
+    :return:
     """
     # Load model
     if model is not None and os.path.exists(model):
@@ -115,11 +118,11 @@ def find_unfollows(config, friends_manager, model, action_scheduler, features):
     for friend in friends_manager.get_following():
         if not friend.friend_follower:
             # Predict class
-            prediction, _ = model(bow(tokenizer(friend.friend_description)))
+            prediction, probs = model(bow(tokenizer(friend.friend_description)))
             censor_prediction, _ = censor(friend.friend_description)
 
             # Predicted as unfollow
-            if prediction == 'neg' or censor_prediction == 'neg':
+            if prediction == 'neg' or censor_prediction == 'neg' or probs['pos'] < threshold:
                 try:
                     logging.getLogger(u"pyTweetBot").info(
                         u"Adding Friend \"{}\" to unfollow to the scheduler".format(friend.friend_screen_name))
