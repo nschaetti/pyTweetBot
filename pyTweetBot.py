@@ -35,7 +35,6 @@ from twitter.TweetBotConnect import TweetBotConnector
 from update_statistics import update_statistics
 from find_tweets import find_tweets
 from find_retweets import find_retweets
-from find_likes import find_likes
 from find_follows import find_follows
 from find_unfollows import find_unfollows
 from find_quotes import find_quotes
@@ -82,6 +81,8 @@ def add_model_argument(p, required):
     p.add_argument("--model", type=str, help="Classification model's file", required=required)
     p.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words",
                    required=required)
+    p.add_argument("--threshold", type=float, help="Probability threshold for the prediction to be positive",
+                   default=0.5, required=False)
 # end add_model_argument
 
 
@@ -277,22 +278,19 @@ if __name__ == "__main__":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
-        find_tweets(config, args.model, action_scheduler, args.features)
+        find_tweets(config, args.model, action_scheduler, args.features, args.threshold)
     # Find retweets
     elif args.command == "find-retweets":
-        find_retweets(config, args.model, action_scheduler, args.features, args.text_size)
-    # Find likes
-    elif args.command == "find-likes":
-        find_likes(config, args.model, action_scheduler)
+        find_retweets(config, args.model, action_scheduler, args.features, args.text_size, args.threshold)
     # Find follows
     elif args.command == "find-follows":
-        find_follows(config, args.model, action_scheduler, friends_manager, args.features, args.text_size)
+        find_follows(config, args.model, action_scheduler, friends_manager, args.features, args.text_size, args.threshold)
     # Find unfollows
     elif args.command == "find-unfollows":
-        find_unfollows(config, friends_manager, args.model, action_scheduler, args.features)
+        find_unfollows(config, friends_manager, args.model, action_scheduler, args.features, args.threshold)
     # Find quotes
     elif args.command == "find-quotes":
-        find_quotes(config, args.model, action_scheduler)
+        find_quotes(config, args.model, action_scheduler, args.threshold)
     # Training
     elif args.command == "train":
         # Action
@@ -309,7 +307,7 @@ if __name__ == "__main__":
             # end if
         elif args.action == u"test":
             model_testing(data_set_file=args.dataset, model_file=args.model, features=args.features,
-                          text_size=args.text_size)
+                          text_size=args.text_size, threshold=args.threshold)
         elif args.action == u"train":
             model_training\
             (
