@@ -67,7 +67,7 @@ def signal_handler(signum, frame):
 # Main function
 ####################################################
 
-def find_tweets(config, model, action_scheduler, features, n_pages=2):
+def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=0.5):
     """
     Find tweet in the hunters
     :param config:
@@ -151,20 +151,22 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2):
 
             # Predicted as tweet
             if prediction == "pos" and censor_prediction == "pos" and not tweet.already_tweeted():
-                # Try to add
-                try:
-                    logging.getLogger(u"pyTweetBot").info(u"Adding Tweet \"{}\" to the scheduler".format(
-                        tweet.get_tweet()))
-                    action_scheduler.add_tweet(tweet)
-                except ActionReservoirFullError:
-                    logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
-                    exit()
-                    pass
-                except ActionAlreadyExists:
-                    logging.getLogger(u"pyTweetBot").error(u"Tweet \"{}\" already exists in the database".format(
-                        tweet.get_tweet().encode('ascii', errors='ignore')))
-                    pass
-                # end try
+                if probs['pos'] >= threshold:
+                    # Try to add
+                    try:
+                        logging.getLogger(u"pyTweetBot").info(u"Adding Tweet \"{}\" to the scheduler".format(
+                            tweet.get_tweet()))
+                        action_scheduler.add_tweet(tweet)
+                    except ActionReservoirFullError:
+                        logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
+                        exit()
+                        pass
+                    except ActionAlreadyExists:
+                        logging.getLogger(u"pyTweetBot").error(u"Tweet \"{}\" already exists in the database".format(
+                            tweet.get_tweet().encode('ascii', errors='ignore')))
+                        pass
+                    # end try
+                # end if
             # end if
         # end for
     # end while
