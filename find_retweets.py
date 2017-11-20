@@ -49,13 +49,17 @@ from learning.CensorModel import CensorModel
 
 
 # Find retweets and add it to the DB
-def find_retweets(config, model, action_scheduler, features, text_size=80, retweets_likes_probs=[0.5, 0.5]):
+def find_retweets(config, model, action_scheduler, features, text_size=80, retweets_likes_probs=[0.5, 0.5], threshold=0.5):
     """
     Find retweets and add it to the DB
-    :param config: Bot's configuration object
-    :param model: Classification model's file
-    :param action_scheduler: Action scheduler object
-    :return: Number of retweets added.
+    :param config:
+    :param model:
+    :param action_scheduler:
+    :param features:
+    :param text_size:
+    :param retweets_likes_probs:
+    :param threshold:
+    :return:
     """
     # Retweet finders
     retweet_finders = list()
@@ -106,33 +110,35 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, retwe
             # Minimum size
             if len(retweet.text) >= text_size and retweet.text[:3] != u"RT ":
                 # Predict class
-                prediction, _ = model(bow(tokenizer(retweet.text)))
+                prediction, probs = model(bow(tokenizer(retweet.text)))
                 censor_prediction, _ = censor(retweet.text)
 
                 # Predicted as tweet
                 if prediction == "pos" and censor_prediction == "pos" and not Tweeted.exists(retweet):
-                    # Try to add
-                    try:
-                        logging.getLogger(u"pyTweetBot").\
-                        info(
-                            u"Adding retweet ({}, \"{}\") to the scheduler".
-                            format(
-                                retweet.id,
-                                retweet.text.encode('ascii', errors='ignore')
+                    if probs['pos'] >= threshold:
+                        # Try to add
+                        try:
+                            logging.getLogger(u"pyTweetBot").\
+                            info(
+                                u"Adding retweet ({}, \"{}\") to the scheduler".
+                                format(
+                                    retweet.id,
+                                    retweet.text.encode('ascii', errors='ignore')
+                                )
                             )
-                        )
 
-                        # Add action
-                        action_scheduler.add_retweet(retweet.id, retweet.text)
-                    except ActionReservoirFullError:
-                        logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Retweet action, exiting...")
-                        exit()
-                        pass
-                    except ActionAlreadyExists:
-                        logging.getLogger(u"pyTweetBot").error(u"Retweet \"{}\" already exists in the database".format(
-                            retweet.text.encode('ascii', errors='ignore')))
-                        pass
-                    # end try
+                            # Add action
+                            action_scheduler.add_retweet(retweet.id, retweet.text)
+                        except ActionReservoirFullError:
+                            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Retweet action, exiting...")
+                            exit()
+                            pass
+                        except ActionAlreadyExists:
+                            logging.getLogger(u"pyTweetBot").error(u"Retweet \"{}\" already exists in the database".format(
+                                retweet.text.encode('ascii', errors='ignore')))
+                            pass
+                        # end try
+                    # end if
                 # end if
             # end if
         # end for
