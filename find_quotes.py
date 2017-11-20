@@ -38,7 +38,7 @@
 
 
 # Find tweet to respond to and add it to the DB
-def find_quotes(config, model, action_scheduler):
+def find_quotes(config, model, action_scheduler, threshold=0.5):
     """
     Find tweet to like and add it to the DB
     :param config: Bot's configuration object
