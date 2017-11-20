@@ -74,7 +74,7 @@ def add_follow_action(action_scheduler, friend):
 
 
 # Find user to follow to and add it to the DB
-def find_follows(config, model, action_scheduler, friends_manager, features, text_size, n_pages=20):
+def find_follows(config, model, action_scheduler, friends_manager, features, text_size, n_pages=20, threshold=0.5):
     """
     Find tweet to like and add it to the DB
     :param config: Bot's configuration object
@@ -157,11 +157,11 @@ def find_follows(config, model, action_scheduler, friends_manager, features, tex
                 # Request not sent, n_following >= n_followers, description > text_size
                 if not author.follow_request_sent and author.friends_count >= (author.followers_count * ratio) and len(author.description) > text_size:
                     # Predict class
-                    prediction, _ = model(bow(tokenizer(author.description)))
+                    prediction, probs = model(bow(tokenizer(author.description)))
                     censor_prediction, _ = censor(author.description)
 
-                    # Predicted as unfollow
-                    if prediction == 'pos' or censor_prediction == 'pos':
+                    # Predicted as follow
+                    if prediction == 'pos' and censor_prediction == 'pos' and probs['pos'] >= threshold:
                         # Add
                         add_follow_action(action_scheduler, author)
                     # end if
