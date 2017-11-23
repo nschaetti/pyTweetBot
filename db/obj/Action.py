@@ -24,6 +24,8 @@
 
 # Import
 import datetime
+import random
+import time
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
 from twitter.TweetBotConnect import TweetBotConnector
@@ -59,10 +61,15 @@ class Action(Base):
         Execute the action
         :return:
         """
-        if self.action_type == "Follow":
-            FriendsManager().follow(self.action_tweet_text)
-        elif self.action_type == "Unfollow":
-            FriendsManager().unfollow(self.action_tweet_text)
+        if self.action_type == "FollowUnfollow":
+            # Follow
+            FriendsManager().follow(self.action_tweet_follow)
+
+            # Wait between 10 and 30 seconds
+            time.sleep(random.randint(10, 30))
+
+            # Unfollow
+            FriendsManager().unfollow(self.action_tweet_unfollow)
         elif self.action_type == "Like":
             TweetBotConnector().like(self.action_tweet_id)
             Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
