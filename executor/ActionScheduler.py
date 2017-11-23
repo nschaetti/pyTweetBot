@@ -28,7 +28,7 @@ from datetime import timedelta
 import db
 import db.obj
 from twitter.TweetBotConnect import TweetBotConnector
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 import logging
 from patterns.singleton import singleton
 import time
@@ -120,34 +120,14 @@ class ActionScheduler(Thread):
         # Config
         scheduler_config = self._config.get_scheduler_config()
 
-        # Waiting time
-        (min_time, max_time) = scheduler_config['waiting_times']
-
-        # Sleep time
-        (sleep_time, wake_time) = scheduler_config['sleep']
-
         # Main loop
         while True:
-            # Now
-            now_time = datetime.datetime.utcnow()
-
-            # Execute actions
-            if now_time.hour < sleep_time or now_time.hour > wake_time:
+            # Execute actions if awake or wait
+            if self._config.is_awake():
                 self()
-            # end if
-
-            # Waiting time
-            if self._stats_manager is not None:
-                waiting_seconds = self._stats_manager(datetime.datetime.utcnow(), scheduler_config['slope'], scheduler_config['beta'])
             else:
-                waiting_seconds = random.randint(min_time*60, max_time*60)
+                self._config.wait_next_action()
             # end if
-
-            # Log
-            logging.getLogger(u"pyTweetBot").info(u"Waiting {0:.{1}f} minutes for next run".format(waiting_seconds/60.0, 0))
-
-            # Wait
-            time.sleep(waiting_seconds)
         # end while
     # end run
 
@@ -261,29 +241,6 @@ class ActionScheduler(Thread):
         self._session.query(db.obj.Action).filter(db.obj.Action.action_id == action.action_id).delete()
         self._session.commit()
     # end delete
-
-    # Execute
-    def __call__(self):
-        """
-        Execute action
-        :return:
-        """
-        # Level per action
-        for action_type in ["Follow", "Unfollow", "Like", "Tweet", "Retweet"]:
-            # Get actions to be executed
-            for action in self._get_exec_action(action_type):
-                # Try to execute
-                try:
-                    action.execute()
-                except tweepy.TweepError as e:
-                    logging.getLogger(u"pyTweetBot").error(u"Error while executing action {} : {}".format(action, e))
-                # end try
-
-                # Delete the action
-                self.delete(action)
-            # end for
-        # end for
-    # end __call__
 
     # Execute next actions
     def exec_next_actions(self):
@@ -410,8 +367,20 @@ class ActionScheduler(Thread):
         :return: Action to execute as a list()
         """
         # Get all actions
-        exec_actions = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type)\
-            .order_by(db.obj.Action.action_id).all()
+        if action_type == 'FollowUnfollow':
+            exec_actions = self._session.query(db.obj.Action)\
+                .filter(
+                    and_(
+                        db.obj.Action.action_type == action_type,
+                        db.obj.Action.action_tweet_follow is not None,
+                        db.obj.Action.action_tweet_unfollow is not None
+                    )
+                )\
+                .order_by(db.obj.Action.action_id).all()
+        else:
+            exec_actions = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type)\
+                .order_by(db.obj.Action.action_id).all()
+        # end if
         return exec_actions[:self._n_actions[action_type]]
     # end _get_exec_action
 
@@ -468,5 +437,37 @@ class ActionScheduler(Thread):
                 u"{} action for id {} and text {} already in database".format(action_type, the_id, the_text))
         # end if
     # end _add_action
+
+    ##############################################
+    # Override functions
+    ##############################################
+
+    # Execute
+    def __call__(self):
+        """
+        Execute action
+        :return:
+        """
+        # Level per action
+        for action_type in ["FollowUnfollow", "Like", "Tweet", "Retweet"]:
+            # Get actions to be executed
+            for action in self._get_exec_action(action_type):
+                # Try to execute
+                try:
+                    # Execute
+                    action.execute()
+
+                    # Wait
+                    self._config.wait_next_action()
+                except tweepy.TweepError as e:
+                    logging.getLogger(u"pyTweetBot").error(
+                        u"Error while executing action {} : {}".format(action, e))
+                # end try
+
+                # Delete the action
+                self.delete(action)
+            # end for
+        # end for
+    # end __call__
 
 # end ActionScheduler
