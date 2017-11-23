@@ -31,7 +31,7 @@ import logging
 
 
 # Execute actions
-def execute_actions(action_scheduler, action_type):
+def execute_actions(action_scheduler):
     """
     Execute actions
     :param action_scheduler:
