@@ -157,7 +157,19 @@ class ActionScheduler(Thread):
         :param friend_id:
         :return:
         """
-        self._add_text_action("Follow", screen_name)
+        # Get empty actions
+        empty_action = self._get_empty_follow_unfollow_action(type='follow')
+
+        # Set empty action if exists
+        if empty_action is not None:
+            # Update
+            empty_action.action_follow = screen_name
+        else:
+            # Insert
+            new_action = db.obj.Action(action_type='FollowUnfollow', action_follow=screen_name)
+            self._session.add(new_action)
+        # end if
+        self._session.commit()
     # end add_follow
 
     # Add an unfollow action in the DB
@@ -166,7 +178,19 @@ class ActionScheduler(Thread):
         Add an "unfollow" action in the DB:
         :param friend_id: Twitter account0's ID.
         """
-        self._add_text_action("Unfollow", screen_name)
+        # Get empty actions
+        empty_action = self._get_empty_follow_unfollow_action(type='unfollow')
+
+        # Set empty action if exists
+        if empty_action is not None:
+            # Update
+            empty_action.action_unfollow = screen_name
+        else:
+            # Insert
+            new_action = db.obj.Action(action_type='FollowUnfollow', action_unfollow=screen_name)
+            self._session.add(new_action)
+        # end if
+        self._session.commit()
     # end add_unfollow
 
     # Add a like action in the DB
@@ -328,6 +352,41 @@ class ActionScheduler(Thread):
     # Private functions
     ##############################################
 
+    # Get empty follow-unfollow action
+    def _get_empty_follow_unfollow_action(self, type):
+        """
+        Get an empty follow-unfollow action
+        :param type: Action type (follow, unfollow)
+        :return:
+        """
+        if type == 'follow':
+            empty_actions = self._session\
+            .query(db.obj.Action)\
+            .filter(
+                and_(
+                    db.obj.Action.action_type == "FollowUnfollow",
+                    db.obj.Action.action_tweet_unfollow is None
+                )
+            )
+        else:
+            empty_actions = self._session \
+                .query(db.obj.Action) \
+                .filter(
+                and_(
+                    db.obj.Action.action_type == "FollowUnfollow",
+                    db.obj.Action.action_tweet_follow is None
+                )
+            )
+        # end if
+
+        # Results
+        if len(empty_actions) > 0:
+            return empty_actions[0]
+        else:
+            return None
+        # end if
+    # end _get_empty_follow_unfollow_action
+
     # Purge reservoir
     def _purge_reservoir(self):
         """
@@ -344,7 +403,7 @@ class ActionScheduler(Thread):
         """
         result = dict()
         # Level per action
-        for action_type in ["Follow", "Unfollow", "Like", "Tweet", "Retweet"]:
+        for action_type in ["FollowUnfollow", "Like", "Tweet", "Retweet"]:
             result[action_type] = self._get_reservoir_level(action_type)
         # end for
         return result
