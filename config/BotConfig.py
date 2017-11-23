@@ -24,6 +24,10 @@
 
 # Imports
 import simplejson
+import random
+import datetime
+import logging
+import time
 
 #############################################
 # Exceptions
@@ -216,6 +220,49 @@ class BotConfig(object):
         """
         return self._scheduler_config
     # end get_scheduler_config
+
+    # Get a random waiting time
+    def get_random_waiting_time(self):
+        """
+        Get a random waiting time
+        :return:
+        """
+        (min_time, max_time) = self._scheduler_config['waiting_times']
+        return random.randint(min_time * 60, max_time * 60)
+    # end get_random_waiting_time
+
+    # Wait between action
+    def wait_next_action(self):
+        """
+        Wait next action
+        :return:
+        """
+        # Waiting time
+        waiting_seconds = self.get_random_waiting_time()
+
+        # Log
+        logging.getLogger(u"pyTweetBot").info(
+            u"Waiting {0:.{1}f} minutes for next run".format(waiting_seconds / 60.0, 0))
+
+        # Wait
+        time.sleep(waiting_seconds)
+    # end wait_next_action
+
+    # Is the scheduler awake
+    def is_awake(self):
+        """
+        Is the scheduler awake
+        :return:
+        """
+        # Sleep time
+        (sleep_time, wake_time) = self._scheduler_config['sleep']
+
+        # Now
+        now_time = datetime.datetime.utcnow()
+
+        # Asleep
+        return now_time.hour < sleep_time or now_time.hour > wake_time
+    # end is_awake
 
     # Get github config
     def get_github_config(self):
