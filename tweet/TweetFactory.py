@@ -14,13 +14,12 @@ class TweetFactory(object):
     """
 
     # Constructor
-    def __init__(self, hashtags=None, via=None):
+    def __init__(self, hashtags=None):
         """
         Constructor
         :param hashtags:
         """
         self._hashtags = hashtags
-        self._via = via
     # end __init__
 
     ##########################################
@@ -39,6 +38,9 @@ class TweetFactory(object):
 
         # Replace words by hashtags
         cleaned_text = self._replace_hashtags(cleaned_text)
+
+        # No mention
+        cleaned_text = cleaned_text.replace(u'@', u'')
 
         return cleaned_text
     # end __call__
@@ -150,12 +152,12 @@ class TweetFactory(object):
         :param text:
         :return:
         """
-        # For each hashtag
+        # For each hash tag
         for hashtag in self._hashtags:
             # Case sensitive
             case_sensitive = hashtag['case_sensitive'] if 'case_sensitive' in hashtag.keys() else False
 
-            # Replace hashtags
+            # Replace hash tags
             text = self._replace_hashtag(text=text, word=hashtag['from'], hashtag=hashtag['to'],
                                   prefix_suffix=[u' ', u'\'', u'(', u')', u':', u',', u'?', u'!', u'.', u'`', u';', u'\t', u'/', u'’'],
                                   case_sensitive=case_sensitive)
