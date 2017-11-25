@@ -25,14 +25,9 @@
 # Import
 import logging
 import os
-import datetime
 import sys
 import nsNLP
 from learning.Model import Model
-from learning.StatisticalModel import StatisticalModel
-from learning.Statistical2GramModel import Statistical2GramModel
-from learning.TFIDFModel import TFIDFModel
-from learning.TextBlobModel import TextBlobModel
 from learning.Dataset import Dataset
 
 ####################################################

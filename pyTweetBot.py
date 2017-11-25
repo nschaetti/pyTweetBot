@@ -222,11 +222,10 @@ if __name__ == "__main__":
     # Executor
     executor_parser = command_subparser.add_parser("execute")
     add_default_arguments(executor_parser)
-    executor_parser.add_argument("--stats-file", type=str, help="Twitter statistics file", required=True, default=None)
+    executor_parser.add_argument("--stats-file", type=str, help="Twitter statistics file", required=False, default=None)
     executor_parser.add_argument("--daemon", action='store_true', help="Run executor in daemon mode", default=False)
     executor_parser.add_argument("--break-time", action='store_true',
                                  help="Show break duration between execution for the current time", default=False)
-    executor_parser.add_argument("--type", type=str, help="Action type to execute", required=True, default=None)
 
     # GitHub tweets
     github_tweets_parser = command_subparser.add_parser("find-github-tweets")
@@ -326,7 +325,7 @@ if __name__ == "__main__":
         statistics_generator(twitter_connector, args.stats_file, args.n_pages, args.stream, args.info)
     # Executor
     elif args.command == "execute":
-        execute_actions(action_scheduler, args.execute)
+        execute_actions(action_scheduler)
     # List future action
     elif args.command == "actions":
         list_actions(action_scheduler, args.type)

@@ -117,7 +117,7 @@ def model_testing(data_set_file, model_file, features='words', text_size=2000, t
             confusion_matrix[prediction][c] += 1.0
 
             # Compare
-            print(u"Predicted {} for observation {}".format(prediction, c))
+            print(u"Predicted {} ({}) for observation {}".format(prediction, probs[prediction], c))
 
             # Print false positive
             if prediction == 'pos' and c == 'neg':
