@@ -35,6 +35,7 @@ import time
 import tweepy
 from threading import Thread
 import random
+import sys
 
 
 # Reservoir full exception
@@ -87,7 +88,7 @@ class ActionScheduler(Thread):
         self._session = db.DBConnector().get_session()
 
         if n_actions == None:
-            self._n_actions = {"FollowUnfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
+            self._n_actions = {"Follow": 1, "Unfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
         else:
             self._n_actions = n_actions
         # end if
@@ -126,7 +127,6 @@ class ActionScheduler(Thread):
             if self._config.is_awake():
                 self()
             else:
-                logging.getLogger(u"pyTweetBot").info(u"I'm asleep...")
                 self._config.wait_next_action()
             # end if
         # end while
@@ -167,7 +167,7 @@ class ActionScheduler(Thread):
             empty_action.action_follow = screen_name
         else:
             # Insert
-            new_action = db.obj.Action(action_type='FollowUnfollow', action_follow=screen_name)
+            new_action = db.obj.Action(action_type='FollowUnfollow', action_order=self._generate_random_order(), action_follow=screen_name)
             self._session.add(new_action)
         # end if
         self._session.commit()
@@ -188,7 +188,7 @@ class ActionScheduler(Thread):
             empty_action.action_unfollow = screen_name
         else:
             # Insert
-            new_action = db.obj.Action(action_type='FollowUnfollow', action_unfollow=screen_name)
+            new_action = db.obj.Action(action_type='FollowUnfollow', action_order=self._generate_random_order(), action_unfollow=screen_name)
             self._session.add(new_action)
         # end if
         self._session.commit()
@@ -353,6 +353,15 @@ class ActionScheduler(Thread):
     # Private functions
     ##############################################
 
+    # Generate random order
+    def _generate_random_order(self):
+        """
+        Generate random order
+        :return:
+        """
+        return random.randint(0, sys.maxint)
+    # end _generate_random_order
+
     # Get empty follow-unfollow action
     def _get_empty_follow_unfollow_action(self, type):
         """
@@ -436,10 +445,10 @@ class ActionScheduler(Thread):
                         db.obj.Action.action_tweet_unfollow is not None
                     )
                 )\
-                .order_by(db.obj.Action.action_id).all()
+                .order_by(db.obj.Action.action_order).all()
         else:
             exec_actions = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type)\
-                .order_by(db.obj.Action.action_id).all()
+                .order_by(db.obj.Action.action_order).all()
         # end if
         return exec_actions[:self._n_actions[action_type]]
     # end _get_exec_action
@@ -452,7 +461,8 @@ class ActionScheduler(Thread):
         :param the_id: Action's ID
         """
         if not self.exists(action_type, the_id):
-            action = db.obj.Action(action_type=action_type, action_tweet_id=the_id)
+            action = db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
+                                   action_tweet_id=the_id)
             self.add(action)
         else:
             logging.getLogger(u"pyTweetBot").warning(u"{} action for friend/tweet {} already in database"
@@ -469,7 +479,8 @@ class ActionScheduler(Thread):
         :param the_text: Action's text.
         """
         if not self.exists(action_type=action_type, action_tweet_text=the_text):
-            action = db.obj.Action(action_type=action_type, action_tweet_text=the_text)
+            action = db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
+                                   action_tweet_text=the_text)
             self.add(action)
         else:
             logging.getLogger(u"pyTweetBot").warning(u"{} action for text {} already in database"
@@ -488,7 +499,8 @@ class ActionScheduler(Thread):
         :return:
         """
         if not self.exists(action_type=action_type, action_tweet_id=the_id, action_tweet_text=the_text):
-            action = db.obj.Action(action_type=action_type, action_tweet_id=the_id, action_tweet_text=the_text)
+            action = db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
+                                   action_tweet_id=the_id, action_tweet_text=the_text)
             self.add(action)
         else:
             logging.getLogger(u"pyTweetBot").warning(u"{} action for id {} and text {} already in database"
@@ -508,25 +520,40 @@ class ActionScheduler(Thread):
         Execute action
         :return:
         """
+        # Action to execute
+        action_to_execute = list()
+        n_action = 0
+
         # Level per action
         for action_type in ["FollowUnfollow", "Like", "Tweet", "Retweet"]:
             # Get actions to be executed
             for action in self._get_exec_action(action_type):
-                # Try to execute
-                try:
-                    # Execute
-                    action.execute()
-
-                    # Delete the action
-                    self.delete(action)
-
-                    # Wait
-                    self._config.wait_next_action()
-                except tweepy.TweepError as e:
-                    logging.getLogger(u"pyTweetBot").error(
-                        u"Error while executing action {} : {}".format(action, e))
-                # end try
+                # Add to list of action to execute
+                action_to_execute.append(action)
+                n_action += 1
             # end for
+        # end for
+
+        # For each action to execute
+        for i in range(n_action):
+            # Choose an action randomly
+            action = random.choice(action_to_execute)
+
+            # Try to execute
+            try:
+                # Execute
+                action.execute()
+
+                # Wait
+                self._config.wait_next_action()
+            except tweepy.TweepError as e:
+                logging.getLogger(u"pyTweetBot").error(
+                    u"Error while executing action {} : {}".format(action, e))
+            # end try
+
+            # Delete action
+            self.delete(action)
+            action_to_execute.remove(action)
         # end for
     # end __call__
 
