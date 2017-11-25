@@ -53,6 +53,18 @@ class BotConfig(object):
     Read, parse and store configuration informations
     """
 
+    # Default value
+    _default_value = \
+    {
+        'sleep': [
+            0,
+            0
+        ],
+        'waiting_times': [
+            2, 10
+        ]
+    }
+
     # Constructor
     def __init__(self, data):
         """
@@ -227,7 +239,12 @@ class BotConfig(object):
         Get a random waiting time
         :return:
         """
-        (min_time, max_time) = self._scheduler_config['waiting_times']
+        try:
+            (min_time, max_time) = self._scheduler_config['waiting_times']
+        except KeyError:
+            (min_time, max_time) = self._default_value['waiting_times']
+
+        # Return random waiting time
         return random.randint(min_time * 60, max_time * 60)
     # end get_random_waiting_time
 
@@ -242,7 +259,7 @@ class BotConfig(object):
 
         # Log
         logging.getLogger(u"pyTweetBot").info(
-            u"Waiting {0:.{1}f} minutes for next run".format(waiting_seconds / 60.0, 0))
+            u"Waiting {0:.{1}f} minutes for next run".format(waiting_seconds / 60.0, 1))
 
         # Wait
         time.sleep(waiting_seconds)
@@ -255,7 +272,11 @@ class BotConfig(object):
         :return:
         """
         # Sleep time
-        (sleep_time, wake_time) = self._scheduler_config['sleep']
+        try:
+            (sleep_time, wake_time) = self._scheduler_config['sleep']
+        except KeyError:
+            (sleep_time, wake_time) = self._default_value['sleep']
+        # end try
 
         # Now
         now_time = datetime.datetime.utcnow()
