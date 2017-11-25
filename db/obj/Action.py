@@ -45,6 +45,7 @@ class Action(Base):
     # Fields
     action_id = Column(BigInteger, primary_key=True)
     action_type = Column(Enum('Tweet', 'Retweet', 'Like', 'DirectMessage', 'FollowUnfollow'), nullable=False)
+    action_order = Column(BigInteger, nullable=False)
     action_tweet_id = Column(BigInteger, nullable=True)
     action_tweet_text = Column(String(5000), nullable=True)
     action_tweet_follow = Column(String(100), nullable=True)
