@@ -87,7 +87,7 @@ class ActionScheduler(Thread):
         self._session = db.DBConnector().get_session()
 
         if n_actions == None:
-            self._n_actions = {"Follow": 1, "Unfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
+            self._n_actions = {"FollowUnfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
         else:
             self._n_actions = n_actions
         # end if
@@ -126,6 +126,7 @@ class ActionScheduler(Thread):
             if self._config.is_awake():
                 self()
             else:
+                logging.getLogger(u"pyTweetBot").info(u"I'm asleep...")
                 self._config.wait_next_action()
             # end if
         # end while
@@ -516,15 +517,15 @@ class ActionScheduler(Thread):
                     # Execute
                     action.execute()
 
+                    # Delete the action
+                    self.delete(action)
+
                     # Wait
                     self._config.wait_next_action()
                 except tweepy.TweepError as e:
                     logging.getLogger(u"pyTweetBot").error(
                         u"Error while executing action {} : {}".format(action, e))
                 # end try
-
-                # Delete the action
-                self.delete(action)
             # end for
         # end for
     # end __call__

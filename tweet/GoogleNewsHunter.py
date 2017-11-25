@@ -30,8 +30,17 @@ class GoogleNewsHunter(Hunter):
         self._n_pages = n_pages
         self._google_news_client = GoogleNewsClient(search_term, lang, country)
         self._news = list()
-        self._current_page = 0
+        self._current_page = -1
     # end __init__
+
+    # To unicode
+    def __unicode__(self):
+        """
+        To unicode
+        :return:
+        """
+        return u"GoogleNewsHunter(search_term={})".format(self._search_term)
+    # end __unicode__
 
     # Iterator
     def __iter__(self):

@@ -34,6 +34,15 @@ class RSSHunter(Hunter):
         return self._stream
     # end get_stream
 
+    # To unicode
+    def __unicode__(self):
+        """
+        To unicode
+        :return:
+        """
+        return u"RSSHunter(stream={})".format(self._stream)
+    # end __unicode__
+
     # Iterator
     def __iter__(self):
         """

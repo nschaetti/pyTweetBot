@@ -24,7 +24,7 @@
 
 from .Hunter import Hunter
 import random
-from textblob import TextBlob
+import logging
 
 
 # Find new tweets from a set of
@@ -48,31 +48,6 @@ class TweetFinder(Hunter):
         self._shuffle = shuffle
         self._tweet_factory = tweet_factory
         self._classifiers = list()
-
-        # Tokenizer
-        tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
-
-        # Parse features
-        feature_list = features.split('+')
-
-        # Join features
-        bow = nsNLP.features.BagOfGrams()
-
-        # For each features
-        for bag in feature_list:
-            # Select features
-            if bag == 'words':
-                b = nsNLP.features.BagOfWords()
-            elif bag == 'bigrams':
-                b = nsNLP.features.BagOf2Grams()
-            elif bag == 'trigrams':
-                b = nsNLP.features.BagOf3Grams()
-            else:
-                sys.stderr.write(u"Unknown features type {}".format(features))
-                exit()
-            # end if
-            bow.add(b)
-            # end for
     # end __init__
 
     ######################################################
@@ -165,6 +140,7 @@ class TweetFinder(Hunter):
                 return self._to_the_factory(self._hunters[self._current].next())
             except StopIteration:
                 self._current += 1
+                logging.getLogger(u"pyTweetBot").info(u"Changing hunter to {}".format(self._hunters[self._current]))
                 return self._to_the_factory(self.next())
             # end try
         # end if
