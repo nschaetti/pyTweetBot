@@ -45,7 +45,7 @@ class TweetBotConnector(object):
         config = bot_config.get_twitter_config()
         auth = tweepy.OAuthHandler(config['auth_token1'], config['auth_token2'])
         auth.set_access_token(config['access_token1'], config['access_token2'])
-        self._api = tweepy.API(auth)
+        self._api = tweepy.API(auth, retry_delay=3, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
         self._cursor = tweepy.Cursor(self._api.followers).pages()
         self._page = None
         self._followers = list()
