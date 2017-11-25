@@ -199,8 +199,9 @@ def compute_tweet(tweet_text, action_scheduler, instantaneous):
             TweetBotConnector().tweet(tweet_text)
             db.obj.Tweeted().insert_tweet(tweet_text)
         # end if
+    else:
+        return False
     # end if
-
     return True
 # end compute_tweet
 
