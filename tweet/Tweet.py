@@ -13,7 +13,7 @@ class Tweet(object):
     """
 
     # Constructor
-    def __init__(self, text, url, hashtags=None, via=None):
+    def __init__(self, text, url, hashtags=None):
         """
         Constructor
         :param text: Tweet's text
@@ -23,7 +23,6 @@ class Tweet(object):
         self._text = self._factory(text)
         self._url = url
         self._hashtags = hashtags if hashtags is not None else list()
-        self._via = via if via is not None else ""
     # end __init__
 
     ######################################
@@ -94,12 +93,6 @@ class Tweet(object):
             total_length = len(final_text) + url_length
         # end if
 
-        # Add via
-        if total_length + 5 + len(self._via) <= 140 and self._via != "":
-            final_text += " via " + self._via
-            total_length += 5 + len(self._via)
-        # end if
-
         # Add hashtags
         for hashtag in self._hashtags:
             if total_length + len(hashtag) + 1 <= 140:
@@ -128,9 +121,6 @@ class Tweet(object):
         for hashtag in self._hashtags:
             length += len(hashtag)
         # end for
-        if self._via != "":
-            length += 5 + len(self._via)
-        # end if
         return length
     # end get_length
 
@@ -153,8 +143,8 @@ class Tweet(object):
         To string
         :return:
         """
-        return "Tweet(text={}, url={}, hashtags={}, via={}, length={})".format(self._text, self._url, self._hashtags,
-                                                                               self._via, self.get_length())
+        return "Tweet(text={}, url={}, hashtags={}, length={})".format(self._text, self._url, self._hashtags,
+                                                                       self.get_length())
     # end __str__
 
     # To unicode string
@@ -164,8 +154,8 @@ class Tweet(object):
         :return:
         """
         # print(self._text)
-        return u"Tweet(text={}, url={}, hashtags={}, via={}, length={})".format(self._text, self._url, self._hashtags,
-                                                                                self._via, self.get_length())
+        return u"Tweet(text={}, url={}, hashtags={}, length={})".format(self._text, self._url, self._hashtags,
+                                                                        self.get_length())
     # end __unicode__
 
 # end Tweet
