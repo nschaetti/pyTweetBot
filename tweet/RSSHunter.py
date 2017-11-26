@@ -65,7 +65,7 @@ class RSSHunter(Hunter):
         self._current += 1
 
         # Tweet generator
-        return Tweet(current_entry['title'], current_entry['links'][0]['href'], self._hashtags, self._via)
+        return Tweet(current_entry['title'], current_entry['links'][0]['href'], self._hashtags)
     # end next
 
 # end RSSHunter

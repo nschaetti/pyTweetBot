@@ -88,7 +88,7 @@ class ActionScheduler(Thread):
         self._session = db.DBConnector().get_session()
 
         if n_actions == None:
-            self._n_actions = {"Follow": 1, "Unfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
+            self._n_actions = {"FollowUnfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
         else:
             self._n_actions = n_actions
         # end if
@@ -273,7 +273,7 @@ class ActionScheduler(Thread):
         Execute next actions
         :return:
         """
-        for action_type in ["Follow", "Unfollow", "Like", "Tweet", "Retweet"]:
+        for action_type in ["FollowUnfollow", "Like", "Tweet", "Retweet"]:
             # Get action to be executed
             self.exec_next_action(action_type=action_type)
         # end for
@@ -541,6 +541,10 @@ class ActionScheduler(Thread):
 
             # Try to execute
             try:
+                # Delete action
+                self.delete(action)
+                action_to_execute.remove(action)
+
                 # Execute
                 action.execute()
 
@@ -550,10 +554,6 @@ class ActionScheduler(Thread):
                 logging.getLogger(u"pyTweetBot").error(
                     u"Error while executing action {} : {}".format(action, e))
             # end try
-
-            # Delete action
-            self.delete(action)
-            action_to_execute.remove(action)
         # end for
     # end __call__
 
