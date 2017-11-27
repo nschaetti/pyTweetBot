@@ -134,7 +134,7 @@ def find_follows(config, model, action_scheduler, friends_manager, features, tex
 
     # Get options
     search_keywords = config.get_retweet_config()['keywords']
-    ratio = config.get_retweet_config()['ratio']
+    ratio = config.get_friends_config()['ratio']
 
     # Shuffle keywords
     random.shuffle(search_keywords)
