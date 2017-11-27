@@ -127,8 +127,8 @@ class FriendsManager(object):
         :param screen_name: Friend's screen name
         :return: True or False
         """
-        return self._session.query(db.obj.Friend).filter(
-            db.obj.Friend.friend_screen_name == screen_name and db.obj.Friend.friend_follower).count > 0
+        return self._session.query(db.obj.Friend).filter(and_(
+            db.obj.Friend.friend_screen_name == screen_name, db.obj.Friend.friend_follower)).count > 0
     # end is_follower
 
     # Am I following this friend?
@@ -138,7 +138,7 @@ class FriendsManager(object):
         :param screen_name: Friend's screen name
         :return: True or False
         """
-        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name and db.obj.Friend.friend_following).count > 0
+        return self._session.query(db.obj.Friend).filter(and_(db.obj.Friend.friend_screen_name == screen_name, db.obj.Friend.friend_following == 1)).count() > 0
     # end is_following
 
     # Get obsolete friends
@@ -212,6 +212,8 @@ class FriendsManager(object):
 
             # Followed
             return True
+        else:
+            logging.getLogger(u"pyTweetBot").error(u"Already following user {}".format(screen_name))
         # end if
 
         # Nothing
