@@ -118,9 +118,6 @@ class ActionScheduler(Thread):
         Thread running function
         :return:
         """
-        # Config
-        scheduler_config = self._config.get_scheduler_config()
-
         # Main loop
         while True:
             # Execute actions if awake or wait
@@ -158,19 +155,25 @@ class ActionScheduler(Thread):
         :param friend_id:
         :return:
         """
-        # Get empty actions
-        empty_action = self._get_empty_follow_unfollow_action(type='follow')
+        if not self.exists(action_type="FollowUnfollow", action_follow=screen_name):
+            # Get empty actions
+            empty_action = self._get_empty_follow_unfollow_action(type='follow')
 
-        # Set empty action if exists
-        if empty_action is not None:
-            # Update
-            empty_action.action_follow = screen_name
+            # Set empty action if exists
+            if empty_action is not None:
+                # Update
+                empty_action.action_follow = screen_name
+            else:
+                # Insert
+                new_action = db.obj.Action(action_type='FollowUnfollow', action_order=self._generate_random_order(),
+                                           action_follow=screen_name)
+                self._session.add(new_action)
+            # end if
+            self._session.commit()
         else:
-            # Insert
-            new_action = db.obj.Action(action_type='FollowUnfollow', action_order=self._generate_random_order(), action_follow=screen_name)
-            self._session.add(new_action)
+            raise ActionAlreadyExists(
+                u"Follow action for screen name {} already in database".format(screen_name))
         # end if
-        self._session.commit()
     # end add_follow
 
     # Add an unfollow action in the DB
@@ -179,19 +182,25 @@ class ActionScheduler(Thread):
         Add an "unfollow" action in the DB:
         :param friend_id: Twitter account0's ID.
         """
-        # Get empty actions
-        empty_action = self._get_empty_follow_unfollow_action(type='unfollow')
+        if not self.exists(action_type="FollowUnfollow", action_unfollow=screen_name):
+            # Get empty actions
+            empty_action = self._get_empty_follow_unfollow_action(type='unfollow')
 
-        # Set empty action if exists
-        if empty_action is not None:
-            # Update
-            empty_action.action_unfollow = screen_name
+            # Set empty action if exists
+            if empty_action is not None:
+                # Update
+                empty_action.action_unfollow = screen_name
+            else:
+                # Insert
+                new_action = db.obj.Action(action_type='FollowUnfollow', action_order=self._generate_random_order(),
+                                           action_unfollow=screen_name)
+                self._session.add(new_action)
+            # end if
+            self._session.commit()
         else:
-            # Insert
-            new_action = db.obj.Action(action_type='FollowUnfollow', action_order=self._generate_random_order(), action_unfollow=screen_name)
-            self._session.add(new_action)
+            raise ActionAlreadyExists(
+                u"Unfollow action for screen name {} already in database".format(screen_name))
         # end if
-        self._session.commit()
     # end add_unfollow
 
     # Add a like action in the DB
@@ -226,7 +235,7 @@ class ActionScheduler(Thread):
     # end add_retweet
 
     # Does an action already exists in the DB?
-    def exists(self, action_type, action_tweet_id=None, action_tweet_text=None):
+    def exists(self, action_type, action_tweet_id=None, action_tweet_text=None, action_follow=None, action_unfollow=None):
         """
         Does an action already exists in the DB?
         :param action_type: Type of action
@@ -235,7 +244,23 @@ class ActionScheduler(Thread):
         :return: True or False
         """
         try:
-            if action_tweet_id is None and action_tweet_text is None:
+            if action_type == 'FollowUnfollow' and action_follow is not None and action_unfollow is None:
+                self._session.query(db.obj.Action).filter(
+                    and_(
+                        db.obj.Action.action_type == action_type,
+                        db.obj.Action.action_follow == action_follow
+                    )
+                ).one()
+                return True
+            elif action_type == 'FollowUnfollow' and action_follow is None and action_unfollow is not None:
+                self._session.query(db.obj.Action).filter(
+                    and_(
+                        db.obj.Action.action_type == action_type,
+                        db.obj.Action.action_unfollow == action_unfollow
+                    )
+                ).one()
+                return True
+            elif action_tweet_id is None and action_tweet_text is None:
                 self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).one()
                 return True
             elif action_tweet_id is not None and action_tweet_text is None:
@@ -375,18 +400,20 @@ class ActionScheduler(Thread):
             .filter(
                 and_(
                     db.obj.Action.action_type == "FollowUnfollow",
-                    db.obj.Action.action_tweet_unfollow is None
+                    db.obj.Action.action_follow == None,
+                    db.obj.Action.action_unfollow != None
                 )
-            )
+            ).all()
         else:
             empty_actions = self._session \
                 .query(db.obj.Action) \
                 .filter(
                 and_(
                     db.obj.Action.action_type == "FollowUnfollow",
-                    db.obj.Action.action_tweet_follow is None
+                    db.obj.Action.action_follow != None,
+                    db.obj.Action.action_unfollow == None
                 )
-            )
+            ).all()
         # end if
 
         # Results
@@ -441,8 +468,8 @@ class ActionScheduler(Thread):
                 .filter(
                     and_(
                         db.obj.Action.action_type == action_type,
-                        db.obj.Action.action_tweet_follow is not None,
-                        db.obj.Action.action_tweet_unfollow is not None
+                        db.obj.Action.action_follow != None,
+                        db.obj.Action.action_unfollow != None
                     )
                 )\
                 .order_by(db.obj.Action.action_order).all()
