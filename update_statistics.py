@@ -23,12 +23,7 @@
 #
 
 # Import
-import argparse
-import logging
-from config.BotConfig import BotConfig
-from db.DBConnector import DBConnector
 from stats.UserStatistics import UserStatistics
-from twitter.TweetBotConnect import TweetBotConnector
 from mail.MailBuilder import MailBuilder
 from mail.MailSender import MailSender
 import pkg_resources
@@ -45,30 +40,6 @@ def update_statistics(config):
     :param config:
     :return:
     """
-
-    # Argument parser
-    """parser = argparse.ArgumentParser(description="pyTweetBot - Smart Tweeter Bot")
-
-    # Argument
-    parser.add_argument("--config", type=str, help="Configuration file", required=True)
-    parser.add_argument("--log-level", type=int, help="Log level", default=20)
-    args = parser.parse_args()
-
-    # Logging
-    logging.basicConfig(level=args.log_level)
-    logger = logging.getLogger(name="pyTweetBot")
-
-    # Load configuration file
-    config = BotConfig.load(args.config)
-
-    # Connection to MySQL
-    dbc = config.get_database_config()
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
-
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)"""
-
     # Get last statistics
     last_stats = UserStatistics().get_last_statistics()
 
