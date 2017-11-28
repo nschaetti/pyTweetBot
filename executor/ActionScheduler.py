@@ -27,11 +27,11 @@ import datetime
 from datetime import timedelta
 import db
 import db.obj
+from friends.FriendsManager import FollowUnfollowRatioReached
 from twitter.TweetBotConnect import TweetBotConnector
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
-import time
 import tweepy
 from threading import Thread
 import random
@@ -614,16 +614,26 @@ class ActionScheduler(Thread):
 
             # Try to execute
             try:
+                # Execute
+                action.execute()
+
                 # Delete action
                 self.delete(action)
                 action_to_execute.remove(action)
 
-                # Execute
-                action.execute()
-
                 # Wait
                 self._config.wait_next_action()
+            except FollowUnfollowRatioReached as e:
+                # Log error
+                logging.getLogger(u"pyTweetBot").error(
+                    u"Error while executing action {} : {}".format(action, e)
+                )
             except tweepy.TweepError as e:
+                # Delete action
+                self.delete(action)
+                action_to_execute.remove(action)
+
+                # Log error
                 logging.getLogger(u"pyTweetBot").error(
                     u"Error while executing action {} : {}".format(action, e))
             # end try
