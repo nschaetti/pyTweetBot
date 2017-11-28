@@ -36,6 +36,22 @@ import time
 import logging
 from datetime import timedelta
 import tweepy
+import math
+
+
+##############################################
+# EXCEPTION
+##############################################
+
+
+# Exception, ratio reached
+class FollowUnfollowRatioReached(Exception):
+    pass
+# end FollowUnfollowRatioReached
+
+##############################################
+# CLASS
+##############################################
 
 
 # The class manage followers and following in the database and do
@@ -60,6 +76,12 @@ class FriendsManager(object):
 
         # Logger
         self._logger = logging.getLogger(name=u"pyTweetBot")
+
+        # Follow and unfollow history and counters
+        self._follow_history = list()
+        self._follow_count = 0
+        self._unfollow_history = list()
+        self._unfollow_count = 0
     # end __init__
 
     ######################################################
@@ -197,21 +219,28 @@ class FriendsManager(object):
         """
         # Follow if needed
         if not self.is_following(screen_name=screen_name):
-            # Following on Twitter
-            TweetBotConnector().follow(screen_name)
+            if self._follow_unfollow_ratio() < 1.2:
+                # Following on Twitter
+                TweetBotConnector().follow(screen_name)
 
-            # Get the Twitter user
-            twf = TweetBotConnector().get_user(screen_name)
+                # Get the Twitter user
+                twf = TweetBotConnector().get_user(screen_name)
 
-            # Add friend in the DB (if needed)
-            self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
-                             twf.friends_count, twf.statuses_count)
+                # Add friend in the DB (if needed)
+                self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
+                                 twf.friends_count, twf.statuses_count)
 
-            # Change DB
-            self._set_following(screen_name, True)
+                # Change DB
+                self._set_following(screen_name, True)
 
-            # Followed
-            return True
+                # Update follow counter
+                self._inc_follow_count(screen_name)
+
+                # Followed
+                return True
+            else:
+                raise FollowUnfollowRatioReached(u"Follow/Unfollow daily ration reached")
+            # end if
         else:
             logging.getLogger(u"pyTweetBot").error(u"Already following user {}".format(screen_name))
         # end if
@@ -229,14 +258,21 @@ class FriendsManager(object):
         """
         # Unfollow if possible
         if self.is_following(screen_name=screen_name):
-            # Unfollowing on Twitter
-            TweetBotConnector().unfollow(screen_name)
+            if self._follow_unfollow_ratio() > 0.8:
+                # Unfollowing on Twitter
+                TweetBotConnector().unfollow(screen_name)
 
-            # Change DB
-            self._set_following(screen_name, False)
+                # Change DB
+                self._set_following(screen_name, False)
 
-            # Unfollowed
-            return True
+                # Update unfollow counter
+                self._inc_unfollow_counter(screen_name)
+
+                # Unfollowed
+                return True
+            else:
+                raise FollowUnfollowRatioReached(u"Follow/Unfollow daily ration reached")
+            # end if
         # end if
 
         # Nothing
@@ -312,6 +348,66 @@ class FriendsManager(object):
     ######################################################
     # PRIVATE FUNCTIONS
     ######################################################
+
+    # Get last day follow/unfollow ratio
+    def _follow_unfollow_ratio(self):
+        """
+        Get last day follow/unfollow ratio
+        :return:
+        """
+        if self._unfollow_count != 0 and self._follow_count != 0:
+            return float(self._follow_count) / float(self._unfollow_count)
+        else:
+            return float("inf")
+        # end if
+    # end _follow_unfollow_ratio
+
+    # Increment follow counter
+    def _inc_follow_counter(self):
+        """
+        Increment follow counter
+        :return:
+        """
+        # Add to history
+        self._follow_history.append(datetime.datetime.utcnow())
+
+        # Last 24h list
+        last_day_follows = list()
+        last_day_counter = 0
+        for follow_time in self._follow_history:
+            if datetime.datetime.utcnow() - follow_time <= 60 * 60 * 24:
+                last_day_follows.append(follow_time)
+                last_day_counter += 1
+            # end if
+        # end for
+
+        # History and counter
+        self._follow_history = last_day_follows
+        self._follow_count = last_day_counter
+    # end _inc_follow_counter
+
+    # Increment unfollow counter
+    def _inc_unfollow_counter(self):
+        """
+        Increment unfollow counter
+        :return:
+        """
+        self._unfollow_history.append(datetime.datetime.utcnow())
+
+        # Last 24h list
+        last_day_unfollows = list()
+        last_day_counter = 0
+        for unfollow_time in self._unfollow_history:
+            if datetime.datetime.utcnow() - unfollow_time <= 60 * 60 * 24:
+                last_day_unfollows.append(unfollow_time)
+                last_day_counter += 1
+                # end if
+        # end for
+
+        # History and counter
+        self._unfollow_history = last_day_unfollows
+        self._unfollow_count = last_day_counter
+    # end _inc_unfollow_counter
 
     # Add a friend
     def _add_friend(self, screen_name, description, location, followers_count, friends_count,
