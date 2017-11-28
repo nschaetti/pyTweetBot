@@ -456,6 +456,52 @@ class ActionScheduler(Thread):
         return len(self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).all())
     # end _get_reservoir_level
 
+    # Get follow/unfollow actions to execute
+    def _get_follow_unfollow_exec_action(self):
+        """
+        Get follow/unfollow actions to execute
+        :return:
+        """
+        # Get action with a follow and an unfollow
+        exec_actions = self._session.query(db.obj.Action) \
+            .filter(
+            and_(
+                db.obj.Action.action_type == 'FollowUnfollow',
+                db.obj.Action.action_follow != None,
+                db.obj.Action.action_unfollow != None
+            )
+        ) \
+        .order_by(db.obj.Action.action_order).all()
+
+        # Get actions with only follow
+        alone_exec_action = self._session.query(db.obj.Action) \
+            .filter(
+            and_(
+                db.obj.Action.action_type == 'FollowUnfollow',
+                db.obj.Action.action_follow != None,
+                db.obj.Action.action_unfollow == None
+            )
+        ) \
+        .order_by(db.obj.Action.action_order).all()
+
+        # Get actions with only unfollow
+        alone_exec_action.append(self._session.query(db.obj.Action) \
+                            .filter(
+            and_(
+                db.obj.Action.action_type == 'FollowUnfollow',
+                db.obj.Action.action_follow == None,
+                db.obj.Action.action_unfollow != None
+            )
+        ) \
+        .order_by(db.obj.Action.action_order).all())
+
+        # Shuffle and append
+        random.shuffle(alone_exec_action)
+        exec_actions.append(alone_exec_action)
+
+        return exec_actions
+    # end _get_follow_unfollow_exec_action
+
     # Get action to execute
     def _get_exec_action(self, action_type):
         """
