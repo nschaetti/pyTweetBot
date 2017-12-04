@@ -27,7 +27,7 @@ import argparse
 import logging
 import sys
 import os
-from config.BotConfig import BotConfig
+from config.BotConfig import BotConfig, MissingRequiredField
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler
 from friends.FriendsManager import FriendsManager
@@ -242,7 +242,11 @@ if __name__ == "__main__":
     logger = create_logger(u"pyTweetBot", log_level=args.log_level, log_file=args.log_file)
 
     # Load configuration file
-    config = BotConfig.load(args.config)
+    try:
+        config = BotConfig.load(args.config)
+    except MissingRequiredField as e:
+        sys.stderr.write(u"Error parsing configuration file : {}\n".format(e))
+    # end try
 
     # Connection to MySQL
     dbc = config.get_database_config()
