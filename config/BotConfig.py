@@ -28,6 +28,7 @@ import random
 import datetime
 import logging
 import time
+from .default_config import default_config
 
 #############################################
 # Exceptions
@@ -43,6 +44,15 @@ class MissingRequiredField(Exception):
 # end MissingRequiredField
 
 
+# Field not available
+class FieldNotAvailable(Exception):
+    """
+    Field is not available
+    """
+    pass
+# end FieldNotAvailable
+
+
 #############################################
 # CLASS
 #############################################
@@ -52,18 +62,6 @@ class BotConfig(object):
     """
     Read, parse and store configuration informations
     """
-
-    # Default value
-    _default_value = \
-    {
-        'sleep': [
-            0,
-            0
-        ],
-        'waiting_times': [
-            2, 10
-        ]
-    }
 
     # Constructor
     def __init__(self, data):
@@ -75,109 +73,97 @@ class BotConfig(object):
         self._required_states = \
         {
             'database': True,
+            'email': False,
+            'scheduler': False,
+            'hashtags': False,
             'twitter': True,
             'friends': False,
+            'forbidden_words': False,
             'direct_message': False,
             'news_settings': False,
             'news': False,
-            'retweet': False,
-            'hashtags': False,
             'rss': False,
-            'forbidden_words': False,
-            'email': False,
-            'scheduler': False,
+            'retweet': False,
             'github': False
         }
 
         # Settings available
-        self._availability = dict()
         for key in self._required_states:
-            self._availability[key] = False
+            if self._required_states[key] and key not in data:
+                raise MissingRequiredField(u"The required field {} is missing in configuration file".format(key))
+            # end if
         # end for
 
-        # Load
-        self._database = data['database']
-        self._twitter = data['twitter']
-        self._friends = data['friends']
-        self._direct_message = self._get_field(data, 'direct_message')
-        self._news_settings = self._get_field(data, 'news_settings')
-        self._news = self._get_field(data, 'news')
-        self._retweet = self._get_field(data, 'retweet')
-        self._hashtags = self._get_field(data, 'hashtags')
-        self._rss = self._get_field(data, 'rss')
-        self._forbidden_words = self._get_field(data, 'forbidden_words')
-        self._email = data['email']
-        self._scheduler_config = self._get_field(data, 'scheduler')
-        self._github_config = data['github']
+        # Set
+        self._config = data
     # end __init__
 
     ######################################
-    # Public
+    # Property
     ######################################
 
     # Get database settings
     @property
-    def database_settings(self):
+    def database(self):
         """
         Get database settings
         :return: Database settings (username, password, database)
         """
-        return self._database
+        return self['database']
     # end database_config
 
-    # Get database information.
-    def get_database_config(self):
+    # Get Twitter settings
+    @property
+    def twitter(self):
         """
-        Get database information.
-        :return: Database information
-        """
-        return self._database
-    # end get_database_config
-
-    # Get Twitter information.
-    def get_twitter_config(self):
-        """
-        Get Twitter information.
-        :return: Twitter information.
-        """
-        return self._twitter
-    # end get_twitter_config
-
-    # Get friends config.
-    def get_friends_config(self):
-        """
-        Get friends config.
+        Get Twitter settings
         :return:
         """
-        return self._friends
-    # end get_friends_config
+        return self['twitter']
+    # end twitter
 
-    # Get hashtags
-    def get_hashtags(self):
+    # Get friends settings
+    @property
+    def friends(self):
         """
-        Get hashtags
+        Get friends settings
         :return:
         """
-        return self._hashtags
-    # end get_hashtags
+        return self['friends']
+    # end friends
 
-    # Get Direct Message config
-    def get_direct_message_config(self):
+    # Get hashtags settings
+    @property
+    def hashtags(self):
         """
-        Get Direct Message information.
+        Get hashtags settins
         :return:
         """
-        return self._direct_message
-    # end get_direct_message_config
+        return self['hashtags']
+    # end hashtags
 
-    # Get news settings.
-    def get_news_settings(self):
+    # Get direct message config
+    @property
+    def direct_message(self):
         """
-        Get news settings.
-        :return: News settings.
+        Get direct message config
+        :return:
         """
-        return self._news_settings
-    # end get_news_settings
+        return self['direct_message']
+    # end direct_message
+
+    # Get tweet settings
+    def tweet(self):
+        """
+        Get tweet settings
+        :return:
+        """
+        return self['tweet']
+    # end tweet
+
+    ######################################
+    # Public
+    ######################################
 
     # Get RSS streams
     def get_rss_streams(self):
@@ -232,6 +218,16 @@ class BotConfig(object):
         """
         return self._scheduler_config
     # end get_scheduler_config
+
+    # Is setting available
+    def is_available(self, key):
+        """
+        Is setting available?
+        :param key:
+        :return:
+        """
+        return key in self._config
+    # end is_available
 
     # Get a random waiting time
     def get_random_waiting_time(self):
@@ -312,12 +308,38 @@ class BotConfig(object):
         except KeyError:
             if not required:
                 self._availability[key] = False
+
                 return []
             else:
                 raise MissingRequiredField(u"The required field {} is missing in configuration file".format(key))
             # end if
         # end try
     # end _get_field
+
+    # Get field default value
+    def _get_default_value(self, key, subkey=None):
+        """
+        Get field default value
+        :param key:
+        :param subkey:
+        :return:
+        """
+        pass
+    # end _get_default_value
+
+    ######################################
+    # Override
+    ######################################
+
+    # Get settings
+    def __getitem__(self, item):
+        """
+        Get settings
+        :param item:
+        :return:
+        """
+        return self._config[item]
+    # end __getitem__
 
     ######################################
     # Static
