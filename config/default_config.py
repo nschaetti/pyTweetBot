@@ -40,7 +40,7 @@ default_config = \
 		"keywords" : [],
 		"nbpages" : 40,
 		"retweet_prob" : 0.5,
-		"limit_prob" : 1.0
+        "limit_prob" : 1.0,
 		"interval" : [2.0, 4.0]
 	}
 }
