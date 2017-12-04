@@ -29,6 +29,8 @@ import datetime
 import logging
 import time
 from .default_config import default_config
+from .required_fields import required_fields
+
 
 #############################################
 # Exceptions
@@ -57,42 +59,29 @@ class FieldNotAvailable(Exception):
 # CLASS
 #############################################
 
-# Read, parse and store configuration informations
+# This class reads the JSON configuration file and
+# check that all required field is set.
+# It will check that a field a available when
+# asked for or will raise a FieldNotAvailable exception.
 class BotConfig(object):
     """
-    Read, parse and store configuration informations
+    This class reads the JSON configuration file and
+    check that all required field is set.
+    It will check that a field a available when
+    asked for or will raise a FieldNotAvailable exception.
     """
 
     # Constructor
     def __init__(self, data):
         """
-        Constructor.
-        :param data: Dictionary containing settings
+        Constructor
+        :param data: Settings read from JSON file as a dictionary
         """
-        # Required states
-        self._required_states = \
-        {
-            'database': True,
-            'email': False,
-            'scheduler': False,
-            'hashtags': False,
-            'twitter': True,
-            'friends': False,
-            'forbidden_words': False,
-            'direct_message': False,
-            'news_settings': False,
-            'news': False,
-            'rss': False,
-            'retweet': False,
-            'github': False
-        }
-
-        # Settings available
-        for key in self._required_states:
-            if self._required_states[key] and key not in data:
-                raise MissingRequiredField(u"The required field {} is missing in configuration file".format(key))
-            # end if
-        # end for
+        # Check required fields
+        config_ok, missing_field = self._check_config(data)
+        if not config_ok:
+            raise MissingRequiredField(u"The required field {} is missing in configuration file".format(missing_field))
+        # end if
 
         # Set
         self._config = data
@@ -153,6 +142,7 @@ class BotConfig(object):
     # end direct_message
 
     # Get tweet settings
+    @property
     def tweet(self):
         """
         Get tweet settings
@@ -161,97 +151,117 @@ class BotConfig(object):
         return self['tweet']
     # end tweet
 
-    ######################################
-    # Public
-    ######################################
-
     # Get RSS streams
-    def get_rss_streams(self):
+    @property
+    def rss(self):
         """
-        Get RSS stream
+        Get RSS streams
         :return:
         """
-        return self._rss
-    # end get_rss_streams
+        return self['rss']
+    # end rss
 
-    # Get news config
-    def get_news_config(self):
+    # Get Google News settings
+    @property
+    def google_news(self):
         """
-        Get news config.
-        :return: News config.
+        Get Google News settings
+        :return:
         """
-        return self._news
-    # end get_news_config
+        return self['news']
+    # end google_news
 
     # Get forbidden words
-    def get_forbidden_words(self):
+    @property
+    def forbidden_words(self):
         """
         Get forbidden words
-        :return: Forbidden words
-        """
-        return self._forbidden_words
-    # end get_forbidden_words
-
-    # Get retweet settings
-    def get_retweet_config(self):
-        """
-        Get retweet settings
-        :return: Retweet settings
-        """
-        return self._retweet
-    # end get_retweet_config
-
-    # Get email address
-    def get_email(self):
-        """
-        Get email
         :return:
         """
-        return self._email
-    # end get_email
+        return self['forbidden_words']
+    # end forbidden_words
+
+    # Get retweet settings
+    @property
+    def retweet(self):
+        """
+        Get retweet settings
+        :return:
+        """
+        return self['retweet']
+    # end retweet
+
+    # Get email address
+    @property
+    def email(self):
+        """
+        Get email address
+        :return:
+        """
+        return self['email']
+    # end email
 
     # Get scheduler config
-    def get_scheduler_config(self):
+    @property
+    def scheduler(self):
         """
         Get scheduler config
         :return:
         """
-        return self._scheduler_config
-    # end get_scheduler_config
+        return self['scheduler']
+    # end scheduler
+
+    # Get GitHub config
+    @property
+    def github(self):
+        """
+        Get GitHub config
+        :return:
+        """
+        return self['github']
+    # end github
+
+    ######################################
+    # Public
+    ######################################
 
     # Is setting available
     def is_available(self, key):
         """
         Is setting available?
-        :param key:
-        :return:
+        :param key: Key to check the availability
+        :return: True if available, False otherwise
         """
         return key in self._config
     # end is_available
 
-    # Get a random waiting time
-    def get_random_waiting_time(self):
+    # Get a random interval
+    def get_random_interval(self, setting):
         """
-        Get a random waiting time
-        :return:
+        Get a random interval for a specific action type
+        :param setting: Setting type (tweet, retweet, friend)
+        :return: A random interval
         """
-        try:
-            (min_time, max_time) = self._scheduler_config['waiting_times']
-        except KeyError:
-            (min_time, max_time) = self._default_value['waiting_times']
+        if setting == "tweet":
+            (min_time, max_time) = self.tweet['interval']
+        elif setting == "retweet":
+            (min_time, max_time) = self.retweet['interval']
+        elif setting == "friends":
+            (min_time, max_time) = self.friends['interval']
+        # end if
 
         # Return random waiting time
         return random.randint(min_time * 60, max_time * 60)
     # end get_random_waiting_time
 
     # Wait between action
-    def wait_next_action(self):
+    def wait_next_action(self, setting):
         """
         Wait next action
-        :return:
+        :param setting: Setting type (tweet, retweet, friend)
         """
         # Waiting time
-        waiting_seconds = self.get_random_waiting_time()
+        waiting_seconds = self.get_random_interval(setting)
 
         # Log
         logging.getLogger(u"pyTweetBot").info(
@@ -261,18 +271,14 @@ class BotConfig(object):
         time.sleep(waiting_seconds)
     # end wait_next_action
 
-    # Is the scheduler awake
+    # Is the scheduler awake?
     def is_awake(self):
         """
-        Is the scheduler awake
-        :return:
+        Is the scheduler awake?
+        :return: True if awake, False otherwise
         """
         # Sleep time
-        try:
-            (sleep_time, wake_time) = self._scheduler_config['sleep']
-        except KeyError:
-            (sleep_time, wake_time) = self._default_value['sleep']
-        # end try
+        (sleep_time, wake_time) = self.scheduler['sleep']
 
         # Now
         now_time = datetime.datetime.utcnow()
@@ -281,64 +287,48 @@ class BotConfig(object):
         return now_time.hour < sleep_time or now_time.hour > wake_time
     # end is_awake
 
-    # Get github config
-    def get_github_config(self):
-        """
-        Get GitHub config
-        :return:
-        """
-        return self._github_config
-    # end get_github_config
-
     ######################################
     # Private
     ######################################
 
-    # Get a field
-    def _get_field(self, data, key, required=False):
+    # Check if required fields are available
+    def _check_config(self, data):
         """
-        Get a field
-        :param data: Data
-        :param key: Key of data
-        :return: The value
+        Check if required field are available
+        :param data: Setting dictionary
+        :param required_fields: Dictionary of required fields
+        :return: True if required field present, False otherwise
         """
-        try:
-            self._availability[key] = True
-            return data[key]
-        except KeyError:
-            if not required:
-                self._availability[key] = False
-
-                return []
+        for key in required_fields.keys():
+            if key not in data.keys():
+                return False, key
             else:
-                raise MissingRequiredField(u"The required field {} is missing in configuration file".format(key))
+                self._check_config(data[key])
             # end if
-        # end try
-    # end _get_field
-
-    # Get field default value
-    def _get_default_value(self, key, subkey=None):
-        """
-        Get field default value
-        :param key:
-        :param subkey:
-        :return:
-        """
-        pass
-    # end _get_default_value
+        # end for
+        return True, None
+    # end _check_config
 
     ######################################
     # Override
     ######################################
 
-    # Get settings
+    # Get a setting item
     def __getitem__(self, item):
         """
-        Get settings
-        :param item:
-        :return:
+        Get setting item
+        :param item: Setting key
+        :return: The setting value
         """
-        return self._config[item]
+        try:
+            return self._config[item]
+        except KeyError:
+            if item not in default_config.keys():
+                raise FieldNotAvailable(u"The required field {} is not available in configuration file".format(item))
+            else:
+                return default_config[item]
+            # end if
+        # end try
     # end __getitem__
 
     ######################################
