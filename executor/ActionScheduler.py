@@ -67,16 +67,16 @@ class NoFactory(Exception):
 
 # Manage bot's action
 @singleton
-class ActionScheduler(Thread):
+class ActionScheduler(object):
     """
     Manage bot's action
     """
 
     # Properties
-    action_types = ["tweet", "retweet", "like", "follow", "unfollow"]
+    action_types = ["Tweet", "Retweet", "Like", "Follow", "Unfollow"]
 
     # Constructor
-    def __init__(self, config, n_actions=None, update_delay=timedelta(minutes=10), reservoir_size=timedelta(days=3),
+    def __init__(self, config, update_delay=timedelta(minutes=10), reservoir_size=timedelta(days=3),
                  purge_delay=timedelta(weeks=2), stats=None):
         """
         Constructor
@@ -90,12 +90,6 @@ class ActionScheduler(Thread):
         # Properties
         self._session = db.DBConnector().get_session()
 
-        if n_actions == None:
-            self._n_actions = {"FollowUnfollow": 1, "Like": 1, "Tweet": 1, "Retweet": 1}
-        else:
-            self._n_actions = n_actions
-        # end if
-
         self._purge_delay = purge_delay
         self._reservoir_size = reservoir_size
         self._update_delay = update_delay
@@ -104,9 +98,6 @@ class ActionScheduler(Thread):
         # Purge the reservoir
         self._purge_reservoir()
 
-        # Tread
-        Thread.__init__(self)
-
         # Stats
         self._stats_manager = stats
     # end __init__
@@ -114,23 +105,6 @@ class ActionScheduler(Thread):
     ##############################################
     # Public
     ##############################################
-
-    # Thread running function
-    def run(self):
-        """
-        Thread running function
-        :return:
-        """
-        # Main loop
-        while True:
-            # Execute actions if awake or wait
-            if self._config.is_awake():
-                self()
-            else:
-                self._config.wait_next_action()
-            # end if
-        # end while
-    # end run
 
     # Add an action to the DB
     def add(self, action):
@@ -158,20 +132,11 @@ class ActionScheduler(Thread):
         :param friend_id:
         :return:
         """
-        if not self.exists(action_type="FollowUnfollow", action_follow=screen_name):
-            # Get empty actions
-            empty_action = self._get_empty_follow_unfollow_action(type='follow')
-
-            # Set empty action if exists
-            if empty_action is not None:
-                # Update
-                empty_action.action_follow = screen_name
-            else:
-                # Insert
-                new_action = db.obj.Action(action_type='FollowUnfollow', action_order=self._generate_random_order(),
-                                           action_follow=screen_name)
-                self._session.add(new_action)
-            # end if
+        if not self.exists(action_type="Follow", action_tweet_text=screen_name):
+            # Insert
+            new_action = db.obj.Action(action_type='Follow', action_order=self._generate_random_order(),
+                                       action_tweet_text=screen_name)
+            self._session.add(new_action)
             self._session.commit()
         else:
             raise ActionAlreadyExists(
@@ -185,20 +150,11 @@ class ActionScheduler(Thread):
         Add an "unfollow" action in the DB:
         :param friend_id: Twitter account0's ID.
         """
-        if not self.exists(action_type="FollowUnfollow", action_unfollow=screen_name):
-            # Get empty actions
-            empty_action = self._get_empty_follow_unfollow_action(type='unfollow')
-
-            # Set empty action if exists
-            if empty_action is not None:
-                # Update
-                empty_action.action_unfollow = screen_name
-            else:
-                # Insert
-                new_action = db.obj.Action(action_type='FollowUnfollow', action_order=self._generate_random_order(),
-                                           action_unfollow=screen_name)
-                self._session.add(new_action)
-            # end if
+        if not self.exists(action_type="Unfollow", action_tweet_text=screen_name):
+            # Insert
+            new_action = db.obj.Action(action_type='Unfollow', action_order=self._generate_random_order(),
+                                       action_tweet_text=screen_name)
+            self._session.add(new_action)
             self._session.commit()
         else:
             raise ActionAlreadyExists(
@@ -238,7 +194,7 @@ class ActionScheduler(Thread):
     # end add_retweet
 
     # Does an action already exists in the DB?
-    def exists(self, action_type, action_tweet_id=None, action_tweet_text=None, action_follow=None, action_unfollow=None):
+    def exists(self, action_type, action_tweet_id=None, action_tweet_text=None):
         """
         Does an action already exists in the DB?
         :param action_type: Type of action
@@ -247,23 +203,7 @@ class ActionScheduler(Thread):
         :return: True or False
         """
         try:
-            if action_type == 'FollowUnfollow' and action_follow is not None and action_unfollow is None:
-                self._session.query(db.obj.Action).filter(
-                    and_(
-                        db.obj.Action.action_type == action_type,
-                        db.obj.Action.action_follow == action_follow
-                    )
-                ).one()
-                return True
-            elif action_type == 'FollowUnfollow' and action_follow is None and action_unfollow is not None:
-                self._session.query(db.obj.Action).filter(
-                    and_(
-                        db.obj.Action.action_type == action_type,
-                        db.obj.Action.action_unfollow == action_unfollow
-                    )
-                ).one()
-                return True
-            elif action_tweet_id is None and action_tweet_text is None:
+            if action_tweet_id is None and action_tweet_text is None:
                 self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).one()
                 return True
             elif action_tweet_id is not None and action_tweet_text is None:
@@ -301,7 +241,7 @@ class ActionScheduler(Thread):
         Execute next actions
         :return:
         """
-        for action_type in ["FollowUnfollow", "Like", "Tweet", "Retweet"]:
+        for action_type in self.action_types:
             # Get action to be executed
             self.exec_next_action(action_type=action_type)
         # end for
@@ -400,43 +340,6 @@ class ActionScheduler(Thread):
         return random.randint(0, sys.maxint)
     # end _generate_random_order
 
-    # Get empty follow-unfollow action
-    def _get_empty_follow_unfollow_action(self, type):
-        """
-        Get an empty follow-unfollow action
-        :param type: Action type (follow, unfollow)
-        :return:
-        """
-        if type == 'follow':
-            empty_actions = self._session\
-            .query(db.obj.Action)\
-            .filter(
-                and_(
-                    db.obj.Action.action_type == "FollowUnfollow",
-                    db.obj.Action.action_follow == None,
-                    db.obj.Action.action_unfollow != None
-                )
-            ).all()
-        else:
-            empty_actions = self._session \
-                .query(db.obj.Action) \
-                .filter(
-                and_(
-                    db.obj.Action.action_type == "FollowUnfollow",
-                    db.obj.Action.action_follow != None,
-                    db.obj.Action.action_unfollow == None
-                )
-            ).all()
-        # end if
-
-        # Results
-        if len(empty_actions) > 0:
-            return empty_actions[0]
-        else:
-            return None
-        # end if
-    # end _get_empty_follow_unfollow_action
-
     # Purge reservoir
     def _purge_reservoir(self):
         """
@@ -453,7 +356,7 @@ class ActionScheduler(Thread):
         """
         result = dict()
         # Level per action
-        for action_type in ["FollowUnfollow", "Like", "Tweet", "Retweet"]:
+        for action_type in self.action_types:
             result[action_type] = self._get_reservoir_level(action_type)
         # end for
         return result
@@ -469,52 +372,6 @@ class ActionScheduler(Thread):
         return len(self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).all())
     # end _get_reservoir_level
 
-    # Get follow/unfollow actions to execute
-    def _get_follow_unfollow_exec_action(self):
-        """
-        Get follow/unfollow actions to execute
-        :return:
-        """
-        # Get action with a follow and an unfollow
-        exec_actions = self._session.query(db.obj.Action) \
-            .filter(
-            and_(
-                db.obj.Action.action_type == 'FollowUnfollow',
-                db.obj.Action.action_follow != None,
-                db.obj.Action.action_unfollow != None
-            )
-        ) \
-        .order_by(db.obj.Action.action_order).all()
-
-        # Get actions with only follow
-        alone_exec_action = self._session.query(db.obj.Action) \
-            .filter(
-            and_(
-                db.obj.Action.action_type == 'FollowUnfollow',
-                db.obj.Action.action_follow != None,
-                db.obj.Action.action_unfollow == None
-            )
-        ) \
-        .order_by(db.obj.Action.action_order).all()
-
-        # Get actions with only unfollow
-        alone_exec_action.append(self._session.query(db.obj.Action) \
-                            .filter(
-            and_(
-                db.obj.Action.action_type == 'FollowUnfollow',
-                db.obj.Action.action_follow == None,
-                db.obj.Action.action_unfollow != None
-            )
-        ) \
-        .order_by(db.obj.Action.action_order).all())
-
-        # Shuffle and append
-        random.shuffle(alone_exec_action)
-        exec_actions.append(alone_exec_action)
-
-        return exec_actions
-    # end _get_follow_unfollow_exec_action
-
     # Get action to execute
     def _get_exec_action(self, action_type):
         """
@@ -522,21 +379,11 @@ class ActionScheduler(Thread):
         :return: Action to execute as a list()
         """
         # Get all actions
-        if action_type == 'FollowUnfollow':
-            exec_actions = self._session.query(db.obj.Action)\
-                .filter(
-                    and_(
-                        db.obj.Action.action_type == action_type,
-                        db.obj.Action.action_follow != None,
-                        db.obj.Action.action_unfollow != None
-                    )
-                )\
-                .order_by(db.obj.Action.action_order).all()
-        else:
-            exec_actions = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type)\
-                .order_by(db.obj.Action.action_order).all()
+        exec_actions = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type)\
+            .order_by(db.obj.Action.action_order).all()
+
         # end if
-        return exec_actions[:self._n_actions[action_type]]
+        return exec_actions[0]
     # end _get_exec_action
 
     # Add action with id
@@ -595,62 +442,5 @@ class ActionScheduler(Thread):
                 u"{} action for id {} and text {} already in database".format(action_type, the_id, the_text))
         # end if
     # end _add_action
-
-    ##############################################
-    # Override functions
-    ##############################################
-
-    # Execute
-    def __call__(self):
-        """
-        Execute action
-        :return:
-        """
-        # Action to execute
-        action_to_execute = list()
-        n_action = 0
-
-        # Level per action
-        for action_type in ["FollowUnfollow", "Like", "Tweet", "Retweet"]:
-            # Get actions to be executed
-            for action in self._get_exec_action(action_type):
-                # Add to list of action to execute
-                action_to_execute.append(action)
-                n_action += 1
-            # end for
-        # end for
-
-        # For each action to execute
-        for i in range(n_action):
-            # Choose an action randomly
-            action = random.choice(action_to_execute)
-
-            # Try to execute
-            try:
-                # Execute
-                action.execute()
-
-                # Delete action
-                self.delete(action)
-                action_to_execute.remove(action)
-
-                # Wait
-                self._config.wait_next_action()
-            except FollowUnfollowRatioReached as e:
-                # Log error
-                logging.getLogger(u"pyTweetBot").error(
-                    u"Error while executing action {} : {}".format(action, e)
-                )
-            except tweepy.TweepError as e:
-                # Delete action
-                self.delete(action)
-                action_to_execute.remove(action)
-
-                # Log error
-                logging.getLogger(u"pyTweetBot").error(
-                    u"Error while executing action {} : {}".format(action, e))
-            # end try
-        # end for
-    # end __call__
 
 # end ActionScheduler
