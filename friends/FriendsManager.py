@@ -55,6 +55,12 @@ class ActionAlreadyDone(Exception):
     pass
 # end ActionAlreadyDone
 
+
+# Friend request (follow/unfollow) limits reached
+class FriendRequestLimitReached(Exception):
+    pass
+# end FriendRequestLimitReached
+
 ##############################################
 # CLASS
 ##############################################
