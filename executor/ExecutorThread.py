@@ -23,7 +23,8 @@
 #
 
 # Imports
-from friends.FriendsManager import FollowUnfollowRatioReached, ActionAlreadyDone, FriendRequestLimitReached
+from friends.FriendsManager import ActionAlreadyDone
+from twitter.TweetBotConnect import RequestLimitReached
 import logging
 import tweepy
 from threading import Thread
@@ -112,7 +113,7 @@ class ExecutorThread(Thread):
 
             # Wait
             self._wait_next_action()
-        except (FollowUnfollowRatioReached, FriendRequestLimitReached) as e:
+        except RequestLimitReached as e:
             # Log error
             logging.getLogger(u"pyTweetBot").error(
                 u"Limit reached while executing action {} : {}".format(action, e)
