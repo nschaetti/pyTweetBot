@@ -35,7 +35,7 @@ from executor.ExecutorThread import ExecutorThread
 
 
 # Execute actions
-def execute_actions(action_scheduler):
+def execute_actions(config, action_scheduler):
     """
     Execute actions
     :param action_scheduler:
@@ -47,7 +47,7 @@ def execute_actions(action_scheduler):
     # For each action type
     for action_type in action_scheduler.action_types:
         # New executor thread
-        executor_thread = ExecutorThread(BotConfig(), action_scheduler, action_type)
+        executor_thread = ExecutorThread(config, action_scheduler, action_type)
 
         # Start executing action
         logging.getLogger(u"pyTweetBot").info(u"Start thread for action type {}...".format(action_type))
