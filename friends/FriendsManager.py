@@ -51,11 +51,6 @@ class ActionAlreadyDone(Exception):
 # end ActionAlreadyDone
 
 
-# Friend request (follow/unfollow) limits reached
-class FriendRequestLimitReached(Exception):
-    pass
-# end FriendRequestLimitReached
-
 ##############################################
 # CLASS
 ##############################################
@@ -83,12 +78,6 @@ class FriendsManager(object):
 
         # Logger
         self._logger = logging.getLogger(name=u"pyTweetBot")
-
-        # Follow and unfollow history and counters
-        self._follow_history = list()
-        self._follow_count = 0
-        self._unfollow_history = list()
-        self._unfollow_count = 0
     # end __init__
 
     ######################################################
@@ -217,34 +206,6 @@ class FriendsManager(object):
         return len(self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name).all()) > 0
     # end exists
 
-    # Check friend request limits
-    def check_friend_request_limits(self, action_type):
-        """
-        Check fiend request limits
-        :param action_type:
-        :return:
-        """
-        # Friends config
-        friends_config = BotConfig().friends
-
-        # Ratio limit
-        ratio_limit = friends_config['follow_unfollow_ratio_limit']
-        if action_type == 'Follow':
-            # Count info
-            count_limit = friends_config['max_new_followers']
-            count = self._follow_count
-        else:
-            # Count info
-            count_limit = friends_config['max_new_unfollow']
-            count = self._unfollow_count
-        # end if
-
-        # Check limits
-        return self._follow_unfollow_ratio(action_type) <= ratio_limit and count <= count_limit
-    # end check_friend_request_limits
-
-    # end check_friend_request_limits
-
     # Follow a Twitter account
     def follow(self, screen_name):
         """
@@ -254,25 +215,18 @@ class FriendsManager(object):
         """
         # Follow if needed
         if not self.is_following(screen_name=screen_name):
-            if self.check_friend_request_limits('follow'):
-                # Following on Twitter
-                TweetBotConnector().follow(screen_name)
+            # Following on Twitter
+            TweetBotConnector().follow(screen_name)
 
-                # Get the Twitter user
-                twf = TweetBotConnector().get_user(screen_name)
+            # Get the Twitter user
+            twf = TweetBotConnector().get_user(screen_name)
 
-                # Add friend in the DB (if needed)
-                self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
-                                 twf.friends_count, twf.statuses_count)
+            # Add friend in the DB (if needed)
+            self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
+                             twf.friends_count, twf.statuses_count)
 
-                # Change DB
-                self._set_following(screen_name, True)
-
-                # Update follow counter
-                self._inc_follow_count(screen_name)
-            else:
-                raise FriendRequestLimitReached(u"Follow/Unfollow daily ratio reached")
-            # end if
+            # Change DB
+            self._set_following(screen_name, True)
         else:
             raise ActionAlreadyDone(u"Already following user {}".format(screen_name))
         # end if
@@ -287,21 +241,11 @@ class FriendsManager(object):
         """
         # Unfollow if possible
         if self.is_following(screen_name=screen_name):
-            if self.check_friend_request_limits('unfollow'):
-                # Unfollowing on Twitter
-                TweetBotConnector().unfollow(screen_name)
+            # Unfollowing on Twitter
+            TweetBotConnector().unfollow(screen_name)
 
-                # Change DB
-                self._set_following(screen_name, False)
-
-                # Update unfollow counter
-                self._inc_unfollow_counter(screen_name)
-
-                # Unfollowed
-                return True
-            else:
-                raise FriendRequestLimitReached(u"Follow/Unfollow daily ration reached")
-            # end if
+            # Change DB
+            self._set_following(screen_name, False)
         else:
             raise ActionAlreadyDone(u"Already not following user {}".format(screen_name))
         # end if
