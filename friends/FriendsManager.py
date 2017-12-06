@@ -27,6 +27,7 @@ import executor
 import db
 import db.obj
 from patterns.singleton import singleton
+from config.BotConfig import BotConfig
 from twitter.TweetBotConnect import TweetBotConnector
 import twitter
 from sqlalchemy import update, delete
@@ -42,12 +43,6 @@ import math
 ##############################################
 # EXCEPTION
 ##############################################
-
-
-# Exception, ratio reached
-class FollowUnfollowRatioReached(Exception):
-    pass
-# end FollowUnfollowRatioReached
 
 
 # Exception, Useless action because already done (already following a user)
@@ -222,6 +217,34 @@ class FriendsManager(object):
         return len(self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name).all()) > 0
     # end exists
 
+    # Check friend request limits
+    def check_friend_request_limits(self, action_type):
+        """
+        Check fiend request limits
+        :param action_type:
+        :return:
+        """
+        # Friends config
+        friends_config = BotConfig().friends
+
+        # Ratio limit
+        ratio_limit = friends_config['follow_unfollow_ratio_limit']
+        if action_type == 'Follow':
+            # Count info
+            count_limit = friends_config['max_new_followers']
+            count = self._follow_count
+        else:
+            # Count info
+            count_limit = friends_config['max_new_unfollow']
+            count = self._unfollow_count
+        # end if
+
+        # Check limits
+        return self._follow_unfollow_ratio(action_type) <= ratio_limit and count <= count_limit
+    # end check_friend_request_limits
+
+    # end check_friend_request_limits
+
     # Follow a Twitter account
     def follow(self, screen_name):
         """
@@ -231,7 +254,7 @@ class FriendsManager(object):
         """
         # Follow if needed
         if not self.is_following(screen_name=screen_name):
-            if self._follow_unfollow_ratio() < 1.2:
+            if self.check_friend_request_limits('follow'):
                 # Following on Twitter
                 TweetBotConnector().follow(screen_name)
 
@@ -248,7 +271,7 @@ class FriendsManager(object):
                 # Update follow counter
                 self._inc_follow_count(screen_name)
             else:
-                raise FollowUnfollowRatioReached(u"Follow/Unfollow daily ratio reached")
+                raise FriendRequestLimitReached(u"Follow/Unfollow daily ratio reached")
             # end if
         else:
             raise ActionAlreadyDone(u"Already following user {}".format(screen_name))
@@ -264,7 +287,7 @@ class FriendsManager(object):
         """
         # Unfollow if possible
         if self.is_following(screen_name=screen_name):
-            if self._follow_unfollow_ratio() > 0.8:
+            if self.check_friend_request_limits('unfollow'):
                 # Unfollowing on Twitter
                 TweetBotConnector().unfollow(screen_name)
 
@@ -277,7 +300,7 @@ class FriendsManager(object):
                 # Unfollowed
                 return True
             else:
-                raise FollowUnfollowRatioReached(u"Follow/Unfollow daily ration reached")
+                raise FriendRequestLimitReached(u"Follow/Unfollow daily ration reached")
             # end if
         else:
             raise ActionAlreadyDone(u"Already not following user {}".format(screen_name))
@@ -355,15 +378,24 @@ class FriendsManager(object):
     ######################################################
 
     # Get last day follow/unfollow ratio
-    def _follow_unfollow_ratio(self):
+    def _follow_unfollow_ratio(self, action_type):
         """
         Get last day follow/unfollow ratio
         :return:
         """
-        if self._unfollow_count != 0 and self._follow_count != 0:
-            return float(self._follow_count) / float(self._unfollow_count)
+        # Action type
+        if action_type == 'follow':
+            if self._unfollow_count == 0:
+                return self._follow_count
+            else:
+                return float(self._follow_count) / float(self._unfollow_count)
+            # end if
         else:
-            return float("inf")
+            if self._follow_count == 0:
+                return self._unfollow_count
+            else:
+                return float(self._unfollow_count) / float(self._follow_count)
+            # end if
         # end if
     # end _follow_unfollow_ratio
 
