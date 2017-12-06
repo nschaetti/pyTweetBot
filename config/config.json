@@ -26,8 +26,7 @@
 	{
 		"max_new_followers" : 40,
 		"max_new_unfollow" : 40,
-		"follow_unfollow_ratio_limit" : 1.2,
-		"interval" : [30, 45]
+		"interval" : [15, 60]
 	},
 	"forbidden_words" :
 	[
