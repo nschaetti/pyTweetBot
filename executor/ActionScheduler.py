@@ -27,13 +27,10 @@ import datetime
 from datetime import timedelta
 import db
 import db.obj
-from friends.FriendsManager import FollowUnfollowRatioReached
 from twitter.TweetBotConnect import TweetBotConnector
 from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
-import tweepy
-from threading import Thread
 import random
 import sys
 
@@ -382,8 +379,7 @@ class ActionScheduler(object):
         exec_actions = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type)\
             .order_by(db.obj.Action.action_order).all()
 
-        # end if
-        return exec_actions[0]
+        return exec_actions[0] if len(exec_actions) > 0 else None
     # end _get_exec_action
 
     # Add action with id
