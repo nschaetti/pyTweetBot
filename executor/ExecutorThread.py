@@ -23,21 +23,10 @@
 #
 
 # Imports
-import sqlalchemy
-import datetime
-from datetime import timedelta
-import db
-import db.obj
-from config.BotConfig import BotConfig
-from friends.FriendsManager import FollowUnfollowRatioReached
-from twitter.TweetBotConnect import TweetBotConnector
-from sqlalchemy import and_
+from friends.FriendsManager import FollowUnfollowRatioReached, ActionAlreadyDone, FriendRequestLimitReached
 import logging
-from patterns.singleton import singleton
 import tweepy
 from threading import Thread
-import random
-import sys
 
 
 # Execute actions in a thread
@@ -85,6 +74,26 @@ class ExecutorThread(Thread):
     # end run
 
     ##############################################
+    # Private
+    ##############################################
+
+    # Wait next action
+    def _wait_next_action(self):
+        """
+        Wait for the next action
+        :return:
+        """
+        # Wait
+        if self._action_type == "follow" or self._action_type == "unfollow":
+            self._config.wait_next_action("friends")
+        elif self._action_type == "retweet" or self._action_type == "like":
+            self._config.wait_next_action("retweet")
+        elif self._action_type == "tweet":
+            self._config.wait_next_action("tweet")
+        # end if
+    # end wait_next_action
+
+    ##############################################
     # Override
     ##############################################
 
@@ -93,42 +102,39 @@ class ExecutorThread(Thread):
         """
         Execute the next action
         """
-        """
-                Execute action
-                :return:
-                """
-        # Action to execute
-        action_to_execute = list()
-        n_action = 0
+        # Try to execute
+        try:
+            # Execute
+            action = self._scheduler.next_action_to_execute(self._action_type)
 
-        # Get action to be executed
-        action = self._scheduler._get_exec_action(self._action_type)
+            # Delete
+            self._scheduler.delete(action)
 
-            # Try to execute
-            try:
-                # Execute
-                action.execute()
+            # Wait
+            self._wait_next_action()
+        except (FollowUnfollowRatioReached, FriendRequestLimitReached) as e:
+            # Log error
+            logging.getLogger(u"pyTweetBot").error(
+                u"Limit reached while executing action {} : {}".format(action, e)
+            )
 
-                # Delete action
-                self.delete(action)
-                action_to_execute.remove(action)
+            # Wait
+            self._wait_next_action()
+        except ActionAlreadyDone as e:
+            # Delete action
+            self._scheduler.delete(action)
 
-                # Wait
-                self._config.wait_next_action()
-            except FollowUnfollowRatioReached as e:
-                # Log error
-                logging.getLogger(u"pyTweetBot").error(
-                    u"Error while executing action {} : {}".format(action, e)
-                )
-            except tweepy.TweepError as e:
-                # Delete action
-                self.delete(action)
-                action_to_execute.remove(action)
+            # Log error
+            logging.getLogger(u"pyTweetBot").error(
+                u"Action {} already done : {}".format(action, e))
+        except tweepy.TweepError as e:
+            # Delete action
+            self._scheduler.delete(action)
 
-                # Log error
-                logging.getLogger(u"pyTweetBot").error(
-                    u"Error while executing action {} : {}".format(action, e))
-            # end try
+            # Log error
+            logging.getLogger(u"pyTweetBot").error(
+                u"Error while executing action {} : {}".format(action, e))
+        # end try
     # end __call__
 
 # end ExecutorThread
