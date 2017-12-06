@@ -24,6 +24,10 @@
 
 # Import
 import logging
+import threading
+from Queue import Queue
+from config.BotConfig import BotConfig
+from executor.ExecutorThread import ExecutorThread
 
 ####################################################
 # Main function
@@ -37,16 +41,29 @@ def execute_actions(action_scheduler):
     :param action_scheduler:
     :param action_type:
     """
-    # Start executing action
-    logging.getLogger(u"pyTweetBot").info(u"Start executing action with scheduler...")
-    action_scheduler.daemon = True
-    action_scheduler.start()
+    # List of threads
+    thread_list = list()
+    thread_queue = Queue()
+
+    # For each action type
+    for action_type in action_scheduler.action_types:
+        # New executor thread
+        executor_thread = ExecutorThread(BotConfig(), action_scheduler, action_type)
+
+        # Start executing action
+        logging.getLogger(u"pyTweetBot").info(u"Start thread for action type {}...".format(action_type))
+
+        # Start as daemon
+        executor_thread.daemon = True
+        executor_thread.start()
+
+        # Add to queue
+        thread_queue.put(executor_thread)
+    # end for
 
     # Waiting for the thread to terminate
     try:
-        while action_scheduler.isAlive():
-            action_scheduler.join(5)
-        # end while
+        thread_queue.join()
     except (KeyboardInterrupt, SystemExit):
         logging.getLogger(u"pyTweetBot").info(u"Stopping executing action with scheduler...")
     # end try
