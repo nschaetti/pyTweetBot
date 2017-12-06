@@ -244,9 +244,9 @@ class BotConfig(object):
         """
         if setting == "tweet":
             (min_time, max_time) = self.tweet['interval']
-        elif setting == "retweet":
+        elif setting == "retweet" or setting == "like":
             (min_time, max_time) = self.retweet['interval']
-        elif setting == "friends":
+        elif setting == "follow" or setting == "unfollow":
             (min_time, max_time) = self.friends['interval']
         # end if
 
@@ -265,7 +265,7 @@ class BotConfig(object):
 
         # Log
         logging.getLogger(u"pyTweetBot").info(
-            u"Waiting {0:.{1}f} minutes for next run".format(waiting_seconds / 60.0, 1))
+            u"Waiting {0:.{1}f} minutes for next run of {2}".format(waiting_seconds / 60.0, 1, setting))
 
         # Wait
         time.sleep(waiting_seconds)
