@@ -249,7 +249,7 @@ if __name__ == "__main__":
     # end try
 
     # Connection to MySQL
-    dbc = config.get_database_config()
+    dbc = config.database
     mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
                                   db_name=dbc["database"])
 
@@ -274,7 +274,7 @@ if __name__ == "__main__":
     action_scheduler = ActionScheduler(config=config, stats=stats_manager)
 
     # Tweet factory
-    tweet_factory = TweetFactory(config.get_hashtags())
+    tweet_factory = TweetFactory(config.hashtags)
 
     # Test command
     # Update statistics
@@ -329,7 +329,7 @@ if __name__ == "__main__":
         statistics_generator(twitter_connector, args.stats_file, args.n_pages, args.stream, args.info)
     # Executor
     elif args.command == "execute":
-        execute_actions(action_scheduler)
+        execute_actions(config, action_scheduler)
     # List future action
     elif args.command == "actions":
         list_actions(action_scheduler, args.type)
