@@ -27,7 +27,10 @@ from friends.FriendsManager import ActionAlreadyDone
 from twitter.TweetBotConnect import RequestLimitReached
 import logging
 import tweepy
-from threading import Thread
+from threading import Thread, Lock
+
+# Mutex
+mutex = Lock()
 
 
 # Execute actions in a thread
@@ -85,11 +88,15 @@ class ExecutorThread(Thread):
         :return:
         """
         # Wait
-        if self._action_type == "follow" or self._action_type == "unfollow":
-            self._config.wait_next_action("friends")
-        elif self._action_type == "retweet" or self._action_type == "like":
+        if self._action_type == "Follow":
+            self._config.wait_next_action("follow")
+        elif self._action_type == "Unfollow":
+            self._config.wait_next_action("unfollow")
+        elif self._action_type == "Retweet":
             self._config.wait_next_action("retweet")
-        elif self._action_type == "tweet":
+        elif self._action_type == "Like":
+            self._config.wait_next_action("like")
+        elif self._action_type == "Tweet":
             self._config.wait_next_action("tweet")
         # end if
     # end wait_next_action
@@ -105,11 +112,20 @@ class ExecutorThread(Thread):
         """
         # Try to execute
         try:
-            # Execute
-            action = self._scheduler.next_action_to_execute(self._action_type)
+            # Lock
+            with mutex:
+                # Get next action
+                action = self._scheduler.next_action_to_execute(self._action_type)
 
-            # Delete
-            self._scheduler.delete(action)
+                # Execute if found
+                if action is not None:
+                    # Execute
+                    action.execute()
+
+                    # Delete
+                    self._scheduler.delete(action)
+                # end if
+            # end mutex
 
             # Wait
             self._wait_next_action()
@@ -123,14 +139,18 @@ class ExecutorThread(Thread):
             self._wait_next_action()
         except ActionAlreadyDone as e:
             # Delete action
-            self._scheduler.delete(action)
+            with mutex:
+                self._scheduler.delete(action)
+            # end mutex
 
             # Log error
             logging.getLogger(u"pyTweetBot").error(
                 u"Action {} already done : {}".format(action, e))
         except tweepy.TweepError as e:
             # Delete action
-            self._scheduler.delete(action)
+            with mutex:
+                self._scheduler.delete(action)
+            # end mutex
 
             # Log error
             logging.getLogger(u"pyTweetBot").error(
