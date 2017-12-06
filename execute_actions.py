@@ -42,7 +42,6 @@ def execute_actions(action_scheduler):
     :param action_type:
     """
     # List of threads
-    thread_list = list()
     thread_queue = Queue()
 
     # For each action type
