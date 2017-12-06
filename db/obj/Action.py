@@ -44,12 +44,10 @@ class Action(Base):
 
     # Fields
     action_id = Column(BigInteger, primary_key=True)
-    action_type = Column(Enum('Tweet', 'Retweet', 'Like', 'DirectMessage', 'FollowUnfollow'), nullable=False)
+    action_type = Column(Enum('Tweet', 'Retweet', 'Like', 'DirectMessage', 'Follow', 'Unfollow'), nullable=False)
     action_order = Column(BigInteger, nullable=False)
     action_tweet_id = Column(BigInteger, nullable=True)
     action_tweet_text = Column(String(5000), nullable=True)
-    action_follow = Column(String(100), nullable=True)
-    action_unfollow = Column(String(100), nullable=True)
     action_date = Column(DateTime, nullable=False, default=datetime.datetime.utcnow())
 
     ############################################
@@ -62,22 +60,22 @@ class Action(Base):
         Execute the action
         :return:
         """
-        if self.action_type == "FollowUnfollow":
+        if self.action_type == "Follow":
             # Follow
-            FriendsManager().follow(self.action_follow)
-
-            # Wait between 10 and 30 seconds
-            time.sleep(random.randint(10, 30))
-
+            FriendsManager().follow(self.action_tweet_text)
+        elif self.action_type == "Unfollow":
             # Unfollow
-            FriendsManager().unfollow(self.action_unfollow)
+            FriendsManager().unfollow(self.action_tweet_text)
         elif self.action_type == "Like":
+            # Like
             TweetBotConnector().like(self.action_tweet_id)
             Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
         elif self.action_type == "Tweet":
+            # Tweet
             TweetBotConnector().tweet(self.action_tweet_text)
             Tweeted.insert_tweet(self.action_tweet_text)
         elif self.action_type == "Retweet":
+            # Retweet
             TweetBotConnector().retweet(self.action_tweet_id)
             Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
         # end if
@@ -93,13 +91,11 @@ class Action(Base):
         To string
         :return:
         """
-        return "Action(id={}, type={}, tweet_id={}, tweet_text={}, action_follow={}, action_unfollow={}, tweet_date={})".format(
+        return "Action(id={}, type={}, tweet_id={}, tweet_text={}, tweet_date={})".format(
             self.action_id,
             self.action_type,
             self.action_tweet_id,
             self.action_tweet_text,
-            self.action_follow,
-            self.action_unfollow,
             self.action_date)
     # end __str__
 
@@ -109,13 +105,11 @@ class Action(Base):
         To unicode
         :return:
         """
-        return u"Action(id={}, type={}, tweet_id={}, tweet_text={}, action_follow={}, action_unfollow={}, tweet_date={})".format(
+        return u"Action(id={}, type={}, tweet_id={}, tweet_text={}, tweet_date={})".format(
             self.action_id,
             self.action_type,
             self.action_tweet_id,
             self.action_tweet_text,
-            self.action_follow,
-            self.action_unfollow,
             self.action_date)
     # end __unicode__
 
