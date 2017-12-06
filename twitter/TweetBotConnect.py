@@ -342,7 +342,7 @@ class TweetBotConnector(object):
         last_day = list()
         last_day_counter = 0
         for action_time in self._histories[action_type]:
-            if datetime.datetime.utcnow() - action_time <= 60 * 60 * 24:
+            if (datetime.datetime.utcnow() - action_time).total_seconds() <= 60 * 60 * 24:
                 last_day.append(action_time)
                 last_day_counter += 1
             # end if
