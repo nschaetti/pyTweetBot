@@ -72,6 +72,9 @@ class ActionScheduler(Thread):
     Manage bot's action
     """
 
+    # Properties
+    action_types = ["tweet", "retweet", "like", "follow", "unfollow"]
+
     # Constructor
     def __init__(self, config, n_actions=None, update_delay=timedelta(minutes=10), reservoir_size=timedelta(days=3),
                  purge_delay=timedelta(weeks=2), stats=None):
@@ -317,6 +320,16 @@ class ActionScheduler(Thread):
         action.execute()
         self.delete(action)
     # end exec_next_action
+
+    # Next action
+    def next_action_to_execute(self, action_type):
+        """
+        Get next action to execute
+        :param action_type:
+        :return:
+        """
+        return self._get_exec_action(action_type)
+    # end next_action_to_execute
 
     # List actions in the reservoir
     def list_actions(self, action_type=""):
