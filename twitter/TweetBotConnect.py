@@ -22,10 +22,17 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import datetime
 import tweepy
 import time
 import logging
 from patterns.singleton import singleton
+
+
+# Request limits reached
+class RequestLimitReached(Exception):
+    pass
+# end RequestLimitReached
 
 
 # Twitter connector
@@ -42,7 +49,7 @@ class TweetBotConnector(object):
         :param bot_config: Bot configuration object.
         """
         # Auth to Twitter
-        config = bot_config.get_twitter_config()
+        config = bot_config.twitter
         auth = tweepy.OAuthHandler(config['auth_token1'], config['auth_token2'])
         auth.set_access_token(config['access_token1'], config['access_token2'])
         self._api = tweepy.API(auth, retry_delay=3, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
@@ -51,6 +58,18 @@ class TweetBotConnector(object):
         self._followers = list()
         self._current_follower = 0
         self._config = config
+
+        # History
+        self._histories = {'follow': list(), 'unfollow': list(), 'tweet': list(), 'retweet': list(), 'like': list()}
+        self._counts = {'follow': 0, 'unfollow': 0, 'tweet': 0, 'retweet': 0, 'like': 0}
+
+        # Limits
+        self._limits = dict()
+        self._limits['follow'] = bot_config.friends['max_new_followers']
+        self._limits['unfollow'] = bot_config.friends['max_new_unfollow']
+        self._limits['tweet'] = bot_config.tweet['max_tweets']
+        self._limits['retweet'] = bot_config.retweet['max_retweets']
+        self._limits['like'] = bot_config.retweet['max_likes']
     # end __init__
 
     ###########################################
@@ -66,6 +85,9 @@ class TweetBotConnector(object):
         # Log
         logging.getLogger(u"pyTweetBot").info(u"Retweeting {}".format(tweet_id))
         self._api.retweet(tweet_id)
+
+        # Inc counter
+        self._inc_counter('retweet')
     # end retweet
 
     # Tweet
@@ -74,12 +96,20 @@ class TweetBotConnector(object):
         Send a Tweet
         :param text: Tweet's text.
         """
-        try:
-            logging.getLogger(u"pyTweetBot").info(u"Tweeting \"{}\"".format(text))
-            self._api.update_status(status=text)
-        except tweepy.error.TweepError as e:
-            logging.getLogger(u"pyTweetBot").info(u"Twitter API error \"{}\"".format(e))
-        # end try
+        if self.check_limits('tweet'):
+            try:
+                # Log
+                logging.getLogger(u"pyTweetBot").info(u"Tweeting \"{}\"".format(text))
+                self._api.update_status(status=text)
+
+                # Inc counter
+                self._inc_counter('tweet')
+            except tweepy.error.TweepError as e:
+                logging.getLogger(u"pyTweetBot").info(u"Twitter API error \"{}\"".format(e))
+            # end try
+        else:
+            raise RequestLimitReached(u"Request limit reached for tweet action")
+        # end if
     # end tweet
 
     # Unfollow
@@ -88,8 +118,16 @@ class TweetBotConnector(object):
         Unfollow
         :param user_id: Twitter user's ID to follow.
         """
-        logging.getLogger(u"pyTweetBot").info(u"Unfollowing Twitter username {}".format(screen_name))
-        self._api.destroy_friendship(screen_name)
+        if self.check_limits('unfollow'):
+            # Log
+            logging.getLogger(u"pyTweetBot").info(u"Unfollowing Twitter username {}".format(screen_name))
+            self._api.destroy_friendship(screen_name)
+
+            # Inc counter
+            self._inc_counter('unfollow')
+        else:
+            raise RequestLimitReached(u"Request limit reached for unfollow action")
+        # end if
     # end unfollow
 
     # Follow
@@ -98,8 +136,16 @@ class TweetBotConnector(object):
         Follow a user.
         :param user_id:
         """
-        logging.getLogger(u"pyTweetBot").info(u"Following Twitter username {}".format(screen_name))
-        self._api.create_friendship(screen_name)
+        if self.check_limits('follow'):
+            # Log
+            logging.getLogger(u"pyTweetBot").info(u"Following Twitter username {}".format(screen_name))
+            self._api.create_friendship(screen_name)
+
+            # Inc counter
+            self._inc_counter('follow')
+        else:
+            raise RequestLimitReached(u"Request limit reached for follow action")
+        # end if
     # end follow
 
     # Like
@@ -108,8 +154,16 @@ class TweetBotConnector(object):
         Like a tweet.
         :param tweet_id: Tweet's ID.
         """
-        logging.getLogger(u"pyTweetBot").info(u"Liking Tweet {}".format(tweet_id))
-        self._api.create_favorite(tweet_id)
+        if self.check_limits('like'):
+            # Log
+            logging.getLogger(u"pyTweetBot").info(u"Liking Tweet {}".format(tweet_id))
+            self._api.create_favorite(tweet_id)
+
+            # Inc counter
+            self._inc_counter('like')
+        else:
+            raise RequestLimitReached(u"Request limit reached for like action")
+        # end if
     # end like
 
     # Send direct message
@@ -228,6 +282,17 @@ class TweetBotConnector(object):
         # end if
     # end get_user
 
+    # Check limits
+    def check_limits(self, action_type):
+        """
+        Check limits
+        :param action_type:
+        :return:
+        """
+        # Check limits
+        return self._counts[action_type] <= self._limits[action_type]
+    # end check_friend_request_limits
+
     ###########################################
     # Override
     ###########################################
@@ -251,6 +316,10 @@ class TweetBotConnector(object):
 
     # Load followers
     def _load_followers(self):
+        """
+
+        :return:
+        """
         self._page = self._cursor.next()
         self._followers = list()
         for follower in self._page:
@@ -259,5 +328,29 @@ class TweetBotConnector(object):
         self._current_follower = 0
         time.sleep(60)
     # end load
+
+    # Increment counter
+    def _inc_counter(self, action_type):
+        """
+        Increment follow counter
+        :return:
+        """
+        # Add to history
+        self._histories[action_type].append(datetime.datetime.utcnow())
+
+        # Last 24h list
+        last_day = list()
+        last_day_counter = 0
+        for action_time in self._histories[action_type]:
+            if datetime.datetime.utcnow() - action_time <= 60 * 60 * 24:
+                last_day.append(action_time)
+                last_day_counter += 1
+            # end if
+        # end for
+
+        # History and counter
+        self._histories[action_type] = last_day
+        self._counts[action_type] = last_day_counter
+    # end _inc_follow_counter
 
 # end TweetBotConnector
