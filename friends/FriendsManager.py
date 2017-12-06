@@ -49,6 +49,12 @@ class FollowUnfollowRatioReached(Exception):
     pass
 # end FollowUnfollowRatioReached
 
+
+# Exception, Useless action because already done (already following a user)
+class ActionAlreadyDone(Exception):
+    pass
+# end ActionAlreadyDone
+
 ##############################################
 # CLASS
 ##############################################
@@ -235,18 +241,12 @@ class FriendsManager(object):
 
                 # Update follow counter
                 self._inc_follow_count(screen_name)
-
-                # Followed
-                return True
             else:
-                raise FollowUnfollowRatioReached(u"Follow/Unfollow daily ration reached")
+                raise FollowUnfollowRatioReached(u"Follow/Unfollow daily ratio reached")
             # end if
         else:
-            logging.getLogger(u"pyTweetBot").error(u"Already following user {}".format(screen_name))
+            raise ActionAlreadyDone(u"Already following user {}".format(screen_name))
         # end if
-
-        # Nothing
-        return False
     # end follow
 
     # Unfollow a Twitter account
@@ -273,10 +273,9 @@ class FriendsManager(object):
             else:
                 raise FollowUnfollowRatioReached(u"Follow/Unfollow daily ration reached")
             # end if
+        else:
+            raise ActionAlreadyDone(u"Already not following user {}".format(screen_name))
         # end if
-
-        # Nothing
-        return False
     # end unfollow
 
     # Update followers and following
@@ -424,8 +423,8 @@ class FriendsManager(object):
         """
         if not self.exists(screen_name):
             new_friend = db.obj.Friend(friend_screen_name=screen_name, friend_description=description,
-                                friend_location=location, friend_followers_count=followers_count,
-                                friend_friends_count=friends_count, friend_statuses_count=statuses_count)
+                                       friend_location=location, friend_followers_count=followers_count,
+                                       friend_friends_count=friends_count, friend_statuses_count=statuses_count)
             self._session.add(new_friend)
             self._logger.info(u"New friend %s" % screen_name)
             return 1
