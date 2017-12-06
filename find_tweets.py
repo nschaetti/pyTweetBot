@@ -53,12 +53,12 @@ cont_loop = True
 def signal_handler(signum, frame):
     """
     Signal handler
-    :param signum:
-    :param frame:
-    :return:
+    :param signum: Signal number to handle
+    :param frame: Frame
     """
     global cont_loop
     logging.info(u"Signal {} received in frame {}".format(signum, frame))
+    logging.info(u"Stopping loop at next iteration")
     cont_loop = False
 # end signal_handler
 
@@ -70,15 +70,17 @@ def signal_handler(signum, frame):
 def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=0.5):
     """
     Find tweet in the hunters
-    :param config:
-    :param model:
-    :param action_scheduler:
-    :return:
+    :param config: BotConfig configuration object
+    :param model: Path to model file for classification
+    :param action_scheduler: Scheduler object
+    :param features: Features (words, bigrams, trigrams) separated by +
+    :param n_pages: Number of pages to analyze
+    :param threshold: Probability threshold to be accepted as tweet
     """
 
     # Set the signal handler and a 5-second alarm
-    #signal.signal(signal.SIGQUIT, signal_handler)
-    #signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGQUIT, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
 
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
@@ -90,7 +92,7 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
         censor = CensorModel(config)
         logging.getLogger(u"pyTweetBot").info(u"Model {} loaded".format(model))
     else:
-        sys.stderr.write(u"Can't open model file {}\n".format(model))
+        logging.getLogger(u"pyTweetBot").error(u"Can't open model file {}\n".format(model))
         exit()
     # end if
 
@@ -120,15 +122,16 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
     # end for
 
     # Add RSS streams
-    for rss_stream in config.get_rss_streams():
+    for rss_stream in config.rss:
         tweet_finder.add(RSSHunter(rss_stream))
     # end for
 
     # Add Google News
-    for news in config.get_news_config():
+    for news in config.news:
         for language in news['languages']:
             for country in news['countries']:
-                tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, hashtags=news['hashtags'], n_pages=n_pages))
+                tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country,
+                                                  hashtags=news['hashtags'], n_pages=n_pages))
             # end for
         # end for
     # end for
