@@ -38,7 +38,7 @@ class CensorModel(object):
         :param config: Settings
         """
         # Forbidden words
-        self._forbidden_words = config.get_forbidden_words()
+        self._forbidden_words = config.forbidden_words
     # end __init__
 
     #################################################
