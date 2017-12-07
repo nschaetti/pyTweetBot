@@ -72,7 +72,7 @@ class ExecutorThread(Thread):
             if self._config.is_awake():
                 self()
             else:
-                self._config.wait_next_action()
+                self._wait_next_action()
             # end if
         # end while
     # end run
