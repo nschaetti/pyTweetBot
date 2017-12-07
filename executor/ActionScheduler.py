@@ -303,9 +303,20 @@ class ActionScheduler(object):
         # Get reservoir level
         reservoir_level = self._get_reservoir_level(action_type)
 
+        # Get interval
+        if action_type == "Tweet":
+            (min_time, max_time) = self._config.tweet['interval']
+        elif action_type == "Retweet" or action_type == "Like":
+            (min_time, max_time) = self._config.retweet['interval']
+        elif action_type == "Follow" or action_type == "Unfollow":
+            (min_time, max_time) = self._config.friends['interval']
+        # end if
+
+        # Average
+        average_time = (min_time + max_time) / 2.0
+
         # Max number of actions
-        max_n_action = int(self._reservoir_size.total_seconds() / self._update_delay.total_seconds()
-                           * self._n_actions[action_type])
+        max_n_action = int(self._reservoir_size.total_seconds() / (average_time * 60))
 
         # Log
         logging.debug(u"is_reservoir_full: {} in the reservoir for a max value of {}".format(reservoir_level,
