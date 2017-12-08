@@ -282,7 +282,7 @@ if __name__ == "__main__":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
-        find_tweets(config, args.model, action_scheduler, args.features, args.threshold)
+        find_tweets(config, args.model, action_scheduler, args.features, args.n_pages, args.threshold)
     # Find retweets
     elif args.command == "find-retweets":
         find_retweets(config, args.model, action_scheduler, args.features, args.text_size, args.threshold)
