@@ -65,7 +65,7 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, retwe
     retweet_finders = list()
 
     # Get all finders
-    for keyword in config.get_retweet_config()['keywords']:
+    for keyword in config.retweet['keywords']:
         retweet_finders.append(RetweetFinder(search_keywords=keyword))
     # end for
 
