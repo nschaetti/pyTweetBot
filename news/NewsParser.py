@@ -41,6 +41,15 @@ class NewsParser(HTMLParser):
                         # URL
                         url = attr[1]
 
+                        # URL
+                        if url[:7] == u"/url?q=":
+                            url = url[7:]
+                        # end if
+
+                        # No URL options
+                        url = url[:url.find(u'%')]
+                        url = url[:url.find(u'&')]
+
                         # Substring
                         if url not in self.news:
                             self.news.append(url)
