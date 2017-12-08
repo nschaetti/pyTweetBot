@@ -16,7 +16,8 @@ default_config = \
 		"max_new_followers" : 40,
 		"max_new_unfollow" : 40,
 		"follow_unfollow_ratio_limit" : 1.2,
-		"interval" : [30, 45]
+		"interval" : [30, 45],
+		"ratio" : 0.8
 	},
 	"forbidden_words" :
 	[
