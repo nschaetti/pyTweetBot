@@ -127,7 +127,7 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
     # end for
 
     # Add Google News
-    for news in config.news:
+    for news in config.google_news:
         for language in news['languages']:
             for country in news['countries']:
                 tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country,
