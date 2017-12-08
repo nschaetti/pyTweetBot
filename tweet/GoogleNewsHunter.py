@@ -30,7 +30,7 @@ class GoogleNewsHunter(Hunter):
         self._n_pages = n_pages
         self._google_news_client = GoogleNewsClient(search_term, lang, country)
         self._news = list()
-        self._current_page = -1
+        self._current_page = 0
     # end __init__
 
     # To unicode
@@ -58,18 +58,18 @@ class GoogleNewsHunter(Hunter):
         :return:
         """
         if len(self._news) == 0:
-            self._current_page += 1
             if self._current_page > self._n_pages:
                 raise StopIteration
             # end if
-            self._news = self._google_news_client.get_news(page=self._current_page-1)
+            self._news = self._google_news_client.get_news(page=self._current_page)
+            self._current_page += 1
         # end if
 
         # Current news
         try:
             current_news = self._news[0]
         except IndexError:
-            logging.error(
+            logging.getLogger(u"pyTweetBot").error(
                 u"Error: no news for page {} and research terms {} ({}/{})".format(self._current_page,
                                                                                    self._search_term, self._lang,
                                                                                    self._country))
