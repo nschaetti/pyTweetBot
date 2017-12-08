@@ -24,11 +24,13 @@
 
 # Import
 import os
+import tweepy
 import logging
 import time
 import sys
 import nsNLP
 import random
+import db.obj
 from friends.FriendsManager import FriendsManager
 from learning.Model import Model
 from learning.CensorModel import CensorModel
@@ -53,9 +55,15 @@ def add_follow_action(action_scheduler, friend):
     :return:
     """
     try:
-        logging.getLogger(u"pyTweetBot").info(
-            u"Adding Friend \"{}\" to follow to the scheduler".format(friend.friend_screen_name))
-        action_scheduler.add_follow(friend.friend_screen_name)
+        if type(friend) is db.obj.Friend:
+            logging.getLogger(u"pyTweetBot").info(
+                u"Adding Friend \"{}\" to follow to the scheduler".format(friend.friend_screen_name))
+            action_scheduler.add_follow(friend.friend_screen_name)
+        elif type(friend) is tweepy.User:
+            logging.getLogger(u"pyTweetBot").info(
+                u"Adding Friend \"{}\" to follow to the scheduler".format(friend.screen_name))
+            action_scheduler.add_follow(friend.screen_name)
+        # end if
     except ActionReservoirFullError:
         logging.getLogger(u"pyTweetBot").error(u"Reservoir full for follow action, exiting...")
         exit()
@@ -133,8 +141,8 @@ def find_follows(config, model, action_scheduler, friends_manager, features, tex
     # end for
 
     # Get options
-    search_keywords = config.get_retweet_config()['keywords']
-    ratio = config.get_friends_config()['ratio']
+    search_keywords = config.retweet['keywords']
+    ratio = config.friends['ratio']
 
     # Shuffle keywords
     random.shuffle(search_keywords)
@@ -166,11 +174,11 @@ def find_follows(config, model, action_scheduler, friends_manager, features, tex
                         add_follow_action(action_scheduler, author)
                     # end if
                 # end if
-
-                # Wait 1 minute
-                logging.getLogger(u"pyTweetBot").info(u"Waiting for 1 minute (Twitter limits)")
-                time.sleep(60)
             # end for
+
+            # Wait 1 minute
+            logging.getLogger(u"pyTweetBot").info(u"Waiting for 1 minute (Twitter limits)")
+            time.sleep(60)
         # end for
     # end for
 # end find_follows
