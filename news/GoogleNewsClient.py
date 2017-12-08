@@ -4,6 +4,7 @@
 
 # Import
 import urllib2
+from urlparse import urlparse
 from HTMLParser import HTMLParser
 from bs4 import BeautifulSoup
 import numpy as np
@@ -28,13 +29,20 @@ class GoogleNewsClient(object):
 
     # Header
     _headers = {
-        u'user-agent': u"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) "
+        u'user-agent': u"Mozilla/5.0 (X11; Linux x86_64) "
                        u"AppleWebKit/537.36 (KHTML, like Gecko) "
-                       u"Chrome/59.0.3071.115 "
+                       u"Chrome/56.0.2924.87 "
                        u"Safari/537.36",
-        u'accept': u"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
         u'accept-language': u"en-US,en;q=0.8,et;q=0.6,fr;q=0.4",
-        u'cache-control': u"no-cache"
+        u'cache-control': u"no-cache",
+        u'authority': u"",
+        u'method': u"GET",
+        u'path': u"",
+        u'scheme': u"https",
+        u'accept': u"text/html, application/xhtml+xml, application/xml; q=0.9, image/webp, */*;q=0.8",
+        u'accept-encoding': u"gzip, deflate, sdch, br",
+        u'pragma': u"no-cache",
+        u'upgrade-insecure-requests': u"1"
     }
 
     # Time out
@@ -97,6 +105,14 @@ class GoogleNewsClient(object):
         """
         # HTML parser
         pars = HTMLParser()
+
+        # URL parser
+        url_parse = urlparse(url)
+
+        # Final header
+        final_header = self._headers
+        final_header[u'authority'] = url_parse.netloc
+        final_header[u'path'] = url_parse.path
 
         # HTTP request
         request = urllib2.Request(url, None, self._headers)
