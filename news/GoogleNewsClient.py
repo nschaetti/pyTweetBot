@@ -15,6 +15,9 @@ import logging
 import httplib
 import socket
 import ssl
+import brotli
+import gzip
+from StringIO import StringIO
 
 
 #
@@ -29,20 +32,21 @@ class GoogleNewsClient(object):
 
     # Header
     _headers = {
-        u'user-agent': u"Mozilla/5.0 (X11; Linux x86_64) "
-                       u"AppleWebKit/537.36 (KHTML, like Gecko) "
-                       u"Chrome/56.0.2924.87 "
-                       u"Safari/537.36",
+        u'user-agent': u"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) "
+                       u"Gecko/2009021910 "
+                       u"Firefox/3.0.7",
         u'accept-language': u"en-US,en;q=0.8,et;q=0.6,fr;q=0.4",
         u'cache-control': u"no-cache",
         u'authority': u"",
         u'method': u"GET",
         u'path': u"",
         u'scheme': u"https",
-        u'accept': u"text/html, application/xhtml+xml, application/xml; q=0.9, image/webp, */*;q=0.8",
+        u'accept': u"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        u'Accept-Charset': u'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
         u'accept-encoding': u"gzip, deflate, sdch, br",
         u'pragma': u"no-cache",
-        u'upgrade-insecure-requests': u"1"
+        u'upgrade-insecure-requests': u"1",
+        u'Connection': u'keep-alive'
     }
 
     # Time out
@@ -79,7 +83,7 @@ class GoogleNewsClient(object):
         news = []
 
         # Logging
-        logging.debug(u"Getting page {}".format(page))
+        logging.getLogger(u"pyTweetBot").debug(u"Getting page {}".format(page))
 
         # Add page's news
         news += self._get_page(page)
@@ -96,6 +100,47 @@ class GoogleNewsClient(object):
     #
     ###############################################
 
+    # Request page
+    def _request_page(self, url):
+        """
+        Request page
+        :param url:
+        :return:
+        """
+        # URL parser
+        url_parse = urlparse(url)
+
+        # Final header
+        final_header = self._headers
+        final_header[u'authority'] = url_parse.netloc
+        final_header[u'path'] = url_parse.path
+
+        # Call URL
+        request = urllib2.Request(url, None, self._headers)
+
+        # Request server
+        response = urllib2.urlopen(request, timeout=self._timeout)
+
+        # Data
+        response_data = response.read()
+
+        # Content encoding
+        content_encoding = response.info().getheader('Content-Encoding')
+
+        # Content encoding
+        if content_encoding == 'br':
+            return brotli.decompress(response_data)
+        elif content_encoding == 'gzip':
+            buf = StringIO(response_data)
+            f = gzip.GzipFile(fileobj=buf)
+            return f.read()
+        elif content_encoding is None or 'text/html' in content_encoding:
+            return response_data
+        else:
+            logging.getLogger(u"pyTweetBot").error(u"Unknown encoding : {}".format(url))
+        # end if
+    # end _request_page
+
     # Get news' title
     def _get_news_title(self, url):
         """
@@ -106,24 +151,13 @@ class GoogleNewsClient(object):
         # HTML parser
         pars = HTMLParser()
 
-        # URL parser
-        url_parse = urlparse(url)
-
-        # Final header
-        final_header = self._headers
-        final_header[u'authority'] = url_parse.netloc
-        final_header[u'path'] = url_parse.path
-
-        # HTTP request
-        request = urllib2.Request(url, None, self._headers)
-
         # Get HTML
-        html = urllib2.urlopen(request, timeout=self._timeout).read()
+        html = self._request_page(url)
 
         # Get URL's content
         soup = BeautifulSoup(html, "lxml")
 
-        # Clean strange characters
+        # Get and clean data
         new_title = unicode(soup.title.string.strip())
         new_title = new_title.replace(u'\n', u'').replace(u'\t', u'').replace(u"'", u"\'").replace(u"&amp;",
                                                                                                    u"&").replace(u'\r',
@@ -153,24 +187,21 @@ class GoogleNewsClient(object):
                 self.keyword.replace(u" ", u"+")) + u"&tbm=nws&start=" + unicode(page * 10)
 
         # Log
-        logging.info(u"Retrieving {}".format(url))
-
-        # Call URL
-        request = urllib2.Request(url, None, self._headers)
+        logging.getLogger(u"pyTweetBot").info(u"Retrieving {}".format(url))
 
         # Get HTML
         cont = True
         counter = 0
         while cont:
             try:
-                html = urllib2.urlopen(request, timeout=self._timeout).read()
+                html = self._request_page(url)
                 cont = False
             except urllib2.URLError as e:
-                logging.error(u"URL error while retrieving page {}".format(url))
+                logging.getLogger(u"pyTweetBot").error(u"URL error while retrieving page {} : {}".format(url, e))
                 time.sleep(20)
                 pass
             except UnicodeEncodeError as e:
-                logging.error(u"Error while encoding request to unicode {}".format(url))
+                logging.getLogger(u"pyTweetBot").error(u"Error while encoding request to unicode {} : {}".format(url, e))
                 return news
             # end try
             counter += 1
@@ -182,6 +213,8 @@ class GoogleNewsClient(object):
         # instantiate the parser and fed it some HTML
         parser = NewsParser()
         parser.feed(html.decode('utf-8', errors='ignore'))
+
+        # Get news
         urls = parser.get_news()
 
         # For each url
@@ -191,23 +224,23 @@ class GoogleNewsClient(object):
                 title = self._get_news_title(url)
                 news.append((url, title))
             except urllib2.HTTPError as e:
-                logging.error(u"HTTP Error while retrieving page {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"HTTP Error while retrieving page {} : {}".format(url, e))
             except AttributeError as e:
-                logging.error(u"AttributeError while retrieving page {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"AttributeError while retrieving page {} : {}".format(url, e))
             except httplib.BadStatusLine as e:
-                logging.error(u"Bad status line error while retrieving page {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"Bad status line error while retrieving page {} : {}".format(url, e))
             except socket.timeout as e:
-                logging.error(u"Socket error while retrieving page {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"Socket error while retrieving page {} : {}".format(url, e))
             except httplib.IncompleteRead as e:
-                logging.error(u"Incomplete read error while retrieving page {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"Incomplete read error while retrieving page {} : {}".format(url, e))
             except urllib2.URLError as e:
-                logging.error(u"Error while retrieving page {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"Error while retrieving page {} : {}".format(url, e))
             except ssl.CertificateError as e:
-                logging.error(u"Error with SSL Certificate while retrieving {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"Error with SSL Certificate while retrieving {} : {}".format(url, e))
             except ssl.SSLError as e:
-                logging.error(u"Error with SSL while retrieving {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"Error with SSL while retrieving {} : {}".format(url, e))
             except ValueError as e:
-                logging.error(u"Error with URL value while retrieving {} : {}".format(url, e))
+                logging.getLogger(u"pyTweetBot").error(u"Error with URL value while retrieving {} : {}".format(url, e))
             # end try
         # end for
         return news
