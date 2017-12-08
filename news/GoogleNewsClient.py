@@ -241,6 +241,8 @@ class GoogleNewsClient(object):
                 logging.getLogger(u"pyTweetBot").error(u"Error with SSL while retrieving {} : {}".format(url, e))
             except ValueError as e:
                 logging.getLogger(u"pyTweetBot").error(u"Error with URL value while retrieving {} : {}".format(url, e))
+            except TypeError as e:
+                logging.getLogger(u"pyTweetBot").error(u"Type error while retrieving {} : {}".format(url, e))
             # end try
         # end for
         return news
