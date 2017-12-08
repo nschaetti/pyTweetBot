@@ -93,7 +93,7 @@ def find_unfollows(config, friends_manager, model, action_scheduler, features, t
     # end for
 
     # Unfollow interval in days
-    unfollow_day = int(config.get_friends_config()['unfollow_interval'] / 86400.0)
+    unfollow_day = int(config.friends['unfollow_interval'] / 86400.0)
 
     # First unfollow obsolete friends
     logging.getLogger(u"pyTweetBot").info(u"Searching obsolete friends to unfollow")
