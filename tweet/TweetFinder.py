@@ -140,7 +140,7 @@ class TweetFinder(Hunter):
                 return self._to_the_factory(self._hunters[self._current].next())
             except StopIteration:
                 self._current += 1
-                if self._current < self._hunters:
+                if self._current < self._n_hunters:
                     logging.getLogger(u"pyTweetBot").info(u"Changing hunter to {}".format(self._hunters[self._current]))
                 # end if
                 return self._to_the_factory(self.next())
