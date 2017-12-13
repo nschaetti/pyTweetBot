@@ -12,6 +12,7 @@ import re
 from twitter.TweetBotConnect import TweetBotConnector
 from textblob import TextBlob
 from news.GoogleNewsClient import GoogleNewsClient
+import tools
 
 
 # Find new tweets from Twitter researches
@@ -34,7 +35,6 @@ class TwitterHunter(Hunter):
         self._polarity = polarity
         self._subjectivity = subjectivity
         self._languages = languages
-        self._google_news = GoogleNewsClient("", 'en', 'ch')
     # end __init__
 
     # Get hashtags
@@ -111,11 +111,11 @@ class TwitterHunter(Hunter):
                 if tweet_blob.sentiment.polarity >= self._polarity and \
                                 tweet_blob.sentiment.subjectivity <= self._subjectivity and \
                                 tweet_blob.detect_language() in self._languages:
-                    # Get URL's title
-                    page_title = self._google_news.get_page_title(urls[0])
+                    # Retrieve page
+                    page_parser = tools.PageParser(urls[0])
 
                     # Add to tweets
-                    self._tweets.append(Tweet(page_title, urls[0], self._hashtags))
+                    self._tweets.append(Tweet(page_parser.title, urls[0], self._hashtags))
                 # end if
             # end if
         # end for
