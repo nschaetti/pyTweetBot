@@ -32,6 +32,7 @@ import nsNLP
 from db.obj.Tweeted import Tweeted
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from retweet.RetweetFinder import RetweetFinder
+import learning
 from learning.Model import Model
 from learning.CensorModel import CensorModel
 
@@ -69,39 +70,8 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, retwe
         retweet_finders.append(RetweetFinder(search_keywords=keyword))
     # end for
 
-    # Load model or create
-    if os.path.exists(model):
-        model = Model.load(model)
-        censor = CensorModel(config)
-    else:
-        sys.stderr.write(u"Mode file {} does not exists\n".format(model))
-        exit()
-    # end if
-
-    # Tokenizer
-    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
-
-    # Parse features
-    feature_list = features.split('+')
-
-    # Join features
-    bow = nsNLP.features.BagOfGrams()
-
-    # For each features
-    for bag in feature_list:
-        # Select features
-        if bag == 'words':
-            b = nsNLP.features.BagOfWords()
-        elif bag == 'bigrams':
-            b = nsNLP.features.BagOf2Grams()
-        elif bag == 'trigrams':
-            b = nsNLP.features.BagOf3Grams()
-        else:
-            sys.stderr.write(u"Unknown features type {}".format(features))
-            exit()
-        # end if
-        bow.add(b)
-    # end for
+    # Load model
+    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model, features)
 
     # For each retweet finders
     for retweet_finder in retweet_finders:
