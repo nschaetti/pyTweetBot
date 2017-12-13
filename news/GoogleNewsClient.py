@@ -94,6 +94,16 @@ class GoogleNewsClient(object):
         return news
     # end get_news
 
+    # Get page's title
+    def get_page_title(self, url):
+        """
+        Get page's title
+        :param url:
+        :return:
+        """
+        return self._get_news_title(url)
+    # end get_page_title
+
     ###############################################
     #
     # Private functions
