@@ -106,7 +106,6 @@ class TwitterHunter(Hunter):
             if len(urls) > 0:
                 # Analyze text
                 tweet_blob = TextBlob(tweet.text)
-
                 # Pass level of pol & sub
                 if tweet_blob.sentiment.polarity >= self._polarity and \
                                 tweet_blob.sentiment.subjectivity <= self._subjectivity and \
