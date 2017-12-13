@@ -38,7 +38,7 @@ from learning.CensorModel import CensorModel
 from news.PageParser import PageParser, PageParserRetrievalError
 from learning.tools import load_model
 import learning
-import tweet
+import tweet as tw
 
 ####################################################
 # Globals
@@ -80,16 +80,11 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
     :param n_pages: Number of pages to analyze
     :param threshold: Probability threshold to be accepted as tweet
     """
-
-    # Set the signal handler and a 5-second alarm
-    signal.signal(signal.SIGQUIT, signal_handler)
-    signal.signal(signal.SIGINT, signal_handler)
-
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
 
     # Load model
-    tokenizer, bow, model, censor = learning.Classifier().load_model(config, model, features)
+    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model, features)
 
     # Add RSS streams
     for rss_stream in config.rss:
@@ -107,19 +102,23 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
         # end for
 
         # Add as a Twitter hunter
-        tweet_finder.add(tweet.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages))
+        tweet_finder.add(tw.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages))
     # end for
 
     # Keep running
     while cont_loop:
         # For each tweet
         for tweet in tweet_finder:
+            # On title
+            on_title = False
+
             # Get page's text
             try:
                 page_text = PageParser.get_text(tweet.get_url())
             except PageParserRetrievalError as e:
-                logging.getLogger(u"pyTweetBot").error(u"Page retrieval error : {}".format(e))
-                continue
+                logging.getLogger(u"pyTweetBot").warning(u"Page retrieval error : {}".format(e))
+                page_text = tweet.get_text()
+                on_title = True
             # end try
 
             # Predict class
@@ -129,20 +128,22 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
             # Predicted as tweet
             if prediction == "pos" and censor_prediction == "pos" and not tweet.already_tweeted():
                 if probs['pos'] >= threshold:
-                    # Try to add
-                    try:
-                        logging.getLogger(u"pyTweetBot").info(u"Adding Tweet \"{}\" to the scheduler".format(
-                            tweet.get_tweet()))
-                        action_scheduler.add_tweet(tweet)
-                    except ActionReservoirFullError:
-                        logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
-                        exit()
-                        pass
-                    except ActionAlreadyExists:
-                        logging.getLogger(u"pyTweetBot").error(u"Tweet \"{}\" already exists in the database".format(
-                            tweet.get_tweet().encode('ascii', errors='ignore')))
-                        pass
-                    # end try
+                    if not on_title or probs['pos'] >= 0.8:
+                        # Try to add
+                        try:
+                            logging.getLogger(u"pyTweetBot").info(u"Adding Tweet \"{}\" to the scheduler".format(
+                                tweet.get_tweet()))
+                            action_scheduler.add_tweet(tweet)
+                        except ActionReservoirFullError:
+                            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
+                            exit()
+                            pass
+                        except ActionAlreadyExists:
+                            logging.getLogger(u"pyTweetBot").error(u"Tweet \"{}\" already exists in the database".format(
+                                tweet.get_tweet().encode('ascii', errors='ignore')))
+                            pass
+                        # end try
+                    # end if
                 # end if
             # end if
         # end for
