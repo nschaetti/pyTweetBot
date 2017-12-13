@@ -43,7 +43,7 @@ class PageParser(object):
         while count < 10:
             # Get title
             try:
-                soup = BeautifulSoup(urllib2.urlopen(url.encode('ascii', errors='ignore')))
+                soup = BeautifulSoup(urllib2.urlopen(url.encode('ascii', errors='ignore')), "lxml")
                 success = True
                 break
             except urllib2.HTTPError as e:
