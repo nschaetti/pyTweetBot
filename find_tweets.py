@@ -37,6 +37,8 @@ from tweet.TweetFactory import TweetFactory
 from learning.CensorModel import CensorModel
 from news.PageParser import PageParser, PageParserRetrievalError
 from learning.tools import load_model
+import learning
+import tweet
 
 ####################################################
 # Globals
@@ -87,10 +89,7 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
     tweet_finder = TweetFinder(shuffle=True)
 
     # Load model
-    tokenizer, bow, model, censor = load_model(config, model, features)
-
-    # Add Twitter hashtag stream
-
+    tokenizer, bow, model, censor = learning.Classifier().load_model(config, model, features)
 
     # Add RSS streams
     for rss_stream in config.rss:
@@ -99,12 +98,16 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
 
     # Add Google News
     for news in config.google_news:
+        # Add for each tuple language/country
         for language in news['languages']:
             for country in news['countries']:
                 tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country,
                                                   hashtags=news['hashtags'], n_pages=n_pages))
             # end for
         # end for
+
+        # Add as a Twitter hunter
+        tweet_finder.add(tweet.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages))
     # end for
 
     # Keep running
