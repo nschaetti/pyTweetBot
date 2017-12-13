@@ -47,8 +47,8 @@ class NewsParser(HTMLParser):
                         # end if
 
                         # No URL options
-                        url = url[:url.find(u'%')]
-                        url = url[:url.find(u'&')]
+                        url = url[:url.find(u'%')] if url.find(u'%') != -1 else url
+                        url = url[:url.find(u'&')] if url.find(u'&') != -1 else url
 
                         # Substring
                         if url not in self.news:
