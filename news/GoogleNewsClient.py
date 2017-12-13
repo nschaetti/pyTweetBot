@@ -32,21 +32,22 @@ class GoogleNewsClient(object):
 
     # Header
     _headers = {
-        u'user-agent': u"Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) "
-                       u"Gecko/2009021910 "
-                       u"Firefox/3.0.7",
-        u'accept-language': u"en-US,en;q=0.8,et;q=0.6,fr;q=0.4",
-        u'cache-control': u"no-cache",
         u'authority': u"",
         u'method': u"GET",
         u'path': u"",
         u'scheme': u"http",
-        u'accept': u"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        u'Accept-Charset': u'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+        u'accept': u"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         u'accept-encoding': u"gzip, deflate, sdch, br",
+        u'accept-language': u"fr,en;q=0.8",
+        u'cache-control': u"no-cache",
         u'pragma': u"no-cache",
-        u'upgrade-insecure-requests': u"1",
-        u'Connection': u'keep-alive'
+        u'upgrade-insecure-requests': 1,
+        u'user-agent': u"Mozilla/5.0 (X11; Linux x86_64) "
+                       u"AppleWebKit/537.36 (KHTML, like Gecko) "
+                       u"Chrome/56.0.2924.87 "
+                       u"Safari/537.36"
+        # u'Accept-Charset': u'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+        # u'Connection': u'keep-alive'
     }
 
     # Time out
@@ -120,6 +121,11 @@ class GoogleNewsClient(object):
         final_header = self._headers
         final_header[u'authority'] = url_parse.netloc
         final_header[u'path'] = url_parse.path
+        if u"https:" in url:
+            final_header[u'scheme'] = u"https"
+        else:
+            final_header[u'scheme'] = u"http"
+        # end if
 
         # Call URL
         request = urllib2.Request(url, None, self._headers)
@@ -137,9 +143,13 @@ class GoogleNewsClient(object):
         if content_encoding == 'br':
             return brotli.decompress(response_data)
         elif content_encoding == 'gzip':
-            buf = StringIO(response_data)
-            f = gzip.GzipFile(fileobj=buf)
-            return f.read()
+            try:
+                buf = StringIO(response_data)
+                f = gzip.GzipFile(fileobj=buf)
+                return f.read()
+            except IOError as e:
+                logging.getLogger(u"pyTweetBot").error(u"Invalid GZip data : {} for {}".format(e, url))
+            # end try
         elif content_encoding is None or 'text/html' in content_encoding:
             return response_data
         else:
