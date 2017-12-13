@@ -40,7 +40,7 @@ class GoogleNewsClient(object):
         u'authority': u"",
         u'method': u"GET",
         u'path': u"",
-        u'scheme': u"https",
+        u'scheme': u"http",
         u'accept': u"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         u'Accept-Charset': u'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
         u'accept-encoding': u"gzip, deflate, sdch, br",
@@ -67,9 +67,7 @@ class GoogleNewsClient(object):
     # end constructor
 
     ###############################################
-    #
-    # Public functions
-    #
+    # Public
     ###############################################
 
     # Get news
@@ -105,9 +103,7 @@ class GoogleNewsClient(object):
     # end get_page_title
 
     ###############################################
-    #
-    # Private functions
-    #
+    # Private
     ###############################################
 
     # Request page

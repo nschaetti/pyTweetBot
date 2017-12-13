@@ -23,11 +23,25 @@
 #
 
 
+# Singleton design pattern
 def singleton(class_):
+    """
+    Singleton design pattern
+    :param class_:
+    :return:
+    """
 
+    # Properties
     instances = {}
 
+    # Get instance
     def getinstance(*args, **kwargs):
+        """
+        Get instance
+        :param args:
+        :param kwargs:
+        :return:
+        """
         if class_ not in instances:
             instances[class_] = class_(*args, **kwargs)
         # end if
