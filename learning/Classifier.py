@@ -25,6 +25,7 @@
 # Imports
 import nsNLP
 import sys
+from CensorModel import CensorModel
 
 
 # Classifier base class
@@ -100,6 +101,41 @@ class Classifier(object):
     #################################################
     # Static
     #################################################
+
+    # Load a complete model with features and path
+    @staticmethod
+    def load_model(config, model, features):
+        # Load model
+        model = nsNLP.classifiers.TextClassifier.load(model)
+        censor = CensorModel(config)
+
+        # Tokenizer
+        tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+
+        # Parse features
+        feature_list = features.split('+')
+
+        # Join features
+        bow = nsNLP.features.BagOfGrams()
+
+        # For each features
+        for bag in feature_list:
+            # Select features
+            if bag == 'words':
+                b = nsNLP.features.BagOfWords()
+            elif bag == 'bigrams':
+                b = nsNLP.features.BagOf2Grams()
+            elif bag == 'trigrams':
+                b = nsNLP.features.BagOf3Grams()
+            else:
+                sys.stderr.write(u"Unknown features type {}".format(features))
+                exit()
+            # end if
+            bow.add(b)
+        # end for
+
+        return tokenizer, bow, model, censor
+    # end load_model
 
 # end Model
 

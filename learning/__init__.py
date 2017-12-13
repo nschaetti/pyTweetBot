@@ -24,5 +24,6 @@
 
 # Imports
 from CensorModel import CensorModel
+from Classifier import Classifier
 from Dataset import Dataset
 from Model import Model
