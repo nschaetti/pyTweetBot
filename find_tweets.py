@@ -36,6 +36,7 @@ from tweet.TweetFinder import TweetFinder
 from tweet.TweetFactory import TweetFactory
 from learning.CensorModel import CensorModel
 from news.PageParser import PageParser, PageParserRetrievalError
+from learning.tools import load_model
 
 ####################################################
 # Globals
@@ -86,40 +87,10 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
     tweet_finder = TweetFinder(shuffle=True)
 
     # Load model
-    if model is not None and os.path.exists(model):
-        logging.getLogger(u"pyTweetBot").info(u"Loading model {}".format(model))
-        model = nsNLP.classifiers.TextClassifier.load(model)
-        censor = CensorModel(config)
-        logging.getLogger(u"pyTweetBot").info(u"Model {} loaded".format(model))
-    else:
-        logging.getLogger(u"pyTweetBot").error(u"Can't open model file {}\n".format(model))
-        exit()
-    # end if
+    tokenizer, bow, model, censor = load_model(config, model, features)
 
-    # Tokenizer
-    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+    # Add Twitter hashtag stream
 
-    # Parse features
-    feature_list = features.split('+')
-
-    # Join features
-    bow = nsNLP.features.BagOfGrams()
-
-    # For each features
-    for bag in feature_list:
-        # Select features
-        if bag == 'words':
-            b = nsNLP.features.BagOfWords()
-        elif bag == 'bigrams':
-            b = nsNLP.features.BagOf2Grams()
-        elif bag == 'trigrams':
-            b = nsNLP.features.BagOf3Grams()
-        else:
-            sys.stderr.write(u"Unknown features type {}".format(features))
-            exit()
-        # end if
-        bow.add(b)
-    # end for
 
     # Add RSS streams
     for rss_stream in config.rss:
