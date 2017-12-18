@@ -23,14 +23,8 @@
 #
 
 # Import
-import os
 import logging
-import time
-import sys
-import nsNLP
-from friends.FriendsManager import FriendsManager
-from learning.Model import Model
-from learning.CensorModel import CensorModel
+import learning
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
 
 ####################################################
@@ -50,52 +44,20 @@ from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullErr
 def find_unfollows(config, friends_manager, model, action_scheduler, features, threshold=0.5):
     """
     Find tweet to like and add it to the DB
-    :param config:
-    :param friends_manager:
-    :param model:
-    :param action_scheduler:
-    :param features:
-    :param threshold:
-    :return:
+    :param config: Bot configuration object.
+    :param friends_manager: Friend manager object.
+    :param model: Path to the model's Pickle file.
+    :param action_scheduler: Action scheduler object.
+    :param features: String describing features.
+    :param threshold: Probability threshold to accept unfollow.
     """
     # Load model
-    if model is not None and os.path.exists(model):
-        model = nsNLP.classifiers.TextClassifier.load(model)
-        censor = CensorModel(config)
-    else:
-        sys.stderr.write(u"Can't open model file {}\n".format(model))
-        exit()
-    # end if
-
-    # Tokenizer
-    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
-
-    # Parse features
-    feature_list = features.split('+')
-
-    # Join features
-    bow = nsNLP.features.BagOfGrams()
-
-    # For each features
-    for bag in feature_list:
-        # Select features
-        if bag == 'words':
-            b = nsNLP.features.BagOfWords()
-        elif bag == 'bigrams':
-            b = nsNLP.features.BagOf2Grams()
-        elif bag == 'trigrams':
-            b = nsNLP.features.BagOf3Grams()
-        else:
-            sys.stderr.write(u"Unknown features type {}\n".format(bag))
-            exit()
-        # end if
-        bow.add(b)
-    # end for
+    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model, features)
 
     # Unfollow interval in days
     unfollow_day = int(config.friends['unfollow_interval'] / 86400.0)
 
-    # First unfollow obsolete friends
+    # First find friends who are not following back after defined period
     logging.getLogger(u"pyTweetBot").info(u"Searching obsolete friends to unfollow")
     for friend in friends_manager.get_obsolete_friends(unfollow_day):
         try:
@@ -113,7 +75,7 @@ def find_unfollows(config, friends_manager, model, action_scheduler, features, t
         # end try
     # end for
 
-    # Find friends to unfollow
+    # Find friends to unfollow (because they don't follow back and they don't meet our criterias)
     logging.getLogger(u"pyTweetBot").info(u"Searching useless friends to unfollow")
     for friend in friends_manager.get_following():
         if not friend.friend_follower:
