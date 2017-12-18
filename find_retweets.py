@@ -24,17 +24,10 @@
 
 # Import
 import logging
-import sys
-import os
-import time
-import random
-import nsNLP
 from db.obj.Tweeted import Tweeted
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from retweet.RetweetFinder import RetweetFinder
 import learning
-from learning.Model import Model
-from learning.CensorModel import CensorModel
 
 ####################################################
 # Globals
@@ -77,8 +70,9 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, retwe
     for retweet_finder in retweet_finders:
         # For each tweet
         for retweet, polarity, subjectivity in retweet_finder:
-            # Minimum size
-            if len(retweet.text) >= text_size and retweet.text[:3] != u"RT ":
+            # Minimum size, not retweet, and not coming from use
+            if len(retweet.text) >= text_size and retweet.text[:3] != u"RT " \
+                    and retweet.screen_name == config.twitter['user']:
                 # Predict class
                 prediction, probs = model(bow(tokenizer(retweet.text)))
                 censor_prediction, _ = censor(retweet.text)
@@ -113,5 +107,4 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, retwe
             # end if
         # end for
     # end for
-
 # end find_retweets
