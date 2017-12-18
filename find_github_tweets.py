@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : pyTweetBot.py
-# Description : pyTweetBot main execution file.
+# File : find_github_tweets.py
+# Description : Tweet information about GitHub activities.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -24,19 +24,10 @@
 
 # Import
 import logging
-import signal
-import os
 import time
-import sys
-import nsNLP
 from github import Github
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
-from tweet.RSSHunter import RSSHunter
-from tweet.GoogleNewsHunter import GoogleNewsHunter
-from tweet.TweetFinder import TweetFinder
 from tweet.TweetFactory import TweetFactory
-from learning.CensorModel import CensorModel
-from news.PageParser import PageParser, PageParserRetrievalError
 from twitter.TweetBotConnect import TweetBotConnector
 import db.obj
 
@@ -44,34 +35,17 @@ import db.obj
 # Globals
 ####################################################
 
-# Continue main loop?
-cont_loop = True
-
 ####################################################
 # Functions
 ####################################################
 
 
-# Signal handler
-def signal_handler(signum, frame):
-    """
-    Signal handler
-    :param signum:
-    :param frame:
-    :return:
-    """
-    global cont_loop
-    logging.info(u"Signal {} received in frame {}".format(signum, frame))
-    cont_loop = False
-# end signal_handler
-
-
 # Prepare project name
 def prepare_project_name(project_name):
     """
-    Prepare project name
-    :param project_name:
-    :return:
+    Prepare the project's name
+    :param project_name: GitHub project's name
+    :return: The project's name prepared
     """
     project_name = project_name.replace(u'-', u' ')
     if u' ' in project_name:
@@ -84,13 +58,13 @@ def prepare_project_name(project_name):
 # Create tweet text
 def create_tweet_text(contrib_counter, contrib_date, project_name, project_url, topics):
     """
-
-    :param contrib_counter:
-    :param contrib_date:
-    :param project_name:
-    :param project_url:
-    :param topics:
-    :return:
+    Create tweet's text for push event
+    :param contrib_counter: Number of contributions
+    :param contrib_date: Date of the push
+    :param project_name: GitHub project's name
+    :param project_url: GitHub project's URL
+    :param topics: GitHub poject's topics
+    :return: The created text.
     """
     # Tweet text
     tweet_text = u"I made {} contributions on {} to project #{}, #GitHub".format\
@@ -117,11 +91,11 @@ def create_tweet_text(contrib_counter, contrib_date, project_name, project_url, 
 def create_tweet_text_create(project_name, project_description, project_url, topics):
     """
     Create tweet text for repo creation
-    :param project_name:
-    :param project_description:
-    :param project_url:
-    :param topics:
-    :return:
+    :param project_name: GitHub project's name
+    :param project_description: GitHub project's description
+    :param project_url: GitHub project's URL
+    :param topics: GitHub project's topics.
+    :return: The created text.
     """
     # Tweet text
     tweet_text = u"Check my project {} on #GitHub : {}".format \
@@ -157,9 +131,9 @@ def create_tweet_text_create(project_name, project_description, project_url, top
 def add_tweet(action_scheduler, tweet_text):
     """
     Add tweet to scheduler
-    :param action_scheduler:
-    :param tweet_text:
-    :return:
+    :param action_scheduler: The action scheduler object
+    :param tweet_text: Text to tweet
+    :return: True if ok, False if problem.
     """
     # Add to scheduler
     try:
@@ -180,14 +154,14 @@ def add_tweet(action_scheduler, tweet_text):
 # end add_tweet
 
 
-# Compute tweet
+# Tweet something or add it to the database
 def compute_tweet(tweet_text, action_scheduler, instantaneous):
     """
-
-    :param tweet_text:
-    :param action_scheduler:
-    :param instantaneous:
-    :return:
+    Tweet something or add it to the database.
+    :param tweet_text: The text to tweet.
+    :param action_scheduler: Action scheduler object
+    :param instantaneous: Tweet directly or add it to the DB.
+    :return: True if tweeted/added, False otherwise.
     """
     # if not instantaneous
     if not db.obj.Tweeted.exists(tweet_text):
@@ -196,6 +170,7 @@ def compute_tweet(tweet_text, action_scheduler, instantaneous):
                 return False
             # end if
         else:
+            # TODO: Tweeted should be insert in TweetBotConnector.tweet()
             TweetBotConnector().tweet(tweet_text)
             db.obj.Tweeted().insert_tweet(tweet_text)
         # end if
@@ -210,14 +185,16 @@ def compute_tweet(tweet_text, action_scheduler, instantaneous):
 # Main function
 ####################################################
 
-# Find Github informations to tweet
+# Add tweets about GitHub activities to the database, or tweet it directly
 def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, instantaneous=False, waiting_time=0):
     """
-    Find tweet in the hunters
-    :param config:
-    :param model:
-    :param action_scheduler:
-    :return:
+    Add tweets about GitHub activities to the database, or tweet it directly.
+    :param config: Bot config object.
+    :param action_scheduler: Action scheduler object.
+    :param event_type: Type of event to tweet (push or create)
+    :param depth: Number of tweets to find.
+    :param instantaneous: Tweet the information instantaneously or not (to DB)?
+    :param waiting_time: Waiting time between each tweets (for instantaneous tweeting)
     """
     # Github settings
     github_settings = config.get_github_config()
