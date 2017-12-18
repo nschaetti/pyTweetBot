@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # File : TweetFinder.py
-# Description : Tweet finder object.
+# Description : Hunter class to find tweets from a set of other hunters.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 16.10.2017 22:28:00
 # Lieu : Nyon, Suisse
@@ -51,15 +51,14 @@ class TweetFinder(Hunter):
     # end __init__
 
     ######################################################
-    # PUBLIC FUNCTIONS
+    # PUBLIC
     ######################################################
 
     # Add an hunter
     def add(self, hunter):
         """
         Add an hunter to the list
-        :param hunter:
-        :return:
+        :param hunter: The hunter object to add.
         """
         self._hunters.append(hunter)
         self._n_hunters += 1
@@ -72,8 +71,7 @@ class TweetFinder(Hunter):
     def remove(self, hunter):
         """
         Remove hunter
-        :param hunter:
-        :return:
+        :param hunter: The hunter object to remove.
         """
         self._hunters.remove(hunter)
         self._n_hunters -= 1
@@ -83,30 +81,22 @@ class TweetFinder(Hunter):
     def set_factory(self, tweet_factory):
         """
         Set the tweet factory
-        :param tweet_factory: The tweet facgory
+        :param tweet_factory: The tweet factory
         """
         self._tweet_factory = tweet_factory
     # end set_factory
-
-    # Set classifier
-    def add_classifier(self, classifier):
-        """
-        Add a classifier
-        :param classifier:
-        """
-        self._classifiers.append(classifier)
-    # end add_classifier
 
     ######################################################
     # PRIVATE
     ######################################################
 
-    # Generate the tweet
+    # Generate the tweet with a factory object
+    # that will add hashtags.
     def _to_the_factory(self, tweet_text):
         """
-        Generate the tweet
-        :param tweet_text: Text to transform
-        :return: The transformed text by factory
+        Generate the tweet by adding hashtags.
+        :param tweet_text: Text to transform.
+        :return: The text transformed by factory.
         """
         if self._tweet_factory is not None:
             return self._tweet_factory(tweet_text)
@@ -122,16 +112,16 @@ class TweetFinder(Hunter):
     def __iter__(self):
         """
         Iterator
-        :return:
+        :return: The object's iterator.
         """
         return self
     # end __iter__
 
-    # Next
+    # Next tweeet
     def next(self):
         """
-        Next element
-        :return:
+        Next tweet.
+        :return: The next found tweet.
         """
         if self._current >= self._n_hunters:
             raise StopIteration
