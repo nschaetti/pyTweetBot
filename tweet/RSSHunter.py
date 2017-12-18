@@ -4,7 +4,6 @@
 
 import feedparser
 from .Hunter import Hunter
-from twitter.TweetGenerator import TweetGenerator
 from .Tweet import Tweet
 import logging
 
