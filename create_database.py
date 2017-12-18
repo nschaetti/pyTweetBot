@@ -25,9 +25,20 @@
 import db.obj
 from sqlalchemy import create_engine
 
-# Create an engine that stores data in the local directory's
-engine = create_engine("mysql://root:1234@localhost/nilsbot")
 
-# Create all tables in  the engine. This is equivalent to "Create Table"
-# statements in raw SQL.
-db.obj.Base.metadata.create_all(engine, checkfirst=True)
+# Function to create the database
+def create_database(host, user, password, db_name):
+    """
+    Function to create the database.
+    :param host: MySQL server's hostname.
+    :param user: MySQL username.
+    :param password: MySQL password.
+    :param db_name: MySQL database's name.
+    """
+    # Create an engine that stores data in the local directory's
+    engine = create_engine("mysql://{}:{}@{}/{}".format(user, password, host, db_name))
+
+    # Create all tables in  the engine. This is equivalent to "Create Table"
+    # statements in raw SQL.
+    db.obj.Base.metadata.create_all(engine, checkfirst=True)
+# end create_database
