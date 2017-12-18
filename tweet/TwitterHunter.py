@@ -1,31 +1,55 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+# File : TwitterHunter.py
+# Description : Hunter class to find new tweets directly from other tweets.
+# Auteur : Nils Schaetti <n.schaetti@gmail.com>
+# Date : 11.12.2017 09:00:00
+# Lieu : Nyon, Suisse
+#
+# This file is part of the pyTweetBot.
+# The pyTweetBot is a set of free software:
+# you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# pyTweetBot is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-import feedparser
 from .Hunter import Hunter
-from twitter.TweetGenerator import TweetGenerator
 from .Tweet import Tweet
 import logging
 import time
 import re
 from twitter.TweetBotConnect import TweetBotConnector
 from textblob import TextBlob
-from news.GoogleNewsClient import GoogleNewsClient
 import tools
 
 
-# Find new tweets from Twitter researches
+# Find new tweets from tweets coming form
+# search on Twitter.
 class TwitterHunter(Hunter):
     """
-    Find new tweets from Twitter researches
+    This class of hunter will find new tweets by scanning
+    URLs in other user's tweets found in research results.
     """
 
     # Constructor
     def __init__(self, search_term, hashtags, n_pages=2, polarity=0.0, subjectivity=0.5, languages=['en']):
         """
         Constructor
-        :param hashtag: Hashtag
+        :param search_term: The term to search on Twitter.
+        :param hashtags: The list of hashtags to add to new tweets.
+        :param n_pages: Number of pages to analyze for this search.
+        :param polarity: Minimum polarity threshold (< 0 negative, > 0 positive)
+        :param subjectivity: Maximum subjectivity threshold.
+        :param languages: Accepted languages.
         """
         self._search_term = search_term
         self._hashtags = hashtags
@@ -40,7 +64,7 @@ class TwitterHunter(Hunter):
     # Get hashtags
     def get_hashtags(self):
         """
-        Get hashtag
+        Get hashtags
         """
         return self._hashtags
     # end get_stream
@@ -54,11 +78,15 @@ class TwitterHunter(Hunter):
         return u"TwitterHunter(hashtag={})".format(self._search_term)
     # end __unicode__
 
+    ############################################
+    # Override
+    ############################################
+
     # Iterator
     def __iter__(self):
         """
         Iterator
-        :return:
+        :return: The object's iterator.
         """
         return self
     # end __iter__
@@ -67,7 +95,7 @@ class TwitterHunter(Hunter):
     def next(self):
         """
         Next
-        :return:
+        :return: The next tweet found.
         """
         # Load if needed
         while len(self._tweets) == 0:
@@ -91,8 +119,7 @@ class TwitterHunter(Hunter):
     # Get tweets
     def _load_tweets(self):
         """
-        Get tweets
-        :return: A tweet
+        Load new tweets from the search stream.
         """
         # Get page
         page = self._cursor.next()
