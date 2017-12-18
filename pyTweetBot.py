@@ -49,6 +49,7 @@ from tweet.TweetFactory import TweetFactory
 from execute_actions import execute_actions
 from stats.TweetStatistics import TweetStatistics
 from follower_dataset import follower_dataset
+from create_database import create_database
 
 
 ####################################################
@@ -128,6 +129,18 @@ if __name__ == "__main__":
 
     # Command subparser
     command_subparser = parser.add_subparsers(dest="command")
+
+    # Database parser
+    database_parser = command_subparser.add_parser("database")
+    add_default_arguments(database_parser)
+    database_parser.add_argument("--create", action='store_true',
+                                 help="Create the database structure on the MySQL host", default=False)
+    database_parser.add_argument("--export", action='store_true',
+                                 help="Export tweets, tweeted and followers/friends to a file", default=False)
+    database_parser.add_argument("--import", action='store_true',
+                                 help="Import tweets, tweeted and followers/friends from a file", default=False)
+    database_parser.add_argument("--file", type=str,
+                                 help="File to import / to export to", default="")
 
     # Update statistics parser
     update_stats_parser = command_subparser.add_parser("user-statistics")
@@ -276,7 +289,12 @@ if __name__ == "__main__":
     # Tweet factory
     tweet_factory = TweetFactory(config.hashtags)
 
-    # Test command
+    # Different possible command
+    if args.command == "database":
+        # Create database
+        if args.create:
+            create_database(config)
+        # end if
     # Update statistics
     if args.command == "user-statistics":
         update_statistics(config=config)

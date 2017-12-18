@@ -27,14 +27,17 @@ from sqlalchemy import create_engine
 
 
 # Function to create the database
-def create_database(host, user, password, db_name):
+def create_database(config):
     """
     Function to create the database.
-    :param host: MySQL server's hostname.
-    :param user: MySQL username.
-    :param password: MySQL password.
-    :param db_name: MySQL database's name.
+    :param config: The bot configuration object
     """
+    # Settings
+    host = config.database['host']
+    user = config.database['username']
+    password = config.database['password']
+    db_name = config.database['database']
+
     # Create an engine that stores data in the local directory's
     engine = create_engine("mysql://{}:{}@{}/{}".format(user, password, host, db_name))
 
