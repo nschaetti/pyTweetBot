@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : twitter.PyTweetBotConnector.py
-# Description : pyTweetBot Twitter connector.
+# File : twitter.TweetBotConnector.py
+# Description : Main class to connect with Twitter API.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -29,13 +29,16 @@ import logging
 from patterns.singleton import singleton
 
 
-# Request limits reached
+# Request limits reached.
 class RequestLimitReached(Exception):
+    """
+    Exception raised when some limits are reached.
+    """
     pass
 # end RequestLimitReached
 
 
-# Twitter connector
+# Main class to connect with Twitter API
 @singleton
 class TweetBotConnector(object):
     """
@@ -317,7 +320,7 @@ class TweetBotConnector(object):
     # Load followers
     def _load_followers(self):
         """
-
+        Load all followers.
         :return:
         """
         self._page = self._cursor.next()
