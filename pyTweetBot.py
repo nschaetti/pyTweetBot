@@ -37,7 +37,6 @@ from find_tweets import find_tweets
 from find_retweets import find_retweets
 from find_follows import find_follows
 from find_unfollows import find_unfollows
-from find_quotes import find_quotes
 from find_github_tweets import find_github_tweets
 from tweet_dataset import tweet_dataset
 from retweet_dataset import retweet_dataset
@@ -181,11 +180,6 @@ if __name__ == "__main__":
     add_default_arguments(find_unfollow_parser)
     add_model_argument(find_unfollow_parser, True)
 
-    # Find quotes to respond to
-    find_quotes_parser = command_subparser.add_parser("find-quotes")
-    add_default_arguments(find_quotes_parser)
-    add_model_argument(find_quotes_parser, True)
-
     # Send private messages
     send_pm_parser = command_subparser.add_parser("send-private-message")
     add_default_arguments(send_pm_parser)
@@ -310,9 +304,6 @@ if __name__ == "__main__":
     # Find unfollows
     elif args.command == "find-unfollows":
         find_unfollows(config, friends_manager, args.model, action_scheduler, args.features, args.threshold)
-    # Find quotes
-    elif args.command == "find-quotes":
-        find_quotes(config, args.model, action_scheduler, args.threshold)
     # Training
     elif args.command == "train":
         # Action
