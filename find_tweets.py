@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : pyTweetBot.py
-# Description : pyTweetBot main execution file.
+# File : find_tweet.py
+# Description : Find new tweets from various sources
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -24,19 +24,11 @@
 
 # Import
 import logging
-import signal
-import os
-import time
-import sys
-import nsNLP
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
-from tweet.TweetFactory import TweetFactory
-from learning.CensorModel import CensorModel
 from news.PageParser import PageParser, PageParserRetrievalError
-from learning.tools import load_model
 import learning
 import tweet as tw
 
@@ -44,39 +36,24 @@ import tweet as tw
 # Globals
 ####################################################
 
-# Continue main loop?
-cont_loop = True
 
 ####################################################
 # Functions
 ####################################################
 
 
-# Signal handler
-def signal_handler(signum, frame):
-    """
-    Signal handler
-    :param signum: Signal number to handle
-    :param frame: Frame
-    """
-    global cont_loop
-    logging.info(u"Signal {} received in frame {}".format(signum, frame))
-    logging.info(u"Stopping loop at next iteration")
-    cont_loop = False
-# end signal_handler
-
-
 ####################################################
 # Main function
 ####################################################
 
-def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=0.5):
+
+# Find new tweets from various sources
+def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     """
     Find tweet in the hunters
     :param config: BotConfig configuration object
     :param model: Path to model file for classification
     :param action_scheduler: Scheduler object
-    :param features: Features (words, bigrams, trigrams) separated by +
     :param n_pages: Number of pages to analyze
     :param threshold: Probability threshold to be accepted as tweet
     """
@@ -84,7 +61,7 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
     tweet_finder = TweetFinder(shuffle=True)
 
     # Load model
-    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model, features)
+    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
 
     # Add RSS streams
     for rss_stream in config.rss:
@@ -105,48 +82,44 @@ def find_tweets(config, model, action_scheduler, features, n_pages=2, threshold=
         tweet_finder.add(tw.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages))
     # end for
 
-    # Keep running
-    while cont_loop:
-        # For each tweet
-        for tweet in tweet_finder:
-            # On title
-            on_title = False
+    # For each tweet
+    for tweet in tweet_finder:
+        # On title
+        on_title = False
 
-            # Get page's text
-            try:
-                page_text = PageParser.get_text(tweet.get_url())
-            except PageParserRetrievalError as e:
-                logging.getLogger(u"pyTweetBot").warning(u"Page retrieval error : {}".format(e))
-                page_text = tweet.get_text()
-                on_title = True
-            # end try
+        # Get page's text
+        try:
+            page_text = PageParser.get_text(tweet.get_url())
+        except PageParserRetrievalError as e:
+            logging.getLogger(u"pyTweetBot").warning(u"Page retrieval error : {}".format(e))
+            page_text = tweet.get_text()
+            on_title = True
+        # end try
 
-            # Predict class
-            prediction, probs = model(bow(tokenizer(page_text)))
-            censor_prediction, _ = censor(page_text)
+        # Predict class
+        prediction, probs = model(bow(tokenizer(page_text)))
+        censor_prediction, _ = censor(page_text)
 
-            # Predicted as tweet
-            if prediction == "pos" and censor_prediction == "pos" and not tweet.already_tweeted():
-                if probs['pos'] >= threshold:
-                    if not on_title or probs['pos'] >= 0.8:
-                        # Try to add
-                        try:
-                            logging.getLogger(u"pyTweetBot").info(u"Adding Tweet \"{}\" to the scheduler".format(
-                                tweet.get_tweet()))
-                            action_scheduler.add_tweet(tweet)
-                        except ActionReservoirFullError:
-                            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
-                            exit()
-                            pass
-                        except ActionAlreadyExists:
-                            logging.getLogger(u"pyTweetBot").error(u"Tweet \"{}\" already exists in the database".format(
-                                tweet.get_tweet().encode('ascii', errors='ignore')))
-                            pass
-                        # end try
-                    # end if
+        # Predicted as tweet?
+        if prediction == "pos" and censor_prediction == "pos" and not tweet.already_tweeted():
+            if probs['pos'] >= threshold:
+                if not on_title or probs['pos'] >= 0.8:
+                    # Try to add
+                    try:
+                        logging.getLogger(u"pyTweetBot").info(u"Adding Tweet \"{}\" to the scheduler".format(
+                            tweet.get_tweet()))
+                        action_scheduler.add_tweet(tweet)
+                    except ActionReservoirFullError:
+                        logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
+                        exit()
+                        pass
+                    except ActionAlreadyExists:
+                        logging.getLogger(u"pyTweetBot").error(u"Tweet \"{}\" already exists in the database".format(
+                            tweet.get_tweet().encode('ascii', errors='ignore')))
+                        pass
+                    # end try
                 # end if
             # end if
-        # end for
-    # end while
-
+        # end if
+    # end for
 # end if
