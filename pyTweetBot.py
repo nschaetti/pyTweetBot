@@ -49,6 +49,7 @@ from execute_actions import execute_actions
 from stats.TweetStatistics import TweetStatistics
 from follower_dataset import follower_dataset
 from create_database import create_database
+import tools.strings as pystr
 
 
 ####################################################
@@ -244,13 +245,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Logging
-    logger = create_logger(u"pyTweetBot", log_level=args.log_level, log_file=args.log_file)
+    logger = create_logger(pystr.LOGGER, log_level=args.log_level, log_file=args.log_file)
 
     # Load configuration file
     try:
         config = BotConfig.load(args.config)
     except MissingRequiredField as e:
-        sys.stderr.write(u"Error parsing configuration file : {}\n".format(e))
+        sys.stderr.write(pystr.ERROR_PARSING_CONFIG_FILE.format(e))
     # end try
 
     # Connection to MySQL
@@ -313,7 +314,7 @@ if __name__ == "__main__":
             elif args.source == u"friends":
                 follower_dataset(twitter_connector, args.dataset, args.info, u"following")
             else:
-                sys.stderr.write(u"Unknown source {}!\n".format(args.source))
+                sys.stderr.write(pystr.ERROR_UNKNOWN_SOURCE.format(args.source))
                 exit()
             # end if
         elif args.action == u"test":
@@ -324,11 +325,10 @@ if __name__ == "__main__":
             (
                 data_set_file=args.dataset,
                 model_file=args.model,
-                model_type=args.classifier,
-                features=args.features
+                model_type=args.classifier
             )
         else:
-            sys.stderr.write(u"Unknown training action {}\n".format(args.action))
+            sys.stderr.write(pystr.ERROR_UNKNOWN_TRAINING.format(args.action))
             exit()
         # end if
     # Statistics generator
@@ -351,7 +351,7 @@ if __name__ == "__main__":
         find_github_tweets(config, action_scheduler, args.event_type, args.depth, args.instantaneous, args.waiting_time)
     # Unknown command
     else:
-        sys.stderr.write(u"Unknown command {}\n".format(args.command))
+        sys.stderr.write(pystr.ERROR_UNKNOWN_COMMAND.format(args.command))
     # end if
 
 # end if
