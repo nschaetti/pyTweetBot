@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : pyTweetBot.py
+# File : find_retweets.py
 # Description : Find tweets directly in Twitter's hashtags feeds to retweet.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 30.07.2017 17:59:05
@@ -43,7 +43,7 @@ import learning
 
 
 # Find retweets and add it to the DB
-def find_retweets(config, model, action_scheduler, features, text_size=80, retweets_likes_probs=[0.5, 0.5], threshold=0.5):
+def find_retweets(config, model, action_scheduler, features, text_size=80, threshold=0.5):
     """
     Find retweets and add it to the DB
     :param config:
@@ -51,7 +51,6 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, retwe
     :param action_scheduler:
     :param features:
     :param text_size:
-    :param retweets_likes_probs:
     :param threshold:
     :return:
     """
