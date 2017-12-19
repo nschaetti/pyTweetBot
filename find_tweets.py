@@ -28,9 +28,10 @@ from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExis
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
-from news.PageParser import PageParser, PageParserRetrievalError
+from tools.PageParser import PageParser, PageParserRetrievalError
 import learning
 import tweet as tw
+import tools.strings as pystr
 
 ####################################################
 # Globals
@@ -91,7 +92,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         try:
             page_text = PageParser.get_text(tweet.get_url())
         except PageParserRetrievalError as e:
-            logging.getLogger(u"pyTweetBot").warning(u"Page retrieval error : {}".format(e))
+            logging.getLogger(pystr.LOGGER).warning(pystr.WARNING_PAGE_RETRIEVAL.format(e))
             page_text = tweet.get_text()
             on_title = True
         # end try
@@ -106,15 +107,15 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
                 if not on_title or probs['pos'] >= 0.8:
                     # Try to add
                     try:
-                        logging.getLogger(u"pyTweetBot").info(u"Adding Tweet \"{}\" to the scheduler".format(
+                        logging.getLogger(pystr.LOGGER).info(pystr.INFO_ADD_TWEET_SCHEDULER.format(
                             tweet.get_tweet()))
                         action_scheduler.add_tweet(tweet)
                     except ActionReservoirFullError:
-                        logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Tweet action, exiting...")
+                        logging.getLogger(pystr.LOGGER).error(pystr.ERROR_RESERVOIR_FULL)
                         exit()
                         pass
                     except ActionAlreadyExists:
-                        logging.getLogger(u"pyTweetBot").error(u"Tweet \"{}\" already exists in the database".format(
+                        logging.getLogger(pystr.LOGGER).error(pystr.ERROR_TWEET_ALREADY_DB.format(
                             tweet.get_tweet().encode('ascii', errors='ignore')))
                         pass
                     # end try
