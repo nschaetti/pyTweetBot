@@ -85,9 +85,7 @@ Their is two required sections :
 
 ### Twitter configuration
 
-## Create database
-
-# Database parser
+### Create database
 
 You have then to create the database on your MySQL host
 
