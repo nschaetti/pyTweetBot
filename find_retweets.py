@@ -43,7 +43,7 @@ import learning
 
 
 # Find retweets and add it to the DB
-def find_retweets(config, model, action_scheduler, features, text_size=80, threshold=0.5):
+def find_retweets(config, model, action_scheduler, text_size=80, threshold=0.5):
     """
     Find retweets and add it to the DB
     :param config:
@@ -63,7 +63,7 @@ def find_retweets(config, model, action_scheduler, features, text_size=80, thres
     # end for
 
     # Load model
-    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model, features)
+    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
 
     # For each retweet finders
     for retweet_finder in retweet_finders:

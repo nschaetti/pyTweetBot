@@ -79,8 +79,6 @@ def add_model_argument(p, required):
     """
     # Model
     p.add_argument("--model", type=str, help="Classification model's file", required=required)
-    p.add_argument("--features", type=str, help="words, bigrams, trigrams, words+bigrams", default="words",
-                   required=required)
     p.add_argument("--threshold", type=float, help="Probability threshold for the prediction to be positive",
                    default=0.5, required=False)
 # end add_model_argument
@@ -294,16 +292,16 @@ if __name__ == "__main__":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
-        find_tweets(config, args.model, action_scheduler, args.features, args.n_pages, args.threshold)
+        find_tweets(config, args.model, action_scheduler, args.n_pages, args.threshold)
     # Find retweets
     elif args.command == "find-retweets":
-        find_retweets(config, args.model, action_scheduler, args.features, args.text_size, args.threshold)
+        find_retweets(config, args.model, action_scheduler, args.text_size, args.threshold)
     # Find follows
     elif args.command == "find-follows":
-        find_follows(config, args.model, action_scheduler, friends_manager, args.features, args.text_size, args.threshold)
+        find_follows(config, args.model, action_scheduler, friends_manager, args.text_size, args.threshold)
     # Find unfollows
     elif args.command == "find-unfollows":
-        find_unfollows(config, friends_manager, args.model, action_scheduler, args.features, args.threshold)
+        find_unfollows(config, friends_manager, args.model, action_scheduler, args.threshold)
     # Training
     elif args.command == "train":
         # Action

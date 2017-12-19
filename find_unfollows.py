@@ -41,7 +41,7 @@ from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullErr
 
 
 # Find user to unfollow to and add it to the DB
-def find_unfollows(config, friends_manager, model, action_scheduler, features, threshold=0.5):
+def find_unfollows(config, friends_manager, model, action_scheduler, threshold=0.5):
     """
     Find tweet to like and add it to the DB
     :param config: Bot configuration object.
@@ -52,7 +52,7 @@ def find_unfollows(config, friends_manager, model, action_scheduler, features, t
     :param threshold: Probability threshold to accept unfollow.
     """
     # Load model
-    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model, features)
+    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
 
     # Unfollow interval in days
     unfollow_day = int(config.friends['unfollow_interval'] / 86400.0)
