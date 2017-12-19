@@ -116,6 +116,32 @@ of time.
 
 Here the scheduler will sleep during 6h00 and 13h00.
 
+### Hashtags
+
+You can add text to be replace as hashtags in your tweet in the "hashtags" section
+
+    "hashtags":
+    [
+        {"from" : "My Hashtag", "to" : "#MyHashtag", "case_sensitive" : true}
+    ]
+
+Here, occurences of "My Hashtag" will be replaced by #MyHashtag.
+
+### Twitter
+
+To access Twitter, pyTweetBot needs four tokens for the Twitter API and your username.
+
+    "twitter" :
+    {
+        "auth_token1" : "",
+        "auth_token2" : "",
+        "access_token1" : "",
+        "access_token2" : "",
+        "user" : ""
+    }
+
+TODO: tutorial to get the tokens
+
 ### Create database
 
 You have then to create the database on your MySQL host
