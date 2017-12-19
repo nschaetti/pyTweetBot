@@ -30,7 +30,7 @@ from learning.Dataset import Dataset
 from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.RSSHunter import RSSHunter
 from tweet.TweetFinder import TweetFinder
-from news.PageParser import PageParser, PageParserRetrievalError
+from tools.PageParser import PageParser, PageParserRetrievalError
 
 
 ####################################################
