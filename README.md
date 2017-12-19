@@ -142,6 +142,22 @@ To access Twitter, pyTweetBot needs four tokens for the Twitter API and your use
 
 TODO: tutorial to get the tokens
 
+### Friends settings
+
+The friends section has four parameters.
+
+    "friends" :
+    {
+        "max_new_followers" : 40,
+        "max_new_unfollow" : 40,
+        "follow_unfollow_ratio_limit" : 1.2,
+        "interval" : [30, 45]
+    }
+
+* The max_new_followers set the maximum user that can be followed each day;
+* The max_new_unfollow set the maximum user that can be unfollowed each day;
+* The interval parameter set the interval in minutes between each follow/unfollow action choosen randomly between the min and the max;
+
 ### Create database
 
 You have then to create the database on your MySQL host
