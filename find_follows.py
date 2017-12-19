@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : pyTweetBot.py
-# Description : Find tweets directly in Twitter's hashtags feeds to retweet.
+# File : find_follows.py
+# Description : Find users to follow based on their description.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 30.07.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -23,17 +23,12 @@
 #
 
 # Import
-import os
 import tweepy
 import logging
 import time
-import sys
-import nsNLP
 import random
 import db.obj
-from friends.FriendsManager import FriendsManager
-from learning.Model import Model
-from learning.CensorModel import CensorModel
+import learning
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
 from twitter.TweetBotConnect import TweetBotConnector
 
@@ -50,8 +45,8 @@ from twitter.TweetBotConnect import TweetBotConnector
 def add_follow_action(action_scheduler, friend):
     """
     Add follow action
-    :param action_scheduler:
-    :param friend:
+    :param action_scheduler: Action scheduler object
+    :param friend: Friend to add as a db.obj.Friend or tweepy.User object
     :return:
     """
     try:
@@ -82,48 +77,19 @@ def add_follow_action(action_scheduler, friend):
 
 
 # Find user to follow to and add it to the DB
-def find_follows(config, model, action_scheduler, friends_manager, features, text_size, n_pages=20, threshold=0.5):
+def find_follows(config, model, action_scheduler, friends_manager, text_size, n_pages=20, threshold=0.5):
     """
     Find tweet to like and add it to the DB
     :param config: Bot's configuration object
     :param model: Classification model's file
     :param action_scheduler: Action scheduler object
-    :param features:
-    :param text_size:
+    :param friends_manager: Friends manager object
+    :param text_size: Minimum text size to be accepted
+    :param n_pages: Number of pages to search for each term
+    :param threshold: Minimum probability to accept following
     """
     # Load model
-    if model is not None and os.path.exists(model):
-        model = nsNLP.classifiers.TextClassifier.load(model)
-        censor = CensorModel(config)
-    else:
-        sys.stderr.write(u"Can't open model file {}\n".format(model))
-        exit()
-    # end if
-
-    # Tokenizer
-    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
-
-    # Parse features
-    feature_list = features.split('+')
-
-    # Join features
-    bow = nsNLP.features.BagOfGrams()
-
-    # For each features
-    for bag in feature_list:
-        # Select features
-        if bag == 'words':
-            b = nsNLP.features.BagOfWords()
-        elif bag == 'bigrams':
-            b = nsNLP.features.BagOf2Grams()
-        elif bag == 'trigrams':
-            b = nsNLP.features.BagOf3Grams()
-        else:
-            sys.stderr.write(u"Unknown features type {}\n".format(bag))
-            exit()
-        # end if
-        bow.add(b)
-    # end for
+    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
 
     # For each followers
     for follower in friends_manager.get_followers():
