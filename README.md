@@ -213,4 +213,5 @@ pyTweetBot launch an executor thread for each action type. You can launch the ex
 
 ### Files
 
-[pyTweetBot.py](https://github.com/nschaetti/pyTweetBot/blob/master/pyTweetBot.py)
+[pyTweetBot.py](pyTweetBot.py) : Main Python file;
+[find_tweets.py](find_tweets.py) : Python code to find new contents to tweet;
