@@ -28,6 +28,7 @@ from db.obj.Tweeted import Tweeted
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from retweet.RetweetFinder import RetweetFinder
 import learning
+import tools.strings as pystr
 
 ####################################################
 # Globals
@@ -81,9 +82,9 @@ def find_retweets(config, model, action_scheduler, text_size=80, threshold=0.5):
                     if probs['pos'] >= threshold:
                         # Try to add
                         try:
-                            logging.getLogger(u"pyTweetBot").\
+                            logging.getLogger(pystr.LOGGER).\
                             info(
-                                u"Adding retweet ({}, \"{}\") to the scheduler".
+                                pystr.INFO_ADD_RETWEET_SCHEDULER.
                                 format(
                                     retweet.id,
                                     retweet.text.encode('ascii', errors='ignore')
@@ -93,11 +94,11 @@ def find_retweets(config, model, action_scheduler, text_size=80, threshold=0.5):
                             # Add action
                             action_scheduler.add_retweet(retweet.id, retweet.text)
                         except ActionReservoirFullError:
-                            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Retweet action, exiting...")
+                            logging.getLogger(pystr.LOGGER).error(pystr.ERROR_RESERVOIR_FULL)
                             exit()
                             pass
                         except ActionAlreadyExists:
-                            logging.getLogger(u"pyTweetBot").error(u"Retweet \"{}\" already exists in the database".format(
+                            logging.getLogger(pystr.LOGGER).error(pystr.ERROR_RETWEET_ALREADY_DB.format(
                                 retweet.text.encode('ascii', errors='ignore')))
                             pass
                         # end try
