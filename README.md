@@ -187,12 +187,20 @@ And then import the bot's data from the file
 
 ### Train a model
 
-## Find new tweets
+## Command line
+
+### Find new tweets
 
     python pyTweetBot find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p
 
-## Find new retweets
+### Find new retweets
 
     python pyTweetBot find-retweets --config /etc/bots/bot.conf --model /etc/bots/moedls/find_retweets.p
 
-## Automatise execution with crontab
+### Automatise execution with crontab
+
+## Development
+
+### Files
+
+[pyTweetBot.py](https://github.com/nschaetti/pyTweetBot/blob/master/pyTweetBot.py)
