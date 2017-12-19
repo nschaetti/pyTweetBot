@@ -40,13 +40,12 @@ from learning.Dataset import Dataset
 
 
 # Train a classifier on a dataset
-def model_training(data_set_file, model_file="", model_type='NaiveBayes', features='word'):
+def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
     """
     Train a classifier on a dataset.
     :param data_set_file: Path to the dataset file
     :param model_file: Path to model file if needed
     :param model_type: Model's type (stat, tfidf, stat2, textblob)
-    :param features: Features
     """
     # Load model or create
     if os.path.exists(model_file):
@@ -74,27 +73,13 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes', featur
     # Tokenizer
     tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
 
-    # Parse features
-    feature_list = features.split('+')
-
     # Join features
     bow = nsNLP.features.BagOfGrams()
 
-    # For each features
-    for bag in feature_list:
-        # Select features
-        if bag == 'words':
-            b = nsNLP.features.BagOfWords()
-        elif bag == 'bigrams':
-            b = nsNLP.features.BagOf2Grams()
-        elif bag == 'trigrams':
-            b = nsNLP.features.BagOf3Grams()
-        else:
-            sys.stderr.write(u"Unknown features type {}\n".format(bag))
-            exit()
-        # end if
-        bow.add(b)
-    # end for
+    # Add features
+    bow.add(nsNLP.features.BagOfWords())
+    bow.add(nsNLP.features.BagOf2Grams())
+    bow.add(nsNLP.features.BagOf3Grams())
 
     # Load dataset
     if os.path.exists(data_set_file):
