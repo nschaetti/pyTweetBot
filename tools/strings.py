@@ -37,12 +37,16 @@ ERROR_RESERVOIR_FULL = u"Reservoir full for Tweet action, exiting..."
 
 # Tweet already in DB
 ERROR_TWEET_ALREADY_DB = u"Tweet \"{}\" already exists in the database"
+ERROR_RETWEET_ALREADY_DB = u"Retweet \"{}\" already exists in the database"
 
 # Unknown source
 ERROR_UNKNOWN_SOURCE = u"Unknown source {}!\n"
 
 # Unknown training action
 ERROR_UNKNOWN_TRAINING = u"Unknown training action {}\n"
+
+# Unknown command
+ERROR_UNKNOWN_COMMAND = u"Unknown command {}\n"
 
 #########################################
 # WARNINGS
@@ -57,3 +61,4 @@ WARNING_PAGE_RETRIEVAL = u"Page retrieval error : {}"
 
 # Adding tweet to DB
 INFO_ADD_TWEET_SCHEDULER = u"Adding Tweet \"{}\" to the scheduler"
+INFO_ADD_RETWEET_SCHEDULER = u"Adding Tweet \"{}\" to the scheduler"
