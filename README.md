@@ -85,6 +85,21 @@ Their is two required sections :
 
 ### Twitter configuration
 
+## Create database
+
+# Database parser
+
+You have then to create the database on your MySQL host
+
+    python pyTweetBot.py database
+        --create : Create the database structure on the MySQL host
+        --export : Export tweets, tweeted and followers/friends to a file
+        --file : File to import / to export to
+
+You can use the "create" action for that :
+
+    python pyTweetBot.py --config /path/to/config.json --create
+
 ## Find new tweets
 
 `python pyTweetBot find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p --features words+bigrams+trigram`
