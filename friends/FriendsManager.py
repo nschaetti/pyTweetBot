@@ -27,7 +27,6 @@ import executor
 import db
 import db.obj
 from patterns.singleton import singleton
-from config.BotConfig import BotConfig
 from twitter.TweetBotConnect import TweetBotConnector
 import twitter
 from sqlalchemy import update, delete
@@ -37,7 +36,6 @@ import time
 import logging
 from datetime import timedelta
 import tweepy
-import math
 
 
 ##############################################
@@ -47,6 +45,9 @@ import math
 
 # Exception, Useless action because already done (already following a user)
 class ActionAlreadyDone(Exception):
+    """
+    Exception, useless action because already done (already following a user)
+    """
     pass
 # end ActionAlreadyDone
 
