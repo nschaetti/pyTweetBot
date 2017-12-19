@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : executor/ActionScheduler.py
-# Description : Manage bot's actions.
+# File : executor.ExecutorThread.py
+# Description : Execute actions.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 15.06.2017 18:14:00
 # Lieu : Nyon, Suisse
