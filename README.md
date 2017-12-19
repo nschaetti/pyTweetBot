@@ -98,6 +98,14 @@ You can use the "create" action for that :
 
     python pyTweetBot.py --config /path/to/config.json --create
 
+It is possible to export bot's data to a file with the export command.
+
+    python pyTweetBot.py --config /path/to/config.json --export --file export_file.p
+
+And then import the bot's data to the file
+
+    python pyTweetBot.py --config /path/to/config.json --import --file export_file.p
+
 ## Model training
 
 ### Create a dataset
