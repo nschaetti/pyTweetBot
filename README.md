@@ -146,13 +146,14 @@ TODO: tutorial to get the tokens
 
 The friends section has four parameters.
 
+    ```javascript
     "friends" :
     {
         "max_new_followers" : 40,
         "max_new_unfollow" : 40,
         "follow_unfollow_ratio_limit" : 1.2,
         "interval" : [30, 45]
-    }
+    }```
 
 * The max_new_followers set the maximum user that can be followed each day;
 * The max_new_unfollow set the maximum user that can be unfollowed each day;
