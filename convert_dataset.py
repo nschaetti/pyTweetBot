@@ -26,12 +26,9 @@
 import argparse
 import os
 import pickle
-import socket
 import sys
-import urllib2
-from bs4 import BeautifulSoup
 from learning.Dataset import Dataset
-from news.PageParser import PageParser, PageParserRetrievalError
+from tools.PageParser import PageParser, PageParserRetrievalError
 
 ####################################################
 # Main function
