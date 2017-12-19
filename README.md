@@ -3,7 +3,7 @@ A Twitter bot written in Python to replace yourself, search and publish news abo
 
 ## Installation
 
-## Configuration file
+### Configuration file
 
 pyTweetBot takes its configuration in a JSON file which looks as follow :
 
@@ -98,12 +98,18 @@ You can use the "create" action for that :
 
     python pyTweetBot.py --config /path/to/config.json --create
 
+## Model training
+
+### Create a dataset
+
+### Train a model
+
 ## Find new tweets
 
-`python pyTweetBot find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p --features words+bigrams+trigram`
+    python pyTweetBot find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p
 
 ## Find new retweets
 
-`python pyTweetBot find-retweets`
+    python pyTweetBot find-retweets --config /etc/bots/bot.conf --model /etc/bots/moedls/find_retweets.p
 
 ## Automatise execution with crontab
