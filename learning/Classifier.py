@@ -102,9 +102,15 @@ class Classifier(object):
     # Static
     #################################################
 
-    # Load a complete model with features and path
+    # Load a complete model and censor with path to model
     @staticmethod
-    def load_model(config, model, features):
+    def load_model(config, model):
+        """
+        Load a complete model and censor with path to model
+        :param config:
+        :param model:
+        :return:
+        """
         # Load model
         model = nsNLP.classifiers.TextClassifier.load(model)
         censor = CensorModel(config)
@@ -112,27 +118,13 @@ class Classifier(object):
         # Tokenizer
         tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
 
-        # Parse features
-        feature_list = features.split('+')
-
         # Join features
         bow = nsNLP.features.BagOfGrams()
 
-        # For each features
-        for bag in feature_list:
-            # Select features
-            if bag == 'words':
-                b = nsNLP.features.BagOfWords()
-            elif bag == 'bigrams':
-                b = nsNLP.features.BagOf2Grams()
-            elif bag == 'trigrams':
-                b = nsNLP.features.BagOf3Grams()
-            else:
-                sys.stderr.write(u"Unknown features type {}".format(features))
-                exit()
-            # end if
-            bow.add(b)
-        # end for
+        # Bag of gram, 2-grams, 3-grams
+        bow.add(nsNLP.features.BagOfWords())
+        bow.add(nsNLP.features.BagOf2Grams())
+        bow.add(nsNLP.features.BagOf3Grams())
 
         return tokenizer, bow, model, censor
     # end load_model
