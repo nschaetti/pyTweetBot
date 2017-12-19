@@ -131,14 +131,16 @@ Here, occurences of "My Hashtag" will be replaced by #MyHashtag.
 
 To access Twitter, pyTweetBot needs four tokens for the Twitter API and your username.
 
-    "twitter" :
-    {
-        "auth_token1" : "",
-        "auth_token2" : "",
-        "access_token1" : "",
-        "access_token2" : "",
-        "user" : ""
-    }
+```javascript
+"twitter" :
+{
+    "auth_token1" : "",
+    "auth_token2" : "",
+    "access_token1" : "",
+    "access_token2" : "",
+    "user" : ""
+}
+```
 
 TODO: tutorial to get the tokens
 
@@ -189,13 +191,19 @@ And then import the bot's data from the file
 
 ## Command line
 
+### Launch executors
+
+pyTweetBot launch an executor thread for each action type. You can launch the executor daemon that way :
+
+    python pyTweetBot.py executor --config /etc/bots/bot.conf
+
 ### Find new tweets
 
-    python pyTweetBot find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p
+    python pyTweetBot.py find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p
 
 ### Find new retweets
 
-    python pyTweetBot find-retweets --config /etc/bots/bot.conf --model /etc/bots/moedls/find_retweets.p
+    python pyTweetBot.py find-retweets --config /etc/bots/bot.conf --model /etc/bots/moedls/find_retweets.p
 
 ### Automatise execution with crontab
 
