@@ -26,8 +26,8 @@
 import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
-from pyTweetBot.twitter
-from pyTweetBot.friends
+import pyTweetBot.twitter
+import pyTweetBot.friends
 from db.obj.Tweeted import Tweeted
 
 
