@@ -105,6 +105,10 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
             page_text = tweet.get_text()
             on_title = True
         # end try
+        print(tweet.get_url())
+        print(on_title)
+        print(page_text)
+        print(u"")
 
         # Predict class
         prediction, probs = model(bow(tokenizer(page_text)))
