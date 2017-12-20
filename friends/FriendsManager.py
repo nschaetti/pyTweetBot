@@ -27,7 +27,8 @@ import executor
 import db
 import db.obj
 from patterns.singleton import singleton
-from twitter.TweetBotConnect import TweetBotConnector
+#from twitter.TweetBotConnect import TweetBotConnector
+from pyTweetBot.twitter.TweetBotConnect import TweetBotConnector
 import twitter
 from sqlalchemy import update, delete
 from sqlalchemy.orm import load_only
