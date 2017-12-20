@@ -61,8 +61,8 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     out, err = p.communicate()
     for line in out.splitlines():
         try:
-            print(line.encode('ascii', errors='ignore'))
-        except UnicodeEncodeError:
+            print(line.decode('ascii', errors='ignore'))
+        except UnicodeDecodeError:
             pass
         # end try
         #print(u"Process : {}".format(line.encode('ascii', errors='ignore')))
