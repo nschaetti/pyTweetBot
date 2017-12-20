@@ -154,7 +154,7 @@ class TwitterHunter(Hunter):
                             # Get true page info
                             try:
                                 true_page_parser = tools.PageParser(page_parser.raw_title)
-                            except:
+                            except Exception as e:
                                 print(u"Error 2 : {}".format(e))
                                 continue
                             # end try
