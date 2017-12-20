@@ -88,7 +88,8 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         # end for"""
 
         # Add as a Twitter hunter
-        tweet_finder.add(tw.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages, languages=news['languages']))
+        tweet_finder.add(tw.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages,
+                                          languages=news['languages']))
     # end for
 
     # For each tweet

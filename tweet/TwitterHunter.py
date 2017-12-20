@@ -153,13 +153,16 @@ class TwitterHunter(Hunter):
                                 continue
                             # end try
 
-                            # Blog
-                            true_text_blob = TextBlob(true_page_parser.text)
-                            print(true_page_parser.text.encode('ascii', errors='ignore'))
+                            # Text longer than 3
+                            if len(true_page_parser.text) > 3:
+                                # Blog
+                                true_text_blob = TextBlob(true_page_parser.text)
+                                print(true_page_parser.text.encode('ascii', errors='ignore'))
 
-                            # Add to tweets
-                            if len(true_page_parser.raw_title) > 0 and true_text_blob.detect_language() in self._languages:
-                                self._tweets.append(Tweet(true_page_parser.raw_title, page_parser.raw_title, self._hashtags))
+                                # Add to tweets
+                                if len(true_page_parser.raw_title) > 0 and true_text_blob.detect_language() in self._languages:
+                                    self._tweets.append(Tweet(true_page_parser.raw_title, page_parser.raw_title, self._hashtags))
+                                # end if
                             # end if
                         # end if
                     # end for
