@@ -3,10 +3,12 @@
 #
 
 # Import
+from textblob import TextBlob
 from .Hunter import Hunter
 from news.GoogleNewsClient import GoogleNewsClient
 from .Tweet import Tweet
 import logging
+import tools.strings as pystr
 
 
 # Hunter for Google News
@@ -69,18 +71,26 @@ class GoogleNewsHunter(Hunter):
         try:
             current_news = self._news[0]
         except IndexError:
-            logging.getLogger(u"pyTweetBot").error(
+            logging.getLogger(pystr.LOGGER).error(
                 u"Error: no news for page {} and research terms {} ({}/{})".format(self._current_page,
                                                                                    self._search_term, self._lang,
                                                                                    self._country))
-            return self.next()
+            raise StopIteration
         # end try
 
         # Remove from list
         self._news.remove(current_news)
 
-        # Return
-        return Tweet(text=current_news[1], url=current_news[0], hashtags=self._hashtags)
+        # Analyze text
+        tweet_blob = TextBlob(current_news[1])
+
+        # Check language
+        if tweet_blob.detect_language() in self._lang:
+            # Return
+            return Tweet(text=current_news[1], url=current_news[0], hashtags=self._hashtags)
+        else:
+            return self.next()
+        # end if
     # end next
 
 # end GoogleNewsHunter
