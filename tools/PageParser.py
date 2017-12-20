@@ -227,6 +227,8 @@ class PageParser(object):
                 last_e = e
                 count += 1
                 pass
+            except UnicodeEncodeError as e:
+                raise PageParserRetrievalError(u"HTTP error while retrieving {} : {}\n".format(url, e))
             # end try
         # end while
 
