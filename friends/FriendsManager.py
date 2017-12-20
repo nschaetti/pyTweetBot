@@ -24,8 +24,6 @@
 
 import datetime
 import executor
-import db
-import db.obj
 from patterns.singleton import singleton
 import pyTweetBot
 from sqlalchemy import update, delete
@@ -287,7 +285,7 @@ class FriendsManager(object):
         :return:
         """
         # New statistic object
-        statistic = db.obj.Statistic(statistic_friends_count=self.n_following(),
+        statistic = pyTweetBot.db.obj.Statistic(statistic_friends_count=self.n_following(),
                                      statistic_followers_count=self.n_followers(),
                                      statistic_statuses_count=executor.ActionScheduler().n_statuses())
 
@@ -404,14 +402,14 @@ class FriendsManager(object):
         :return: 1 if a new friends created, 0 if updated only.
         """
         if not self.exists(screen_name):
-            new_friend = db.obj.Friend(friend_screen_name=screen_name, friend_description=description,
+            new_friend = pyTweetBot.db.obj.Friend(friend_screen_name=screen_name, friend_description=description,
                                        friend_location=location, friend_followers_count=followers_count,
                                        friend_friends_count=friends_count, friend_statuses_count=statuses_count)
             self._session.add(new_friend)
             self._logger.info(u"New friend %s" % screen_name)
             return 1
         else:
-            update(db.obj.Friend).where(db.obj.Friend.friend_screen_name == screen_name).\
+            update(pyTweetBot.db.obj.Friend).where(pyTweetBot.db.obj.Friend.friend_screen_name == screen_name).\
                 values(friend_last_update=datetime.datetime.now())
             return 0
         # end if
@@ -585,11 +583,11 @@ class FriendsManager(object):
         :return:
         """
         # Select friend with no links
-        no_links = self._session.query(db.obj.Friend).filter(not db.obj.Friend.friend_follower and not db.obj.Friend.friend_following).all()
+        no_links = self._session.query(pyTweetBot.db.obj.Friend).filter(not pyTweetBot.db.obj.Friend.friend_follower and not pyTweetBot.db.obj.Friend.friend_following).all()
 
         # Delete
         for no_link in no_links:
-            delete(db.obj.Friend).where(db.obj.Friend.friend_screen_name == no_link.friend_screen_name)
+            delete(pyTweetBot.db.obj.Friend).where(pyTweetBot.db.obj.Friend.friend_screen_name == no_link.friend_screen_name)
         # end for
     # end _clean_friendship
 
