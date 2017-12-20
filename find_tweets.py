@@ -88,7 +88,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         # end for"""
 
         # Add as a Twitter hunter
-        tweet_finder.add(tw.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages))
+        tweet_finder.add(tw.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages, languages=news['languages']))
     # end for
 
     # For each tweet
@@ -105,11 +105,6 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
             page_text = tweet.get_text()
             on_title = True
         # end try
-        print(u"New tweet :: ")
-        print(tweet.get_url())
-        print(on_title)
-        print(page_text)
-        print(u"")
 
         # Predict class
         prediction, probs = model(bow(tokenizer(page_text)))
