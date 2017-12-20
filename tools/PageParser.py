@@ -86,6 +86,7 @@ class PageParser(object):
     _timeout = 20
 
     # Information
+    _raw_title = u""
     _title = u""
     _html = u""
     _text = u""
@@ -107,6 +108,16 @@ class PageParser(object):
     ###########################################
     # Properties
     ###########################################
+
+    # Raw title
+    @property
+    def raw_title(self):
+        """
+        Raw title
+        :return:
+        """
+        return self._raw_title
+    # end raw_title
 
     # Title
     @property
@@ -248,7 +259,7 @@ class PageParser(object):
         print(u"Data ; {}".format(data))
         # Extract information
         self._html = data
-        self._title = self._extract_title(data)
+        self._title, self._raw_title = self._extract_title(data)
         self._text = self._extract_text(data)
     # end _load
 
@@ -266,8 +277,8 @@ class PageParser(object):
         soup = BeautifulSoup(html, "lxml")
 
         # Get and clean data
-        print(u"Soup title : {}".format(soup.title.string.strip()))
-        new_title = unicode(soup.title.string.strip())
+        raw_title = soup.title.string.strip()
+        new_title = unicode(raw_title)
         new_title = new_title.replace(u'\n', u'').replace(u'\t', u'').replace(u"'", u"\'").replace(u"&amp;",
                                                                                                    u"&").replace(u'\r',
                                                                                                                  u'')
@@ -278,7 +289,7 @@ class PageParser(object):
         new_title = pars.unescape(new_title)
 
         # Return
-        return new_title
+        return new_title, raw_title
     # end _extract_title
 
     # Get text

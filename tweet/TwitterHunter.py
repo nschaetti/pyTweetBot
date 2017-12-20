@@ -142,11 +142,18 @@ class TwitterHunter(Hunter):
                     print(u"2")
                     # Retrieve page each URL
                     for url in urls:
+                        # Get page info
                         page_parser = tools.PageParser(url)
 
-                        # Add to tweets
-                        print(u"Title : {}".format(page_parser.title))
-                        self._tweets.append(Tweet(page_parser.title, urls[0], self._hashtags))
+                        # Load true URL if not from Twitter
+                        if "twitter.com" not in page_parser.raw_title:
+                            # Get true page info
+                            true_page_parser = tools.PageParser(page_parser.raw_title)
+
+                            # Add to tweets
+                            print(u"Title : {}".format(true_page_parser.title))
+                            self._tweets.append(Tweet(true_page_parser.title, urls[0], self._hashtags))
+                        # end if
                     # end for
                 # end if
             # end if
