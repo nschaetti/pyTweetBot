@@ -31,6 +31,8 @@ from tools.PageParser import PageParser, PageParserRetrievalError
 import learning
 import tweet as tw
 import tools.strings as pystr
+from tweet.RSSHunter import RSSHunter
+from tweet.GoogleNewsHunter import GoogleNewsHunter
 
 ####################################################
 # Globals
@@ -65,19 +67,18 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
 
     # Add RSS streams
     for rss_stream in config.rss:
-        #tweet_finder.add(RSSHunter(rss_stream))
-        pass
+        tweet_finder.add(RSSHunter(rss_stream))
     # end for
 
     # Add Google News
     for news in config.google_news:
         # Add for each tuple language/country
-        """for language in news['languages']:
+        for language in news['languages']:
             for country in news['countries']:
                 tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country,
                                                   hashtags=news['hashtags'], n_pages=n_pages))
             # end for
-        # end for"""
+        # end for
 
         # Add as a Twitter hunter
         tweet_finder.add(tw.TwitterHunter(search_term=news['keyword'], hashtags=news['hashtags'], n_pages=n_pages,
