@@ -30,6 +30,7 @@ import re
 from twitter.TweetBotConnect import TweetBotConnector
 from textblob import TextBlob
 import tools
+import tools.strings as pystr
 
 
 # Find new tweets from tweets coming form
@@ -107,7 +108,7 @@ class TwitterHunter(Hunter):
 
         # Remove
         self._tweets.remove(current_tweet)
-        #print(current_tweet)
+
         # Return
         return current_tweet
     # end next
@@ -144,7 +145,9 @@ class TwitterHunter(Hunter):
                         try:
                             page_parser = tools.PageParser(url)
                         except Exception as e:
-                            print(u"Error 1 : {}".format(e))
+                            logging.getLogger(pystr.LOGGER).warning(
+                                pystr.ERROR_RETRIEVING_PAGE.format(url, e)
+                            )
                             continue
                         # end try
 
@@ -155,7 +158,9 @@ class TwitterHunter(Hunter):
                             try:
                                 true_page_parser = tools.PageParser(page_parser.raw_title)
                             except Exception as e:
-                                print(u"Error 2 : {}".format(e))
+                                logging.getLogger(pystr.LOGGER).warning(
+                                    pystr.ERROR_RETRIEVING_PAGE.format(page_parser.raw_title, e)
+                                )
                                 continue
                             # end try
 
@@ -168,10 +173,19 @@ class TwitterHunter(Hunter):
                                 if len(true_page_parser.raw_title) > 0 and true_text_blob.detect_language() in self._languages:
                                     self._tweets.append(Tweet(true_page_parser.raw_title, page_parser.raw_title, self._hashtags))
                                 else:
-                                    print(u"title to short or bad language")
+                                    logging.getLogger(pystr.LOGGER).warning(
+                                        pystr.ERROR_TITLE_TOO_SHORT_BAD_LANGUAGE.format(
+                                            len(true_page_parser.raw_title),
+                                            true_text_blob.detect_language()
+                                        )
+                                    )
                                 # end if
                             else:
-                                print(u"too short")
+                                logging.getLogger(pystr.LOGGER).warning(
+                                    pystr.ERROR_NOT_ENOUGH_PAGE_DATA.format(
+                                        len(true_page_parser.text)
+                                    )
+                                )
                             # end if
                         # end if
                     # end for
@@ -180,7 +194,7 @@ class TwitterHunter(Hunter):
         # end for
 
         # Wait
-        logging.getLogger(u"pyTweetBot").info(u"Waiting 60 seconds...")
+        logging.getLogger(pystr.LOGGER).info(pystr.INFO_TWITTER_WAIT)
         time.sleep(60)
     # end _load_tweets
 

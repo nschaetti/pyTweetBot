@@ -48,6 +48,15 @@ ERROR_UNKNOWN_TRAINING = u"Unknown training action {}\n"
 # Unknown command
 ERROR_UNKNOWN_COMMAND = u"Unknown command {}\n"
 
+# Retrieving page error
+ERROR_RETRIEVING_PAGE = u"Error while retrieving page {} : {}"
+
+# Title is too short
+ERROR_TITLE_TOO_SHORT_BAD_LANGUAGE = u"Title is too short ({}) or wrong language ({})"
+
+# Not enough page data
+ERROR_NOT_ENOUGH_PAGE_DATA = u"Not enough page data ({})"
+
 #########################################
 # WARNINGS
 #########################################
@@ -62,3 +71,6 @@ WARNING_PAGE_RETRIEVAL = u"Page retrieval error : {}"
 # Adding tweet to DB
 INFO_ADD_TWEET_SCHEDULER = u"Adding Tweet \"{}\" to the scheduler"
 INFO_ADD_RETWEET_SCHEDULER = u"Adding Tweet \"{}\" to the scheduler"
+
+# Twitter wait time
+INFO_TWITTER_WAIT = u"Wait 60 seconds (Twitter limits)"
