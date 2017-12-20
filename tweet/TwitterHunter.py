@@ -27,7 +27,7 @@ from .Tweet import Tweet
 import logging
 import time
 import re
-from twitter.TweetBotConnect import TweetBotConnector
+import pyTweetBot.twitter.TweetBotConnect
 from textblob import TextBlob
 import tools
 import tools.strings as pystr
@@ -54,7 +54,7 @@ class TwitterHunter(Hunter):
         """
         self._search_term = search_term
         self._hashtags = hashtags
-        self._cursor = TweetBotConnector().search_tweets(search_term, n_pages)
+        self._cursor = pyTweetBot.twitter.TweetBotConnector().search_tweets(search_term, n_pages)
         self._current = 0
         self._tweets = list()
         self._polarity = polarity
