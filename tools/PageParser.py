@@ -266,6 +266,7 @@ class PageParser(object):
         soup = BeautifulSoup(html, "lxml")
 
         # Get and clean data
+        print(u"Soup title : {}".format(soup.title.string.strip()))
         new_title = unicode(soup.title.string.strip())
         new_title = new_title.replace(u'\n', u'').replace(u'\t', u'').replace(u"'", u"\'").replace(u"&amp;",
                                                                                                    u"&").replace(u'\r',
