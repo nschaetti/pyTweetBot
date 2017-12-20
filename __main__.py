@@ -280,7 +280,7 @@ if __name__ == "__main__":
         except MissingRequiredField as e:
             sys.stderr.write(pystr.ERROR_PARSING_CONFIG_FILE.format(e))
         # end try
-        print(config)
+
         # Connection to MySQL
         dbc = config.database
         mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
@@ -288,8 +288,7 @@ if __name__ == "__main__":
 
         # Connection to Twitter
         #twitter_connector = TweetBotConnector(config)
-        print(TweetBotConnector)
-        twitter_connector = TweetBotConnector.getinstance(config)
+        twitter_connector = TweetBotConnector(config)
 
         # Friends
         friends_manager = FriendsManager()

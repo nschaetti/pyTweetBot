@@ -75,7 +75,7 @@ class FriendsManager(object):
         self._session = db.DBConnector().get_session()
 
         # Twitter connection
-        self._twitter_con = twitter.TweetBotConnector.getinstance()
+        self._twitter_con = twitter.TweetBotConnector()
 
         # Logger
         self._logger = logging.getLogger(name=u"pyTweetBot")

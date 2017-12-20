@@ -42,6 +42,7 @@ def singleton(class_):
         :param kwargs:
         :return:
         """
+        print(instances)
         if class_ not in instances:
             instances[class_] = class_(*args, **kwargs)
         # end if
