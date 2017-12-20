@@ -137,7 +137,7 @@ class ExecutorThread(Thread):
 
             # Wait
             self._wait_next_action()
-        except fr.ActionAlreadyDone as e:
+        except ActionAlreadyDone as e:
             # Delete action
             with mutex:
                 self._scheduler.delete(action)
