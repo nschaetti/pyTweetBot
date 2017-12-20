@@ -151,7 +151,11 @@ class TwitterHunter(Hunter):
                                 "http://" in page_parser.raw_title or "https://" in page_parser.raw_title):
                             print(u"3")
                             # Get true page info
-                            true_page_parser = tools.PageParser(page_parser.raw_title)
+                            try:
+                                true_page_parser = tools.PageParser(page_parser.raw_title)
+                            except AttributeError:
+                                continue
+                            # end try
 
                             # Add to tweets
                             print(u"RAW Title : {}".format(true_page_parser.raw_title))
