@@ -27,6 +27,8 @@ import argparse
 import logging
 import sys
 import os
+import pkg_resources
+import codecs
 from config.BotConfig import BotConfig, MissingRequiredField
 from db.DBConnector import DBConnector
 from executor.ActionScheduler import ActionScheduler
@@ -115,6 +117,23 @@ def create_logger(name, log_level=logging.INFO, log_format="%(asctime)s :: %(lev
 
     return logger
 # end create_logger
+
+
+# Create config file
+def create_config(config_filename):
+    """
+    Create config file
+    :param config_filename:
+    :return:
+    """
+    # Get template
+    empty_config = pkg_resources.resource_string("config", 'config.json')
+
+    # Write
+    file_handler = codecs.open(config_filename, 'w', encoding='utf-8')
+    file_handler.write(unicode(empty_config) + u"\n")
+    file_handler.close()
+# end create_config
 
 ####################################################
 # Main function
@@ -245,52 +264,55 @@ if __name__ == "__main__":
 
     # Parse
     args = parser.parse_args()
-    print(args)
+
     # Logging
     logger = create_logger(pystr.LOGGER, log_level=args.log_level, log_file=args.log_file)
 
-    # Load configuration file
-    try:
-        config = BotConfig.load(args.config)
-    except MissingRequiredField as e:
-        sys.stderr.write(pystr.ERROR_PARSING_CONFIG_FILE.format(e))
-    # end try
+    # Need config and connect?
+    if args.command != "tools" or not args.create_config:
+        # Load configuration file
+        try:
+            config = BotConfig.load(args.config)
+        except MissingRequiredField as e:
+            sys.stderr.write(pystr.ERROR_PARSING_CONFIG_FILE.format(e))
+        # end try
 
-    # Connection to MySQL
-    dbc = config.database
-    mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
-                                  db_name=dbc["database"])
+        # Connection to MySQL
+        dbc = config.database
+        mysql_connector = DBConnector(host=dbc["host"], username=dbc["username"], password=dbc["password"],
+                                      db_name=dbc["database"])
 
-    # Connection to Twitter
-    twitter_connector = TweetBotConnector(config)
+        # Connection to Twitter
+        twitter_connector = TweetBotConnector(config)
 
-    # Friends
-    friends_manager = FriendsManager()
+        # Friends
+        friends_manager = FriendsManager()
 
-    # Load stats file?
-    stats_manager = None
-    if 'stats_file' in args.__dict__.keys() and args.stats_file is not None:
-        if os.path.exists(args.stats_file):
-            stats_manager = TweetStatistics.load(args.stats_file)
-        else:
-            sys.stderr.write(u"Can not load stat file {}!\n".format(args.stats_file))
-            exit()
+        # Load stats file?
+        stats_manager = None
+        if 'stats_file' in args.__dict__.keys() and args.stats_file is not None:
+            if os.path.exists(args.stats_file):
+                stats_manager = TweetStatistics.load(args.stats_file)
+            else:
+                sys.stderr.write(u"Can not load stat file {}!\n".format(args.stats_file))
+                exit()
+            # end if
         # end if
+
+        # Action scheduler
+        action_scheduler = ActionScheduler(config=config, stats=stats_manager)
+
+        # Tweet factory
+        tweet_factory = TweetFactory(config.hashtags)
     # end if
 
-    # Action scheduler
-    action_scheduler = ActionScheduler(config=config, stats=stats_manager)
-
-    # Tweet factory
-    tweet_factory = TweetFactory(config.hashtags)
-
     # Different possible command
-    if args.command == "database":
+    if args.command == "tools":
         # Create database
         if args.create_database:
             create_database(config)
         elif args.create_config:
-            create_config(config)
+            create_config(args.config)
         # end if
     # Update statistics
     if args.command == "user-statistics":
