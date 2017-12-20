@@ -49,7 +49,7 @@ def direct_messages(config):
     :return:
     """
     # Bot connector
-    bot_connector = pyTweetBot.twitter.BotConnector()
+    bot_connector = pyTweetBot.twitter.TweetBotConnector()
 
     # Friend manager
     friend_manager = pyTweetBot.friends.FriendManager()
