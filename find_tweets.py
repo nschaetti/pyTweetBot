@@ -105,6 +105,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
             page_text = tweet.get_text()
             on_title = True
         # end try
+        print(u"New tweet :: ")
         print(tweet.get_url())
         print(on_title)
         print(page_text)

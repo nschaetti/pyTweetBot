@@ -128,46 +128,46 @@ class TwitterHunter(Hunter):
         for tweet in page:
             # Get urls
             urls = re.findall(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", tweet.text)
-            print(urls)
+            #print(urls)
 
             # If there is URLs in the tweet
             if len(urls) > 0:
-                print(u"1")
+                #print(u"1")
                 # Analyze text
                 tweet_blob = TextBlob(tweet.text)
                 # Pass level of pol & sub
                 if tweet_blob.sentiment.polarity >= self._polarity and \
                                 tweet_blob.sentiment.subjectivity <= self._subjectivity and \
                                 tweet_blob.detect_language() in self._languages:
-                    print(u"2")
+                    #print(u"2")
                     # Retrieve page each URL
                     for url in urls:
-                        print(u"Base URL : {}".format(url))
+                        #print(u"Base URL : {}".format(url))
                         # Get page info
                         page_parser = tools.PageParser(url)
-                        print(u"True URL : {}".format(page_parser.raw_title))
+                        #print(u"True URL : {}".format(page_parser.raw_title))
                         # Load true URL if not from Twitter
                         if "twitter.com" not in page_parser.raw_title and (
                                 "http://" in page_parser.raw_title or "https://" in page_parser.raw_title):
-                            print(u"3")
+                            #print(u"3")
                             # Get true page info
                             try:
                                 true_page_parser = tools.PageParser(page_parser.raw_title)
-                            except AttributeError:
+                            except:
                                 continue
                             # end try
 
                             # Add to tweets
-                            print(u"RAW Title : {}".format(true_page_parser.raw_title))
-                            print(u"Title : {}".format(true_page_parser.title))
-                            print(u"HTML : {}".format(true_page_parser.html))
-                            self._tweets.append(Tweet(true_page_parser.title, urls[0], self._hashtags))
+                            #print(u"RAW Title : {}".format(true_page_parser.raw_title))
+                            if len(true_page_parser.raw_title) > 0:
+                                self._tweets.append(Tweet(true_page_parser.raw_title, urls[0], self._hashtags))
+                            # end if
                         # end if
                     # end for
                 # end if
             # end if
         # end for
-        print(len(self._tweets))
+        print(u"New tweet : {}".format(len(self._tweets)))
 
         # Wait
         logging.getLogger(u"pyTweetBot").info(u"Waiting 60 seconds...")
