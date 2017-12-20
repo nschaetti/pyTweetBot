@@ -235,9 +235,6 @@ class PageParser(object):
             raise PageParserRetrievalError(u"Can't retrieve HTML page after {} tries : {}".format(count, last_e))
         # end if
 
-        # Request server
-        response = urllib2.urlopen(request, timeout=self._timeout)
-
         # Data
         response_data = response.read()
 
