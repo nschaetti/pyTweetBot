@@ -27,10 +27,7 @@ import executor
 import db
 import db.obj
 from patterns.singleton import singleton
-from twitter.TweetBotConnect import TweetBotConnector
-#from pyTweetBot.twitter.TweetBotConnect import TweetBotConnector
 import pyTweetBot
-import twitter
 from sqlalchemy import update, delete
 from sqlalchemy.orm import load_only
 from sqlalchemy import and_, not_
@@ -94,7 +91,7 @@ class FriendsManager(object):
         Get the nunber of followers.
         :return: The number of followers.
         """
-        return TweetBotConnector().get_user().followers_count
+        return pyTweetBot.twitter.TweetBotConnector().get_user().followers_count
     # end n_followers
 
     # Get the number of following
@@ -104,7 +101,7 @@ class FriendsManager(object):
         Get the number of following.
         :return: The number of following.
         """
-        return TweetBotConnector().get_user().friends_count
+        return pyTweetBot.twitter.TweetBotConnector().get_user().friends_count
     # end n_followers
 
     # Get followers cursor
@@ -219,10 +216,10 @@ class FriendsManager(object):
         # Follow if needed
         if not self.is_following(screen_name=screen_name):
             # Following on Twitter
-            TweetBotConnector().follow(screen_name)
+            pyTweetBot.twitter.TweetBotConnector().follow(screen_name)
 
             # Get the Twitter user
-            twf = TweetBotConnector().get_user(screen_name)
+            twf = pyTweetBot.twitter.TweetBotConnector().get_user(screen_name)
 
             # Add friend in the DB (if needed)
             self._add_friend(twf.screen_name, twf.description, twf.location, twf.followers_count,
@@ -245,7 +242,7 @@ class FriendsManager(object):
         # Unfollow if possible
         if self.is_following(screen_name=screen_name):
             # Unfollowing on Twitter
-            TweetBotConnector().unfollow(screen_name)
+            pyTweetBot.twitter.TweetBotConnector().unfollow(screen_name)
 
             # Change DB
             self._set_following(screen_name, False)
