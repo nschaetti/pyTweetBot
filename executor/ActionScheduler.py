@@ -419,7 +419,7 @@ class ActionScheduler(object):
         :param the_text: Action's text.
         """
         if not self.exists(action_type=action_type, action_tweet_text=the_text):
-            action = db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
+            action = pyTweetBot.db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
                                    action_tweet_text=the_text)
             self.add(action)
         else:
