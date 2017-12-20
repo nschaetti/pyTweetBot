@@ -160,7 +160,7 @@ class TwitterHunter(Hunter):
                             # Add to tweets
                             #print(u"RAW Title : {}".format(true_page_parser.raw_title))
                             if len(true_page_parser.raw_title) > 0:
-                                self._tweets.append(Tweet(true_page_parser.raw_title, urls[0], self._hashtags))
+                                self._tweets.append(Tweet(true_page_parser.raw_title, page_parser.raw_title, self._hashtags))
                             # end if
                         # end if
                     # end for
