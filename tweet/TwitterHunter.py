@@ -168,7 +168,6 @@ class TwitterHunter(Hunter):
                 # end if
             # end if
         # end for
-        print(u"New tweet : {}".format(len(self._tweets)))
 
         # Wait
         logging.getLogger(u"pyTweetBot").info(u"Waiting 60 seconds...")
