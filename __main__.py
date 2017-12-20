@@ -262,6 +262,10 @@ if __name__ == "__main__":
     github_tweets_parser.add_argument("--instantaneous", action='store_true', help="Directly post tweets?", default=False)
     github_tweets_parser.add_argument("--waiting-time", type=int, help="Waiting time between each tweets (default=0)", default=0)
 
+    # Direct message
+    direct_message_parser = command_subparser.add_parser("direct-message")
+    add_default_arguments(direct_message_parser)
+
     # Parse
     args = parser.parse_args()
 
@@ -315,7 +319,7 @@ if __name__ == "__main__":
             create_config(args.config)
         # end if
     # Update statistics
-    if args.command == "user-statistics":
+    elif args.command == "user-statistics":
         update_statistics(config=config)
     # Find tweets
     elif args.command == "find-tweets":
@@ -375,6 +379,9 @@ if __name__ == "__main__":
     # Find Github tweets
     elif args.command == "find-github-tweets":
         find_github_tweets(config, action_scheduler, args.event_type, args.depth, args.instantaneous, args.waiting_time)
+    # Direct message
+    elif args.command == "direct-message":
+        pass
     # Unknown command
     else:
         sys.stderr.write(pystr.ERROR_UNKNOWN_COMMAND.format(args.command))
