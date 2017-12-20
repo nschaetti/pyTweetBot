@@ -119,7 +119,7 @@ class FriendsManager(object):
         Get followers
         :return: A list of Friend objects
         """
-        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_follower).all()
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_follower).all()
     # end get_followers
 
     # Get following
@@ -129,7 +129,7 @@ class FriendsManager(object):
         Get following
         :return: A list of friend objects
         """
-        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_following).all()
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_following).all()
     # end get_following
 
     ######################################################
@@ -143,8 +143,8 @@ class FriendsManager(object):
         :param screen_name: Friend's screen name
         :return: True or False
         """
-        return self._session.query(db.obj.Friend).filter(and_(
-            db.obj.Friend.friend_screen_name == screen_name, db.obj.Friend.friend_follower)).count > 0
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(and_(
+            pyTweetBot.db.obj.Friend.friend_screen_name == screen_name, pyTweetBot.db.obj.Friend.friend_follower)).count > 0
     # end is_follower
 
     # Am I following this friend?
@@ -154,7 +154,7 @@ class FriendsManager(object):
         :param screen_name: Friend's screen name
         :return: True or False
         """
-        return self._session.query(db.obj.Friend).filter(and_(db.obj.Friend.friend_screen_name == screen_name, db.obj.Friend.friend_following == 1)).count() > 0
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(and_(pyTweetBot.db.obj.Friend.friend_screen_name == screen_name, pyTweetBot.db.obj.Friend.friend_following == 1)).count() > 0
     # end is_following
 
     # Get obsolete friends
@@ -169,10 +169,23 @@ class FriendsManager(object):
         datetime_limit = datetime.datetime.utcnow() - timedelta(days=days)
 
         # Get all
-        return self._session.query(db.obj.Friend).filter(and_(db.obj.Friend.friend_following == True,
-                                                  not_(db.obj.Friend.friend_follower == True),
-                                                  db.obj.Friend.friend_following_date <= datetime_limit)).all()
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(and_(pyTweetBot.db.obj.Friend.friend_following == True,
+                                                  not_(pyTweetBot.db.obj.Friend.friend_follower == True),
+                                                pyTweetBot.db.obj.Friend.friend_following_date <= datetime_limit)).all()
     # end get_obsolete_friends
+
+    # Get uncontacted friends
+    def get_uncontacted_friends(self):
+        """
+        Get uncontacted friends
+        :return: Uncontacted friends
+        """
+        # Get all
+        return self._session.query(pyTweetBot.db.obj.Friend).filter\
+        (
+            and_(pyTweetBot.db.obj.Friend.friend_follower == True, pyTweetBot.db.obj.Friend.friend_contacted == False)
+        )
+    # end get_uncontacted_friends
 
     # Get a friend from the DB
     def get_friend_by_id(self, friend_id):
@@ -181,7 +194,7 @@ class FriendsManager(object):
         :param friend_id: The friend to get as a Tweepy object.
         :return: The friend DB object.
         """
-        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_id == friend_id).one()
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_id == friend_id).one()
     # end get_friend_by_id
 
     # Get a friend from the DB
@@ -191,7 +204,7 @@ class FriendsManager(object):
         :param screen_name: The friend to get as a Tweepy object.
         :return: The friend DB object.
         """
-        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name).one()
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_screen_name == screen_name).one()
     # end get_friend_by_name
 
     # Friend exists
@@ -201,7 +214,7 @@ class FriendsManager(object):
         :param screen_name: Account's screen name
         :return: True or False
         """
-        return len(self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_screen_name == screen_name).all()) > 0
+        return len(self._session.query(pyTweetBot.db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_screen_name == screen_name).all()) > 0
     # end exists
 
     # Follow a Twitter account
