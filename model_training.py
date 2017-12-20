@@ -26,7 +26,9 @@
 import logging
 import os
 import sys
-import nsNLP
+import learning
+import learning.features
+from nltk.tokenize import TweetTokenizer
 from learning.Model import Model
 from learning.Dataset import Dataset
 
@@ -51,35 +53,29 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
     if os.path.exists(model_file):
         model = Model.load(model_file)
     else:
-        if model_type == "stat":
-            model = nsNLP.statistical_models.SLTextClassifier(
+        if model_type == "NaiveBayes":
+            model = learning.NaiveBayesClassifier(
                 classes=['pos', 'neg'],
                 smoothing='dp',
                 smoothing_param=0.05
             )
-        elif model_type == "tfidf":
-            model = nsNLP.statistical_models.TFIDFTextClassifier(
+        elif model_type == "DecisionTree":
+            model = learning.DecisionTree(
                 classes=['pos', 'neg']
-            )
-        elif model_type == "NaiveBayes":
-            model = nsNLP.statistical_models.NaiveBayesClassifier(
-                classes=['pos', 'neg'],
-                smoothing='dp',
-                smoothing_param=0.05
             )
         # end if
     # end if
 
     # Tokenizer
-    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+    tokenizer = TweetTokenizer()
 
     # Join features
-    bow = nsNLP.features.BagOfGrams()
+    bow = learning.features.BagOfGrams()
 
     # Add features
-    bow.add(nsNLP.features.BagOfWords())
-    bow.add(nsNLP.features.BagOf2Grams())
-    bow.add(nsNLP.features.BagOf3Grams())
+    bow.add(learning.features.BagOfWords())
+    bow.add(learning.features.BagOf2Grams())
+    bow.add(learning.features.BagOf3Grams())
 
     # Load dataset
     if os.path.exists(data_set_file):
@@ -95,7 +91,7 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
         index = 1
         for text, c in dataset:
             # Tokens
-            tokens = tokenizer(text)
+            tokens = tokenizer.tokenize(text)
 
             # Log
             logging.getLogger(u"pyTweetBot").info\
