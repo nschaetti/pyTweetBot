@@ -60,7 +60,11 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
-        print(line.encode('ascii', errors='ignore'))
+        try:
+            print(line.encode('ascii', errors='ignore'))
+        except UnicodeEncodeError:
+            pass
+        # end try
         #print(u"Process : {}".format(line.encode('ascii', errors='ignore')))
         """if 'pyTweetBot' in line:
             print(line)
