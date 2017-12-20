@@ -288,7 +288,7 @@ if __name__ == "__main__":
 
         # Connection to Twitter
         #twitter_connector = TweetBotConnector(config)
-        twitter_connector = TweetBotConnector.getinstances(config)
+        twitter_connector = TweetBotConnector.getinstance(config)
 
         # Friends
         friends_manager = FriendsManager()
