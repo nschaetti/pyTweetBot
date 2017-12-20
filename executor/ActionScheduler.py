@@ -25,9 +25,9 @@
 import sqlalchemy
 import datetime
 from datetime import timedelta
-import db
-import db.obj
-from twitter.TweetBotConnect import TweetBotConnector
+import pyTweetBot
+import pyTweetBot.db as db
+import pyTweetBot.db.obj as db.obj
 from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
@@ -332,7 +332,7 @@ class ActionScheduler(object):
         Get the number of statuses
         :return: The number of statuses
         """
-        return TweetBotConnector().get_user().statuses_count
+        return pyTweetBot.twitter.TweetBotConnector().get_user().statuses_count
     # end n_statuses
 
     ##############################################
