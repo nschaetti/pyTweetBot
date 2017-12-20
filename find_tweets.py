@@ -57,7 +57,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     :param n_pages: Number of pages to analyze
     :param threshold: Probability threshold to be accepted as tweet
     """
-    p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
         print(u"Process : {}".format(line))
