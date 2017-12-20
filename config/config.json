@@ -49,8 +49,8 @@
 	],
 	"rss" :
 	[
-		{"url" : "http://feeds.feedburner.com/TechCrunch/startups", "hashtags" : "#startups", "via" : "@techcrunch"},
-		{"url" : "http://feeds.feedburner.com/TechCrunch/fundings-exits", "hashtags" : "#fundings", "via" : "@techcrunch"}
+		{"url" : "http://feeds.feedburner.com/TechCrunch/startups", "hashtags" : "#startups", "language": ["en"]},
+		{"url" : "http://feeds.feedburner.com/TechCrunch/fundings-exits", "hashtags" : "#fundings", "language": ["en"]}
 	],
 	"retweet" :
 	{
