@@ -23,84 +23,274 @@
 #
 
 # Imports
-import nsNLP
-import sys
+import pickle
+import numpy as np
+from nltk.tokenize import TweetTokenizer
 from CensorModel import CensorModel
+import features
 
 
-# Classifier base class
+# Text classifier
 class Classifier(object):
     """
-    Classifier
+    Text classifier
     """
 
+    # Text classifier
+    _training_finalized = False
+
     # Constructor
-    def __init__(self, features, language='english'):
+    def __init__(self, classes):
         """
         Constructor
-        :param config: Settings
+        :param classes: Classes
+        :param lang: Spacy language
         """
-        # Tokenizer
-        self._tokenizer = nsNLP.tokenization.NLTKTokenizer(lang=language)
-
-        # Parse features
-        feature_list = features.split('+')
-
-        # Join features
-        self._bow = nsNLP.features.BagOfGrams()
-
-        # For each features
-        for bag in feature_list:
-            # Select features
-            if bag == 'words':
-                b = nsNLP.features.BagOfWords()
-            elif bag == 'bigrams':
-                b = nsNLP.features.BagOf2Grams()
-            elif bag == 'trigrams':
-                b = nsNLP.features.BagOf3Grams()
-            else:
-                sys.stderr.write(u"Unknown features type {}".format(features))
-                exit()
-            # end if
-            self._bow.add(b)
-        # end for
+        # Properties
+        self._classes = classes
+        self._n_classes = len(classes)
     # end __init__
 
-    #################################################
+    ##############################################
     # Public
-    #################################################
+    ##############################################
 
-    #################################################
+    # Get name
+    def name(self):
+        """
+        Get name
+        :return:
+        """
+        pass
+    # end name
+
+    # Train the model
+    def train(self, x, y):
+        """
+        Train the model
+        :param x: Example's inputs.
+        :param y: Example's outputs.
+        """
+        if not self._training_finalized:
+            return self._train(x, y)
+        else:
+            return False
+        # end if
+    # end train
+
+    # Train a set
+    def training(self, samples):
+        """
+        Train a set
+        :param samples:
+        :param verbose:
+        :return:
+        """
+        for sample in samples:
+            self.train(sample[0], sample[1])
+        # end for
+    # end training
+
+    # Finalize model training
+    def finalize(self, verbose=False):
+        """
+        Finalize model training
+        """
+        if not self._training_finalized:
+            self._finalize_training(verbose)
+            self._training_finalized = True
+        # end if
+    # end finalize
+
+    # Predict the class
+    def predict(self, x):
+        """
+        Predict class of a text file
+        :param x: Sample
+        :return: Predicted class and classes probabilities
+        """
+        return self._classify(x)
+    # end predict
+
+    # Reset the classifier
+    def reset(self):
+        """
+        Reset the classifier
+        """
+        self._reset_model()
+        self._training_finalized = False
+    # end reset
+
+    # Show the debuging informations
+    def debug(self):
+        """
+        Show the debugging informations
+        :return:
+        """
+        pass
+    # end debug
+
+    # Get debugging data
+    def get_debugging_data(self):
+        """
+        Get debugging data
+        :return: debugging data
+        """
+        pass
+    # end _get_debugging_data
+
+    # Save the model
+    def save(self, filename):
+        """
+        Save the model to a Pickle file
+        :param filename:
+        :return:
+        """
+        with open(filename, 'w') as f:
+            pickle.dump(self, f)
+        # end with
+    # end save
+
+    # Finalized?
+    def finalized(self):
+        """
+        Finalized?
+        :return:
+        """
+        return self._training_finalized
+    # end finalized
+
+    ##############################################
     # Override
-    #################################################
+    ##############################################
 
-    # Predict
+    # Class the classifier
     def __call__(self, x):
         """
-        Predict
-        :param x: Text to classify
+        Class a text document.
+        :param x: Document's text.
+        :return: A tuple with found class and values per classes.
+        """
+        # Finalize training
+        if not self._training_finalized:
+            self._finalize_training()
+            self._training_finalized = True
+        # end if
+
+        # Classify the document
+        return self._classify(x)
+    # end __class__
+
+    # To str
+    def __str__(self):
+        """
+        To string
         :return:
         """
         pass
-    # end __call__
+    # end __str__
 
-    #################################################
+    ##############################################
     # Private
-    #################################################
+    ##############################################
 
-    # Predict
-    def _predict(self, x):
+    # Train the model
+    def _train(self, x, c, verbose=False):
         """
-        Predict
-        :param x:
-        :return:
+        Train
+        :param x: Example's inputs
+        :param c: Example's outputs
+        :param verbose: Verbosity
         """
         pass
-    # end _predict
+    # end _train
 
-    #################################################
+    # Filter token
+    def _filter_token(self, word):
+        """
+        Filter token
+        :param token:
+        :return:
+        """
+        word_text = word.text
+        word_text = word_text.replace(u"\n", u"")
+        word_text = word_text.replace(u"\t", u"")
+        word_text = word_text.replace(u"\r", u"")
+        if len(word_text) > 0:
+            word_vector = word.vector
+            if np.average(word_vector) != 0:
+                return True, word_text
+            # end if
+        # end if
+        return False, ""
+    # end if
+
+    # Classify a document
+    def _classify(self, x):
+        """
+        Classify a document.
+        :param x: Document's text.
+        :return: A tuple with found class and values per classes.
+        """
+        pass
+    # end _classify
+
+    # Finalize the training
+    def _finalize_training(self, verbose=False):
+        """
+        Finalize training.
+        :param verbose: Verbosity
+        """
+        pass
+    # end _finalize_training
+
+    # Reset the model
+    def _reset_model(self):
+        """
+        Reset the model
+        """
+        pass
+    # end _reset_model
+
+    # Transform int to class name
+    def _int_to_class(self, index):
+        """
+        Transform index to class name.
+        :param class_index: Class index.
+        :return: Class name.
+        """
+        return self._classes[index]
+    # end _int_to_class
+
+    # Transform class name to int
+    def _class_to_int(self, class_name):
+        """
+        Transform class name to int
+        :param class_name: Class name
+        :return: Integer
+        """
+        for index, name in enumerate(self._classes):
+            if name == class_name:
+                return index
+            # end if
+        # end for
+        return -1
+    # end class_to_int
+
+    ##########################################
     # Static
-    #################################################
+    ##########################################
+
+    # Load the model
+    @staticmethod
+    def load(opt):
+        """
+        Load the model from a file
+        :param opt: Loading option
+        :return: The model object
+        """
+        return pickle.load(open(opt, 'r'))
+    # end load
 
     # Load a complete model and censor with path to model
     @staticmethod
@@ -112,22 +302,22 @@ class Classifier(object):
         :return:
         """
         # Load model
-        model = nsNLP.classifiers.TextClassifier.load(model)
+        model = Classifier.load(model)
         censor = CensorModel(config)
 
         # Tokenizer
-        tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
+        tokenizer = TweetTokenizer()
 
         # Join features
-        bow = nsNLP.features.BagOfGrams()
+        bow = features.BagOfGrams()
 
         # Bag of gram, 2-grams, 3-grams
-        bow.add(nsNLP.features.BagOfWords())
-        bow.add(nsNLP.features.BagOf2Grams())
-        bow.add(nsNLP.features.BagOf3Grams())
+        bow.add(features.BagOfWords())
+        bow.add(features.BagOf2Grams())
+        bow.add(features.BagOf3Grams())
 
         return tokenizer, bow, model, censor
     # end load_model
 
-# end Model
+# end Classifier
 
