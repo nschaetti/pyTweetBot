@@ -74,7 +74,7 @@ def find_retweets(config, model, action_scheduler, text_size=80, threshold=0.5):
             if len(retweet.text) >= text_size and retweet.text[:3] != u"RT " \
                     and retweet.author.screen_name != config.twitter['user']:
                 # Predict class
-                prediction, probs = model(bow(tokenizer(retweet.text)))
+                prediction, probs = model(bow(tokenizer.tokenize(retweet.text)))
                 censor_prediction, _ = censor(retweet.text)
 
                 # Predicted as tweet
