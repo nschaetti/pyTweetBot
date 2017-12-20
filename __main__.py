@@ -287,7 +287,8 @@ if __name__ == "__main__":
                                       db_name=dbc["database"])
 
         # Connection to Twitter
-        twitter_connector = TweetBotConnector(config)
+        #twitter_connector = TweetBotConnector(config)
+        twitter_connector = TweetBotConnector.getinstances(config)
 
         # Friends
         friends_manager = FriendsManager()
