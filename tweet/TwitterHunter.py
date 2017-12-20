@@ -128,6 +128,7 @@ class TwitterHunter(Hunter):
         for tweet in page:
             # Get urls
             urls = re.findall(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", tweet.text)
+            print(urls)
 
             # If there is URLs in the tweet
             if len(urls) > 0:
@@ -141,10 +142,12 @@ class TwitterHunter(Hunter):
                     page_parser = tools.PageParser(urls[0])
 
                     # Add to tweets
+                    print(page_parser.title)
                     self._tweets.append(Tweet(page_parser.title, urls[0], self._hashtags))
                 # end if
             # end if
         # end for
+        print(len(self._tweets))
 
         # Wait
         logging.getLogger(u"pyTweetBot").info(u"Waiting 60 seconds...")
