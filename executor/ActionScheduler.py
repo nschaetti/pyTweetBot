@@ -27,7 +27,6 @@ import datetime
 from datetime import timedelta
 import pyTweetBot
 import pyTweetBot.db as db
-import pyTweetBot.db.obj as db.obj
 from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
