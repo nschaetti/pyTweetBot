@@ -201,20 +201,20 @@ class ActionScheduler(object):
         """
         try:
             if action_tweet_id is None and action_tweet_text is None:
-                self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).one()
+                self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_type == action_type).one()
                 return True
             elif action_tweet_id is not None and action_tweet_text is None:
-                self._session.query(db.obj.Action).filter(
-                    and_(db.obj.Action.action_type == action_type, db.obj.Action.action_tweet_id == action_tweet_id)).one()
+                self._session.query(pyTweetBot.db.obj.Action).filter(
+                    and_(pyTweetBot.db.obj.Action.action_type == action_type, pyTweetBot.db.obj.Action.action_tweet_id == action_tweet_id)).one()
                 return True
             elif action_tweet_id is None and action_tweet_text is not None:
-                self._session.query(db.obj.Action).filter(
-                    and_(db.obj.Action.action_type == action_type, db.obj.Action.action_tweet_text == action_tweet_text)).one()
+                self._session.query(pyTweetBot.db.obj.Action).filter(
+                    and_(pyTweetBot.db.obj.Action.action_type == action_type, pyTweetBot.db.obj.Action.action_tweet_text == action_tweet_text)).one()
                 return True
             else:
-                self._session.query(db.obj.Action).filter(
-                    and_(db.obj.Action.action_type == action_type, db.obj.Action.action_tweet_id == action_tweet_id,
-                         db.obj.Action.action_tweet_text == action_tweet_text)).one()
+                self._session.query(pyTweetBot.db.obj.Action).filter(
+                    and_(pyTweetBot.db.obj.Action.action_type == action_type, pyTweetBot.db.obj.Action.action_tweet_id == action_tweet_id,
+                         pyTweetBot.db.obj.Action.action_tweet_text == action_tweet_text)).one()
                 return True
             # end if
         except sqlalchemy.orm.exc.NoResultFound:
@@ -228,7 +228,7 @@ class ActionScheduler(object):
         Delete an action
         :param action: Action to delete.
         """
-        self._session.query(db.obj.Action).filter(db.obj.Action.action_id == action.action_id).delete()
+        self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_id == action.action_id).delete()
         self._session.commit()
     # end delete
 
@@ -252,8 +252,8 @@ class ActionScheduler(object):
         :return:
         """
         # Get all actions
-        action = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type) \
-            .order_by(db.obj.Action.action_id).all()[0]
+        action = self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_type == action_type) \
+            .order_by(pyTweetBot.db.obj.Action.action_id).all()[0]
         action.execute()
         self.delete(action)
     # end exec_next_action
@@ -276,9 +276,9 @@ class ActionScheduler(object):
         """
         # Get actions
         if action_type == "":
-            return self._session.query(db.obj.Action).order_by(db.obj.Action.action_id).all()
+            return self._session.query(pyTweetBot.db.obj.Action).order_by(pyTweetBot.db.obj.Action.action_id).all()
         else:
-            return self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).order_by(db.obj.Action.action_id).all()
+            return self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_type == action_type).order_by(pyTweetBot.db.obj.Action.action_id).all()
         # end if
     # end list_actions
 
@@ -353,7 +353,7 @@ class ActionScheduler(object):
         """
         Purge the reservoir of obsolete actions.
         """
-        self._session.query(db.obj.Action).filter(db.obj.Action.action_date <= datetime.datetime.utcnow() - self._purge_delay)
+        self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_date <= datetime.datetime.utcnow() - self._purge_delay)
     # end _purge_reservoir
 
     # Get reservoir levels
@@ -377,7 +377,7 @@ class ActionScheduler(object):
         :param action_type: Action's type.
         :return: Reservoir level for this action
         """
-        return len(self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type).all())
+        return len(self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_type == action_type).all())
     # end _get_reservoir_level
 
     # Get action to execute
@@ -387,7 +387,7 @@ class ActionScheduler(object):
         :return: Action to execute as a list()
         """
         # Get all actions
-        exec_actions = self._session.query(db.obj.Action).filter(db.obj.Action.action_type == action_type)\
+        exec_actions = self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_type == action_type)\
             .order_by(db.obj.Action.action_order).all()
 
         return exec_actions[0] if len(exec_actions) > 0 else None
@@ -401,7 +401,7 @@ class ActionScheduler(object):
         :param the_id: Action's ID
         """
         if not self.exists(action_type, the_id):
-            action = db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
+            action = pyTweetBot.db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
                                    action_tweet_id=the_id)
             self.add(action)
         else:
@@ -439,7 +439,7 @@ class ActionScheduler(object):
         :return:
         """
         if not self.exists(action_type=action_type, action_tweet_id=the_id, action_tweet_text=the_text):
-            action = db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
+            action = pyTweetBot.db.obj.Action(action_type=action_type, action_order=self._generate_random_order(),
                                    action_tweet_id=the_id, action_tweet_text=the_text)
             self.add(action)
         else:
