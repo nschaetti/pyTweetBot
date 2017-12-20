@@ -348,8 +348,13 @@ if __name__ == "__main__":
                 exit()
             # end if
         elif args.action == u"test":
-            model_testing(data_set_file=args.dataset, model_file=args.model, features=args.features,
-                          text_size=args.text_size, threshold=args.threshold)
+            model_testing\
+            (
+                data_set_file=args.dataset,
+                model_file=args.model,
+                text_size=args.text_size,
+                threshold=args.threshold
+            )
         elif args.action == u"train":
             model_training\
             (
