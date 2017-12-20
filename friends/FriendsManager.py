@@ -305,7 +305,7 @@ class FriendsManager(object):
         Get followers
         :return:
         """
-        return self._session.query(db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_follower).all()
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_follower).all()
     # end get_followers
 
     # Get following
@@ -314,7 +314,7 @@ class FriendsManager(object):
         Get following
         :return:
         """
-        return self._session.query(db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_following).all()
+        return self._session.query(pyTweetBot.db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_following).all()
     # end get_following
 
     ######################################################
