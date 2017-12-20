@@ -42,11 +42,8 @@ def singleton(class_):
         :param kwargs:
         :return:
         """
-        print(instances)
-        print(class_)
         if class_ not in instances:
             instances[class_] = class_(*args, **kwargs)
-            print(u"New : {}".format(instances))
         # end if
         return instances[class_]
     # end getinstance
