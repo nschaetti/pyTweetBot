@@ -31,6 +31,7 @@ import learning.features
 from nltk.tokenize import TweetTokenizer
 from learning.Model import Model
 from learning.Dataset import Dataset
+import tools.strings as pystr
 
 ####################################################
 # Functions
@@ -103,10 +104,11 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
             model.train(bow(tokens), c)
 
             # Info
-            logging.getLogger(u"pyTweetBot").info\
+            """logging.getLogger(u"pyTweetBot").info\
             (
                 u"Model with {} tokens (neg={}/pos={})".format(model.get_n_tokens(), model.get_n_tokens('neg'), model.get_n_tokens('pos'))
-            )
+            )"""
+            logging.getLogger(pystr.LOGGER).info(u"Classifier {}".format(model))
 
             # Index
             index += 1
