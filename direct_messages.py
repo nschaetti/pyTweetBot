@@ -24,9 +24,11 @@
 
 # Import
 import logging
+import time
 from twitter.TweetBotConnect import TweetBotConnector
 from friends.FriendsManager import FriendsManager
 from db.DBConnector import DBConnector
+import tools.strings as pystr
 
 ####################################################
 # Globals
@@ -72,6 +74,9 @@ def direct_messages(config):
 
         # Commit
         mysql_connector.get_session().commit()
-        exit()
+
+        # Wait
+        logging.getLogger(pystr.LOGGER).info(pystr.INFO_TWITTER_WAIT)
+        time.sleep(60)
     # end for
 # end if
