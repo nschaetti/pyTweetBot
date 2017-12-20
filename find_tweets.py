@@ -60,7 +60,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
-        print(u"Process : {}".format(line.encode('unicode', errors='ignore')))
+        print(u"Process : {}".format(unicode(line)))
         if 'pyTweetBot' in line:
             print(line)
         # end if
