@@ -27,7 +27,7 @@ import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, or_
 from .Base import Base
 import tweet as tw
-import db
+import pyTweetBot.db
 import tweepy
 
 
@@ -58,8 +58,8 @@ class Tweeted(Base):
         :param tweet_text: Tweet's text
         :return:
         """
-        db.DBConnector().get_session().add(Tweeted(tweet_tweet_text=tweet_text))
-        db.DBConnector().get_session().commit()
+        pyTweetBot.db.DBConnector().get_session().add(Tweeted(tweet_tweet_text=tweet_text))
+        pyTweetBot.db.DBConnector().get_session().commit()
     # end insert_tweet
 
     # Insert a new retweeted
@@ -70,8 +70,8 @@ class Tweeted(Base):
         :param tweet_id: Tweet's ID
         :param tweet_text: Tweet's text
         """
-        db.DBConnector().get_session().add(Tweeted(tweet_tweet_id=tweet_id, tweet_tweet_text=tweet_text))
-        db.DBConnector().get_session().commit()
+        pyTweetBot.db.DBConnector().get_session().add(Tweeted(tweet_tweet_id=tweet_id, tweet_tweet_text=tweet_text))
+        pyTweetBot.db.DBConnector().get_session().commit()
     # end insert_tweet
 
     # Tweet exists
@@ -83,18 +83,18 @@ class Tweeted(Base):
         :return:
         """
         if type(tweet) is tweepy.models.Status:
-            return db.DBConnector().get_session().query(Tweeted).filter(
+            return pyTweetBot.db.DBConnector().get_session().query(Tweeted).filter(
                 or_(Tweeted.tweet_tweet_text == tweet.text,
                     Tweeted.tweet_tweet_id == tweet.id)).count() > 0
         if type(tweet) is tw.Tweet:
-            return db.DBConnector().get_session().query(Tweeted).filter(
+            return pyTweetBot.db.DBConnector().get_session().query(Tweeted).filter(
                 or_(Tweeted.tweet_tweet_text == tweet.get_text(),
                     Tweeted.tweet_tweet_text == tweet.get_url(),
                     Tweeted.tweet_tweet_text == tweet.get_tweet())).count() > 0
         elif type(tweet) is unicode:
-            return db.DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_text == tweet).count() > 0
+            return pyTweetBot.db.DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_text == tweet).count() > 0
         elif type(tweet) is int:
-            return db.DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_id == tweet).count() > 0
+            return pyTweetBot.db.DBConnector().get_session().query(Tweeted).filter(Tweeted.tweet_tweet_id == tweet).count() > 0
         # end if
     # end exists
 
