@@ -131,7 +131,7 @@ def find_follows(config, model, action_scheduler, friends_manager, text_size, n_
                 # Request not sent, n_following >= n_followers, description > text_size
                 if not author.follow_request_sent and author.friends_count >= (author.followers_count * ratio) and len(author.description) > text_size:
                     # Predict class
-                    prediction, probs = model(bow(tokenizer(author.description)))
+                    prediction, probs = model(bow(tokenizer.tokenize(author.description)))
                     censor_prediction, _ = censor(author.description)
 
                     # Predicted as follow
