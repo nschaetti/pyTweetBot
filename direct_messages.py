@@ -26,6 +26,7 @@
 import logging
 from twitter.TweetBotConnect import TweetBotConnector
 from friends.FriendsManager import FriendsManager
+from db.DBConnector import DBConnector
 
 ####################################################
 # Globals
@@ -55,16 +56,22 @@ def direct_messages(config):
     # Friends
     friends_manager = FriendsManager()
 
+    # DB connector
+    mysql_connector = DBConnector()
+
     # Direct message
     msg = config.direct_message
 
     # Get friend to contact
     for friend in friends_manager.get_uncontacted_friends():
         # Send direct message
-        twitter_connector.send_direct_message(msg, friend.friend_screen_name)
+        twitter_connector.send_direct_message(text=msg, screen_name=friend.friend_screen_name)
 
         # Set as contacted
         friend.friend_contacted = True
+
+        # Commit
+        mysql_connector.get_session().commit()
         exit()
     # end for
 # end if
