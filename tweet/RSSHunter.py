@@ -22,7 +22,7 @@ class RSSHunter(Hunter):
         logging.debug(u"Retreiving RSS stream {}".format(self._stream_url))
         self._entries = feedparser.parse(self._stream_url)['entries']
         self._hashtags = stream['hashtags'] if 'hashtags' in stream else list()
-        self._languages = stream['languages']
+        self._lang = stream['lang']
         self._current = 0
     # end __init__
 
@@ -73,7 +73,7 @@ class RSSHunter(Hunter):
             tweet_blob = TextBlob(current_entry['title'])
 
             # Right language
-            if tweet_blob.detect_language() in self._languages:
+            if tweet_blob.detect_language() == self._lang:
                 found = True
             # end if
 
