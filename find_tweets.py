@@ -101,7 +101,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         # end try
 
         # Predict class
-        prediction, probs = model(bow(tokenizer(page_text)))
+        prediction, probs = model(bow(tokenizer.tokenize(page_text)))
         censor_prediction, _ = censor(page_text)
 
         # Predicted as tweet?
