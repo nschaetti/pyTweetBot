@@ -26,7 +26,8 @@ import sqlalchemy
 import datetime
 from datetime import timedelta
 import pyTweetBot
-import pyTweetBot.db as db
+import pyTweetBot.db
+import pyTweetBot.db.obj
 from sqlalchemy import and_
 import logging
 from patterns.singleton import singleton
@@ -84,7 +85,7 @@ class ActionScheduler(object):
         :param stats:
         """
         # Properties
-        self._session = db.DBConnector().get_session()
+        self._session = pyTweetBot.db.DBConnector().get_session()
 
         self._purge_delay = purge_delay
         self._reservoir_size = reservoir_size
@@ -130,7 +131,7 @@ class ActionScheduler(object):
         """
         if not self.exists(action_type="Follow", action_tweet_text=screen_name):
             # Insert
-            new_action = db.obj.Action(action_type='Follow', action_order=self._generate_random_order(),
+            new_action = pyTweetBot.db.obj.Action(action_type='Follow', action_order=self._generate_random_order(),
                                        action_tweet_text=screen_name)
             self._session.add(new_action)
             self._session.commit()
@@ -148,7 +149,7 @@ class ActionScheduler(object):
         """
         if not self.exists(action_type="Unfollow", action_tweet_text=screen_name):
             # Insert
-            new_action = db.obj.Action(action_type='Unfollow', action_order=self._generate_random_order(),
+            new_action = pyTweetBot.db.obj.Action(action_type='Unfollow', action_order=self._generate_random_order(),
                                        action_tweet_text=screen_name)
             self._session.add(new_action)
             self._session.commit()
