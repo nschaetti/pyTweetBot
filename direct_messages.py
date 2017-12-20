@@ -59,7 +59,7 @@ def direct_messages(config):
     msg = config.direct_message
 
     # Get friend to contact
-    for friend in friends_manager.get_uncontacted_friend():
+    for friend in friends_manager.get_uncontacted_friends():
         # Send direct message
         twitter_connector.send_direct_message(msg, friend.friend_screen_name)
 
