@@ -24,9 +24,8 @@
 
 # Import
 import logging
+import subprocess, signal
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
-from tweet.RSSHunter import RSSHunter
-from tweet.GoogleNewsHunter import GoogleNewsHunter
 from tweet.TweetFinder import TweetFinder
 from tools.PageParser import PageParser, PageParserRetrievalError
 import learning
@@ -58,6 +57,14 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     :param n_pages: Number of pages to analyze
     :param threshold: Probability threshold to be accepted as tweet
     """
+    p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    for line in out.splitlines():
+        if 'pyTweetBot' in line:
+            print(line)
+        # end if
+    # end for
+
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
 
@@ -91,7 +98,8 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
 
         # Get page's text
         try:
-            page_text = PageParser.get_text(tweet.get_url())
+            page_info = PageParser(tweet.get_url())
+            page_text = page_info.text
         except PageParserRetrievalError as e:
             logging.getLogger(pystr.LOGGER).warning(pystr.WARNING_PAGE_RETRIEVAL.format(e))
             page_text = tweet.get_text()
@@ -103,9 +111,9 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         censor_prediction, _ = censor(page_text)
 
         # Predicted as tweet?
-        if prediction == "pos" and censor_prediction == "pos" and not tweet.already_tweeted():
-            if probs['pos'] >= threshold:
-                if not on_title or probs['pos'] >= 0.8:
+        if censor_prediction == "pos" and (prediction == "pos" or on_title) and not tweet.already_tweeted():
+            if probs['pos'] >= threshold or on_title:
+                if not on_title or probs['pos'] >= 0.9:
                     # Try to add
                     try:
                         logging.getLogger(pystr.LOGGER).info(pystr.INFO_ADD_TWEET_SCHEDULER.format(

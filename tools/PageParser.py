@@ -26,6 +26,11 @@
 import urllib2
 import brotli
 import gzip
+import socket
+import sys
+import urllib2
+import httplib
+from bs4 import BeautifulSoup
 from urlparse import urlparse
 from bs4 import BeautifulSoup
 from StringIO import StringIO
@@ -83,6 +88,7 @@ class PageParser(object):
     # Information
     _title = u""
     _html = u""
+    _text = u""
 
     # Constructor
     def __init__(self, url, timeout=20):
@@ -129,6 +135,16 @@ class PageParser(object):
         return self._html
     # end html
 
+    # Text
+    @property
+    def text(self):
+        """
+        Get text
+        :return:
+        """
+        return self._text
+    # end text
+
     ###########################################
     # Public
     ###########################################
@@ -165,7 +181,45 @@ class PageParser(object):
         final_header[u'path'] = url_parse.path
 
         # Call URL
-        request = urllib2.Request(url, None, self._headers)
+        request = urllib2.Request(url.encode('ascii', errors='ignore'), None, self._headers)
+
+        # Tries count
+        count = 0
+        success = False
+        last_e = None
+
+        # Try
+        while count < 10:
+            # Get title
+            try:
+                response = urllib2.urlopen(request, timeout=self._timeout)
+                success = True
+                break
+            except urllib2.HTTPError as e:
+                raise PageParserRetrievalError(u"HTTP error while retrieving {} : {}\n".format(url, e))
+            except socket.error as e:
+                count += 1
+                last_e = e
+                pass
+            except urllib2.URLError as e:
+                last_e = e
+                count += 1
+                pass
+            except httplib.IncompleteRead as e:
+                last_e = e
+                count += 1
+                pass
+            except httplib.BadStatusLine as e:
+                last_e = e
+                count += 1
+                pass
+            # end try
+        # end while
+
+        # Check for error
+        if not success:
+            raise PageParserRetrievalError(u"Can't retrieve HTML page after {} tries : {}".format(count, last_e))
+        # end if
 
         # Request server
         response = urllib2.urlopen(request, timeout=self._timeout)
@@ -192,6 +246,7 @@ class PageParser(object):
         # Extract information
         self._html = data
         self._title = self._extract_title(data)
+        self._text = self._extract_text(data)
     # end _load
 
     # Extract title from HTML
@@ -221,5 +276,37 @@ class PageParser(object):
         # Return
         return new_title
     # end _extract_title
+
+    # Get text
+    def _extract_text(self, data):
+        """
+        Get text from URL
+        :return:
+        """
+        # Soup HTML
+        soup = BeautifulSoup(data, "lxml")
+
+        # Total text
+        html_text = u""
+
+        # Get each tag
+        for tag in ['h1', 'h2', 'h3', 'h4', 'p']:
+            # Find all occurencies
+            for html_tag in soup.find_all(tag):
+                html_text += html_tag.text + u". "
+                # end for
+        # end for
+
+        # Remove tab
+        html_text = html_text.replace(u"\t", u" ")
+        html_text = html_text.replace(u"\n", u" ")
+
+        # Remove multiple spaces
+        for i in range(20):
+            html_text = html_text.replace(u"  ", u" ")
+        # end for
+
+        return html_text
+    # end get_text
 
 # end PageParser
