@@ -57,20 +57,6 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     :param n_pages: Number of pages to analyze
     :param threshold: Probability threshold to be accepted as tweet
     """
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
-    out, err = p.communicate()
-    for line in out.splitlines():
-        try:
-            print(line.decode('ascii', errors='ignore'))
-        except UnicodeDecodeError:
-            pass
-        # end try
-        #print(u"Process : {}".format(line.encode('ascii', errors='ignore')))
-        """if 'pyTweetBot' in line:
-            print(line)
-        # end if"""
-    # end for
-
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
 
