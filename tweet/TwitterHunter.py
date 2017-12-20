@@ -144,9 +144,10 @@ class TwitterHunter(Hunter):
                     for url in urls:
                         # Get page info
                         page_parser = tools.PageParser(url)
-
+                        print(u"True URL : {}".format(page_parser.raw_title))
                         # Load true URL if not from Twitter
                         if "twitter.com" not in page_parser.raw_title:
+                            print(u"3")
                             # Get true page info
                             true_page_parser = tools.PageParser(page_parser.raw_title)
 
