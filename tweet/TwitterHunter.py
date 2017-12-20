@@ -143,7 +143,8 @@ class TwitterHunter(Hunter):
                         # Get page info
                         try:
                             page_parser = tools.PageParser(url)
-                        except:
+                        except Exception as e:
+                            print(u"Error 1 : {}".format(e))
                             continue
                         # end try
 
@@ -154,6 +155,7 @@ class TwitterHunter(Hunter):
                             try:
                                 true_page_parser = tools.PageParser(page_parser.raw_title)
                             except:
+                                print(u"Error 2 : {}".format(e))
                                 continue
                             # end try
 
@@ -165,7 +167,11 @@ class TwitterHunter(Hunter):
                                 # Add to tweets
                                 if len(true_page_parser.raw_title) > 0 and true_text_blob.detect_language() in self._languages:
                                     self._tweets.append(Tweet(true_page_parser.raw_title, page_parser.raw_title, self._hashtags))
+                                else:
+                                    print(u"title to short or bad language")
                                 # end if
+                            else:
+                                print(u"too short")
                             # end if
                         # end if
                     # end for
