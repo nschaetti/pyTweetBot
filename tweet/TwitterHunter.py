@@ -140,12 +140,14 @@ class TwitterHunter(Hunter):
                                 tweet_blob.sentiment.subjectivity <= self._subjectivity and \
                                 tweet_blob.detect_language() in self._languages:
                     print(u"2")
-                    # Retrieve page
-                    page_parser = tools.PageParser(urls[0])
+                    # Retrieve page each URL
+                    for url in urls:
+                        page_parser = tools.PageParser(url)
 
-                    # Add to tweets
-                    print(page_parser.title)
-                    self._tweets.append(Tweet(page_parser.title, urls[0], self._hashtags))
+                        # Add to tweets
+                        print(u"Title : {}".format(page_parser.title))
+                        self._tweets.append(Tweet(page_parser.title, urls[0], self._hashtags))
+                    # end for
                 # end if
             # end if
         # end for
