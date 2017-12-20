@@ -24,6 +24,7 @@
 
 # Import
 import logging
+from twitter.TweetBotConnect import TweetBotConnector
 import pyTweetBot
 
 ####################################################
@@ -48,8 +49,8 @@ def direct_messages(config):
     :param config:
     :return:
     """
-    # Bot connector
-    bot_connector = pyTweetBot.twitter.TweetBotConnector()
+    # Connection to Twitter
+    twitter_connector = TweetBotConnector(config)
 
     # Friend manager
     friend_manager = pyTweetBot.friends.FriendManager()
@@ -60,7 +61,7 @@ def direct_messages(config):
     # Get friend to contact
     for friend in friend_manager.get_uncontacted_friend():
         # Send direct message
-        bot_connector.send_direct_message(msg, friend.friend_screen_name)
+        twitter_connector.send_direct_message(msg, friend.friend_screen_name)
 
         # Set as contacted
         friend.friend_contacted = True
