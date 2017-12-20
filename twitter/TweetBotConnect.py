@@ -170,14 +170,19 @@ class TweetBotConnector(object):
     # end like
 
     # Send direct message
-    def send_direct_message(self, user_id, text):
+    def send_direct_message(self, text, user_id=None, screen_name=""):
         """
         Send direct message.
         :param user_id: Receipe user's ID.
         :param text: Message's text.
+        :param screen_name: User's screen name
         """
         logging.getLogger(u"pyTweetBot").info(u"Sending message \"{}\" to {}".format(text, user_id))
-        self._api.send_direct_message(user_id=user_id, text=text)
+        if screen_name != "":
+            self._api.send_direct_message(screen_name=screen_name, text=text)
+        elif user_id is not None:
+            self._api.send_direct_message(user_id=user_id, text=text)
+        # end if
     # end send_direct_message
 
     # Get time line

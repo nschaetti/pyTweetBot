@@ -51,6 +51,7 @@ from execute_actions import execute_actions
 from stats.TweetStatistics import TweetStatistics
 from follower_dataset import follower_dataset
 from create_database import create_database
+from direct_messages import direct_messages
 import tools.strings as pystr
 
 
@@ -263,8 +264,8 @@ if __name__ == "__main__":
     github_tweets_parser.add_argument("--waiting-time", type=int, help="Waiting time between each tweets (default=0)", default=0)
 
     # Direct message
-    direct_message_parser = command_subparser.add_parser("direct-message")
-    add_default_arguments(direct_message_parser)
+    direct_messages_parser = command_subparser.add_parser("direct-messages")
+    add_default_arguments(direct_messages_parser)
 
     # Parse
     args = parser.parse_args()
@@ -287,7 +288,6 @@ if __name__ == "__main__":
                                       db_name=dbc["database"])
 
         # Connection to Twitter
-        #twitter_connector = TweetBotConnector(config)
         twitter_connector = TweetBotConnector(config)
 
         # Friends
@@ -386,8 +386,8 @@ if __name__ == "__main__":
     elif args.command == "find-github-tweets":
         find_github_tweets(config, action_scheduler, args.event_type, args.depth, args.instantaneous, args.waiting_time)
     # Direct message
-    elif args.command == "direct-message":
-        pass
+    elif args.command == "direct-messages":
+        direct_messages(config)
     # Unknown command
     else:
         sys.stderr.write(pystr.ERROR_UNKNOWN_COMMAND.format(args.command))
