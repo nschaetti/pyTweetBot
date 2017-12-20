@@ -64,9 +64,15 @@ def add_follow_action(action_scheduler, friend):
         exit()
         pass
     except ActionAlreadyExists:
-        logging.getLogger(u"pyTweetBot").error(
-            u"Follow action for \"{}\" already exists in the database".format(
-                friend.friend_screen_name))
+        if type(friend) is db.obj.Friend:
+            logging.getLogger(u"pyTweetBot").error(
+                u"Follow action for \"{}\" already exists in the database".format(
+                    friend.friend_screen_name))
+        elif type(friend) is tweepy.User:
+            logging.getLogger(u"pyTweetBot").error(
+                u"Follow action for \"{}\" already exists in the database".format(
+                    friend.screen_name))
+        # end if
         pass
     # end try
 # end add_follow_action
