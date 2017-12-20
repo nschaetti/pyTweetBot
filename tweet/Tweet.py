@@ -143,7 +143,8 @@ class Tweet(object):
         To string
         :return:
         """
-        return "Tweet(text={}, url={}, hashtags={}, length={})".format(self._text, self._url, self._hashtags,
+        return "Tweet(text={}, url={}, hashtags={}, length={})".format(self._text.encode('ascii', errors='ignore'),
+                                                                       self._url, self._hashtags,
                                                                        self.get_length())
     # end __str__
 
