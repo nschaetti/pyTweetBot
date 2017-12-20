@@ -142,6 +142,7 @@ class TwitterHunter(Hunter):
                     print(u"2")
                     # Retrieve page each URL
                     for url in urls:
+                        print(u"Base URL : {}".format(url))
                         # Get page info
                         page_parser = tools.PageParser(url)
                         print(u"True URL : {}".format(page_parser.raw_title))
