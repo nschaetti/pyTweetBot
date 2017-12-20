@@ -24,7 +24,6 @@
 
 # Import
 import logging
-import subprocess, signal
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from tweet.TweetFinder import TweetFinder
 from tools.PageParser import PageParser, PageParserRetrievalError
