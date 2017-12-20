@@ -48,6 +48,7 @@ class TweetFinder(Hunter):
         self._shuffle = shuffle
         self._tweet_factory = tweet_factory
         self._classifiers = list()
+        self._first = True
     # end __init__
 
     ######################################################
@@ -126,6 +127,11 @@ class TweetFinder(Hunter):
         if self._current >= self._n_hunters:
             raise StopIteration
         else:
+            if self._first:
+                logging.getLogger(u"pyTweetBot").info(u"Changing hunter to {}".format(self._hunters[self._current]))
+                self._first = False
+            # end if
+
             try:
                 return self._to_the_factory(self._hunters[self._current].next())
             except StopIteration:
