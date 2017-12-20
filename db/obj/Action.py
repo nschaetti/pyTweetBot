@@ -24,12 +24,10 @@
 
 # Import
 import datetime
-import random
-import time
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
 from twitter.TweetBotConnect import TweetBotConnector
-from friends.FriendsManager import FriendsManager
+from pyTweetBot.friends.FriendsManager import FriendsManager
 from db.obj.Tweeted import Tweeted
 
 
