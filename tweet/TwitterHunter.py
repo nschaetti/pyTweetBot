@@ -157,7 +157,6 @@ class TwitterHunter(Hunter):
                             if len(true_page_parser.text) > 3:
                                 # Blog
                                 true_text_blob = TextBlob(true_page_parser.text)
-                                print(true_page_parser.text.encode('ascii', errors='ignore'))
 
                                 # Add to tweets
                                 if len(true_page_parser.raw_title) > 0 and true_text_blob.detect_language() in self._languages:
