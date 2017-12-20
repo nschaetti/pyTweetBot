@@ -26,8 +26,8 @@
 import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
-from twitter.TweetBotConnect import TweetBotConnector
-from pyTweetBot.friends.FriendsManager import FriendsManager
+from pyTweetBot.twitter
+from pyTweetBot.friends
 from db.obj.Tweeted import Tweeted
 
 
@@ -60,21 +60,21 @@ class Action(Base):
         """
         if self.action_type == "Follow":
             # Follow
-            FriendsManager().follow(self.action_tweet_text)
+            pyTweetBot.friends.FriendsManager().follow(self.action_tweet_text)
         elif self.action_type == "Unfollow":
             # Unfollow
-            FriendsManager().unfollow(self.action_tweet_text)
+            pyTweetBot.friends.FriendsManager().unfollow(self.action_tweet_text)
         elif self.action_type == "Like":
             # Like
-            TweetBotConnector().like(self.action_tweet_id)
+            pyTweetBot.twitter.TweetBotConnector().like(self.action_tweet_id)
             Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
         elif self.action_type == "Tweet":
             # Tweet
-            TweetBotConnector().tweet(self.action_tweet_text)
+            pyTweetBot.twitter.TweetBotConnector().tweet(self.action_tweet_text)
             Tweeted.insert_tweet(self.action_tweet_text)
         elif self.action_type == "Retweet":
             # Retweet
-            TweetBotConnector().retweet(self.action_tweet_id)
+            pyTweetBot.twitter.TweetBotConnector().retweet(self.action_tweet_id)
             Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
         # end if
     # end
