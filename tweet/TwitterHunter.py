@@ -107,7 +107,7 @@ class TwitterHunter(Hunter):
 
         # Remove
         self._tweets.remove(current_tweet)
-
+        print(current_tweet)
         # Return
         return current_tweet
     # end next
