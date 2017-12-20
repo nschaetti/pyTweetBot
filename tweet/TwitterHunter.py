@@ -141,7 +141,11 @@ class TwitterHunter(Hunter):
                     # Retrieve page each URL
                     for url in urls:
                         # Get page info
-                        page_parser = tools.PageParser(url)
+                        try:
+                            page_parser = tools.PageParser(url)
+                        except:
+                            continue
+                        # end try
 
                         # Load true URL if not from Twitter
                         if "twitter.com" not in page_parser.raw_title and (
