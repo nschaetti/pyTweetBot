@@ -3,7 +3,7 @@
 #
 
 # Imports
-from twitter.TweetBotConnect import TweetBotConnector
+import pyTweetBot
 from textblob import TextBlob
 import time
 import logging
@@ -28,9 +28,9 @@ class RetweetFinder(object):
 
         # Cursor
         if search_keywords == "":
-            self._cursor = TweetBotConnector().get_time_line(n_pages)
+            self._cursor = pyTweetBot.twitter.TweetBotConnector().get_time_line(n_pages)
         else:
-            self._cursor = TweetBotConnector().search_tweets(search_keywords, n_pages)
+            self._cursor = pyTweetBot.twitter.TweetBotConnector().search_tweets(search_keywords, n_pages)
         # end if
 
         # Current list of tweets
