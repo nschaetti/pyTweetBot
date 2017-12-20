@@ -129,16 +129,18 @@ if __name__ == "__main__":
     command_subparser = parser.add_subparsers(dest="command")
 
     # Database parser
-    database_parser = command_subparser.add_parser("database")
-    add_default_arguments(database_parser)
-    database_parser.add_argument("--create", action='store_true',
-                                 help="Create the database structure on the MySQL host", default=False)
-    database_parser.add_argument("--export", action='store_true',
-                                 help="Export tweets, tweeted and followers/friends to a file", default=False)
-    database_parser.add_argument("--import", action='store_true',
-                                 help="Import tweets, tweeted and followers/friends from a file", default=False)
-    database_parser.add_argument("--file", type=str,
-                                 help="File to import / to export to", default="")
+    tools_parser = command_subparser.add_parser("tools")
+    add_default_arguments(tools_parser)
+    tools_parser.add_argument("--create-database", action='store_true',
+                              help="Create the database structure on the MySQL host", default=False)
+    tools_parser.add_argument("--export", action='store_true',
+                              help="Export tweets, tweeted and followers/friends to a file", default=False)
+    tools_parser.add_argument("--import", action='store_true',
+                              help="Import tweets, tweeted and followers/friends from a file", default=False)
+    tools_parser.add_argument("--file", type=str,
+                              help="File to import / to export to", default="")
+    tools_parser.add_argument("--create-config", action='store_true',
+                              help="Create an empty configuration file", default=False)
 
     # Update statistics parser
     update_stats_parser = command_subparser.add_parser("user-statistics")
@@ -243,7 +245,7 @@ if __name__ == "__main__":
 
     # Parse
     args = parser.parse_args()
-
+    print(args)
     # Logging
     logger = create_logger(pystr.LOGGER, log_level=args.log_level, log_file=args.log_file)
 
@@ -285,8 +287,10 @@ if __name__ == "__main__":
     # Different possible command
     if args.command == "database":
         # Create database
-        if args.create:
+        if args.create_database:
             create_database(config)
+        elif args.create_config:
+            create_config(config)
         # end if
     # Update statistics
     if args.command == "user-statistics":
