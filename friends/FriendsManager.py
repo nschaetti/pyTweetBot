@@ -69,7 +69,7 @@ class FriendsManager(object):
         Constructor
         """
         # DB session
-        self._session = db.DBConnector().get_session()
+        self._session = pyTweetBot.db.DBConnector().get_session()
 
         # Twitter connection
         self._twitter_con = pyTweetBot.twitter.TweetBotConnector()
