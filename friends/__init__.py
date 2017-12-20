@@ -23,4 +23,4 @@
 #
 
 # Imports
-from FriendsManager import FriendsManager
+from FriendsManager import FriendsManager, ActionAlreadyDone
