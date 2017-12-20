@@ -23,7 +23,8 @@
 #
 
 # Imports
-from friends.FriendsManager import ActionAlreadyDone
+#from friends.FriendsManager import ActionAlreadyDone
+import friends.FriendsManager as fr
 from twitter.TweetBotConnect import RequestLimitReached
 import logging
 import tweepy
@@ -137,7 +138,7 @@ class ExecutorThread(Thread):
 
             # Wait
             self._wait_next_action()
-        except ActionAlreadyDone as e:
+        except fr.ActionAlreadyDone as e:
             # Delete action
             with mutex:
                 self._scheduler.delete(action)
