@@ -305,7 +305,7 @@ class FriendsManager(object):
         Get followers
         :return:
         """
-        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_follower).all()
+        return self._session.query(db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_follower).all()
     # end get_followers
 
     # Get following
@@ -314,7 +314,7 @@ class FriendsManager(object):
         Get following
         :return:
         """
-        return self._session.query(db.obj.Friend).filter(db.obj.Friend.friend_following).all()
+        return self._session.query(db.obj.Friend).filter(pyTweetBot.db.obj.Friend.friend_following).all()
     # end get_following
 
     ######################################################
@@ -505,9 +505,11 @@ class FriendsManager(object):
         """
         # Get current friends.
         if follower:
-            friends = self._session.query(db.obj.Friend).options(load_only('friend_screen_name')).filter(db.obj.Friend.friend_follower).all()
+            friends = self._session.query(pyTweetBot.db.obj.Friend).options(load_only('friend_screen_name')).filter(
+                pyTweetBot.db.obj.Friend.friend_follower).all()
         else:
-            friends = self._session.query(db.obj.Friend).options(load_only('friend_screen_name')).filter(db.obj.Friend.friend_following).all()
+            friends = self._session.query(pyTweetBot.db.obj.Friend).options(load_only('friend_screen_name')).filter(
+                pyTweetBot.db.obj.Friend.friend_following).all()
         # end if
 
         # Counter
