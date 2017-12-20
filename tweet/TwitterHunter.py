@@ -132,12 +132,14 @@ class TwitterHunter(Hunter):
 
             # If there is URLs in the tweet
             if len(urls) > 0:
+                print(u"1")
                 # Analyze text
                 tweet_blob = TextBlob(tweet.text)
                 # Pass level of pol & sub
                 if tweet_blob.sentiment.polarity >= self._polarity and \
                                 tweet_blob.sentiment.subjectivity <= self._subjectivity and \
                                 tweet_blob.detect_language() in self._languages:
+                    print(u"2")
                     # Retrieve page
                     page_parser = tools.PageParser(urls[0])
 
