@@ -70,10 +70,9 @@ def find_retweets(config, model, action_scheduler, text_size=80, threshold=0.5):
     for retweet_finder in retweet_finders:
         # For each tweet
         for retweet, polarity, subjectivity in retweet_finder:
-            print(retweet.author.screen_name)
             # Minimum size, not retweet, and not coming from use
             if len(retweet.text) >= text_size and retweet.text[:3] != u"RT " \
-                    and retweet.screen_name == config.twitter['user']:
+                    and retweet.author.screen_name == config.twitter['user']:
                 # Predict class
                 prediction, probs = model(bow(tokenizer(retweet.text)))
                 censor_prediction, _ = censor(retweet.text)
