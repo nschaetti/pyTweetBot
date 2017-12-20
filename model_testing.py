@@ -23,10 +23,9 @@
 #
 
 # Import
-import nsNLP
 import logging
 import os
-import sys
+import learning
 from learning.Dataset import Dataset
 
 
@@ -41,54 +40,23 @@ from learning.Dataset import Dataset
 
 
 # Test a classifier
-def model_testing(data_set_file, model_file, features='words', text_size=2000, threshold=0.5):
+def model_testing(config, data_set_file, model_file, text_size=2000, threshold=0.5):
     """
     Test a classifier
     :param data_set_file: Path to the dataset file
     :param model_file: Path to model file if needed
-    :param features: Features
     :param text_size: Minimum text size
     :param threshold: Probability threshold
     """
-    # Load model or create
-    if os.path.exists(model_file):
-        model = nsNLP.classifiers.TextClassifier.load(model_file)
-    else:
-        sys.stderr.write(u"Can't open model file {}\n".format(model_file))
-        exit()
-    # end if
-
     # Load data set
     if os.path.exists(data_set_file):
         dataset = Dataset.load(data_set_file)
     else:
-        logging.error(u"Cannot find dataset file {}".format(data_set_file))
+        logging.error(u"Cannot find data set file {}".format(data_set_file))
     # end if
 
-    # Tokenizer
-    tokenizer = nsNLP.tokenization.NLTKTokenizer(lang='english')
-
-    # Parse features
-    feature_list = features.split('+')
-
-    # Join features
-    bow = nsNLP.features.BagOfGrams()
-
-    # For each features
-    for bag in feature_list:
-        # Select features
-        if bag == 'words':
-            b = nsNLP.features.BagOfWords()
-        elif bag == 'bigrams':
-            b = nsNLP.features.BagOf2Grams()
-        elif bag == 'trigrams':
-            b = nsNLP.features.BagOf3Grams()
-        else:
-            sys.stderr.write(u"Unknown features type {}".format(features))
-            exit()
-        # end if
-        bow.add(b)
-    # end for
+    # Load model
+    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model_file)
 
     # Stats
     confusion_matrix = {'pos': {'pos': 0.0, 'neg': 0.0}, 'neg': {'pos': 0.0, 'neg': 0.0}}
@@ -104,7 +72,7 @@ def model_testing(data_set_file, model_file, features='words', text_size=2000, t
             print(u"Testing sample {}".format(index))
 
             # Predict
-            _, probs = model(bow(tokenizer(text)))
+            _, probs = model(bow(tokenizer.tokenize(text)))
 
             # Threshold
             if probs['pos'] > threshold:
