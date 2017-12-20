@@ -177,10 +177,11 @@ class TweetBotConnector(object):
         :param text: Message's text.
         :param screen_name: User's screen name
         """
-        logging.getLogger(u"pyTweetBot").info(u"Sending message \"{}\" to {}".format(text, user_id))
         if screen_name != "":
+            logging.getLogger(u"pyTweetBot").info(u"Sending message \"{}\" to {}".format(text, screen_name))
             self._api.send_direct_message(screen_name=screen_name, text=text)
         elif user_id is not None:
+            logging.getLogger(u"pyTweetBot").info(u"Sending message \"{}\" to {}".format(text, user_id))
             self._api.send_direct_message(user_id=user_id, text=text)
         # end if
     # end send_direct_message
