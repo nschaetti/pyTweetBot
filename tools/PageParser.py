@@ -242,7 +242,7 @@ class PageParser(object):
         else:
             raise UnknownEncoding(u"Unknown encoding {}".format(content_encoding))
         # end if
-        print(data)
+        print(u"Data ; {}".format(data))
         # Extract information
         self._html = data
         self._title = self._extract_title(data)
