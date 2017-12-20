@@ -99,6 +99,9 @@ class PageParser(object):
         # Properties
         self._url = url
         self._timeout = timeout
+
+        # Load URL
+        self._load(url)
     # end __init__
 
     ###########################################
