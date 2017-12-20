@@ -23,8 +23,7 @@
 #
 
 # Imports
-#from friends.FriendsManager import ActionAlreadyDone
-import friends.FriendsManager as fr
+from friends.FriendsManager import ActionAlreadyDone
 from twitter.TweetBotConnect import RequestLimitReached
 import logging
 import tweepy
