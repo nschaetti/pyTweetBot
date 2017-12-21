@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pyTweetBot',
-      version=1.0,
+      version='0.1',
       description='A Twitter bot to collect articles and news from the Web and tweet/retweet it on your feed',
       url='https://github.com/nschaetti/pyTweetBot',
       author='Nils Schaetti',
