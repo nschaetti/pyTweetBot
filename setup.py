@@ -8,6 +8,4 @@ setup(name='pyTweetBot',
       author_email='n.schaetti@gmail.com',
       license='GPL',
       packages=['config', 'db', 'directmessage', 'executor', 'friends', 'learning', 'mail', 'news', 'patterns',
-                'retweet', 'stats', 'templates', 'tools', 'tweet', 'twitter'],
-      install_requires=['nltk', 'argparse', 'logging', 'sys', 'os', 'tweepy', 'sklearn', 'github', 'brotli', 'gzip',
-                        'urllib', 'httplib', 'bs4', 'StringIO', 'socket', 'urlparse', 'HTMLParse', 'bs4'])
+                'retweet', 'stats', 'templates', 'tools', 'tweet', 'twitter'])
