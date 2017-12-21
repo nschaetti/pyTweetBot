@@ -31,6 +31,7 @@ import pyTweetBot.twitter.TweetBotConnect
 from textblob import TextBlob
 import tools
 import tools.strings as pystr
+import urllib2
 
 
 # Find new tweets from tweets coming form
@@ -169,16 +170,20 @@ class TwitterHunter(Hunter):
                                 # Blog
                                 true_text_blob = TextBlob(true_page_parser.text)
 
-                                # Add to tweets
-                                if len(true_page_parser.raw_title) > 0 and true_text_blob.detect_language() in self._languages:
-                                    self._tweets.append(Tweet(true_page_parser.raw_title, page_parser.raw_title, self._hashtags))
-                                else:
-                                    logging.getLogger(pystr.LOGGER).warning(
-                                        pystr.ERROR_TITLE_TOO_SHORT_BAD_LANGUAGE.format(
-                                            len(true_page_parser.raw_title),
-                                            true_text_blob.detect_language()
+                                try:
+                                    # Add to tweets
+                                    if len(true_page_parser.raw_title) > 0 and true_text_blob.detect_language() in self._languages:
+                                        self._tweets.append(Tweet(true_page_parser.raw_title, page_parser.raw_title, self._hashtags))
+                                    else:
+                                        logging.getLogger(pystr.LOGGER).warning(
+                                            pystr.ERROR_TITLE_TOO_SHORT_BAD_LANGUAGE.format(
+                                                len(true_page_parser.raw_title),
+                                                true_text_blob.detect_language()
+                                            )
                                         )
-                                    )
+                                # end if
+                                except urllib2.HTTPError:
+                                    pass
                                 # end if
                             else:
                                 logging.getLogger(pystr.LOGGER).warning(
