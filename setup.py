@@ -7,5 +7,5 @@ setup(name='pyTweetBot',
       author='Nils Schaetti',
       author_email='n.schaetti@gmail.com',
       license='GPL',
-      packages=['config', 'db', 'directmessage', 'executor', 'friends', 'learning', 'mail', 'news', 'patterns',
+      packages=['config', 'db', 'directmessages', 'executor', 'friends', 'learning', 'mail', 'news', 'patterns',
                 'retweet', 'stats', 'templates', 'tools', 'tweet', 'twitter'])
