@@ -1,0 +1,4 @@
+include README.md
+include README.rst
+include templates/weekly_statistics.html
+include config/config.json
