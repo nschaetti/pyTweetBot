@@ -23,7 +23,7 @@
 #
 
 import db.obj
-from sqlalchemy import create_engine, and_, or_
+from sqlalchemy import and_, or_
 import os
 import pickle
 import logging
@@ -68,7 +68,7 @@ def import_friends(session, friends):
         if session.query(db.obj.Friend).filter(and_(db.obj.Friend.friend_screen_name == friend.friend_screen_name)):
             logging.getLogger(pystr.LOGGER).error(u"Friend {} already exists".format(friend))
         else:
-            # session.add(friend)
+            session.add(friend)
             logging.getLogger(pystr.LOGGER).info(u"Friend {} added".format(friend))
         # end if
     # end for
@@ -111,7 +111,7 @@ def import_tweets(session, tweets):
                                                      db.obj.Tweeted.tweet_tweet_id == tweet.tweet_tweet_id)):
             logging.getLogger(pystr.LOGGER).error(u"Tweeted {} already exists".format(tweet))
         else:
-            # session.add(tweet)
+            session.add(tweet)
             logging.getLogger(pystr.LOGGER).info(u"Tweeted {} added".format(tweet))
         # end if
     # end for
