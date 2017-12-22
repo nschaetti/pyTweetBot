@@ -111,6 +111,38 @@ class Friend(Base):
     ######################################################
 
     ######################################################
+    # OVERRIDE
+    ######################################################
+
+    # To string
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        return "Friend(id={}, screen_name={}, description={}, follower={}, following={})".format(
+            self.friend_id,
+            self.friend_screen_name,
+            self.friend_description,
+            self.friend_follower,
+            self.friend_following)
+    # end __str__
+
+    # To unicode
+    def __unicode__(self):
+        """
+        To unicode
+        :return:
+        """
+        return u"Friend(id={}, screen_name={}, description={}, follower={}, following={})".format(
+            self.friend_id,
+            self.friend_screen_name,
+            self.friend_description,
+            self.friend_follower,
+            self.friend_following)
+    # end __unicode__
+
+    ######################################################
     # STATIC FUNCTIONS
     ######################################################
 
