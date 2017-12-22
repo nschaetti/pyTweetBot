@@ -126,7 +126,7 @@ def import_tweets(session, tweets):
     for tweet in tweets:
         # Exists?
         if session.query(db.obj.Tweeted).filter(or_(db.obj.Tweeted.tweet_tweet_text == tweet.tweet_tweet_text,
-                                                     db.obj.Tweeted.tweet_tweet_id == tweet.tweet_tweet_id)):
+                                                    db.obj.Tweeted.tweet_tweet_id == tweet.tweet_tweet_id)).count() > 0:
             logging.getLogger(pystr.LOGGER).error(u"Tweeted {} already exists".format(tweet))
         else:
             # Add
