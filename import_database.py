@@ -47,7 +47,13 @@ def import_actions(session, actions):
                      db.obj.Action.action_tweet_text == action.action_tweet_text)).count() > 0:
             logging.getLogger(pystr.LOGGER).error(u"Action {} already exists".format(action))
         else:
+            # Add
             session.add(action)
+
+            # Commit
+            session.commit()
+
+            # Log
             logging.getLogger(pystr.LOGGER).info(u"Action {} added".format(action))
         # end if
     # end for
@@ -68,7 +74,13 @@ def import_friends(session, friends):
         if session.query(db.obj.Friend).filter(and_(db.obj.Friend.friend_screen_name == friend.friend_screen_name)):
             logging.getLogger(pystr.LOGGER).error(u"Friend {} already exists".format(friend))
         else:
+            # Add
             session.add(friend)
+
+            # Commit
+            session.commit()
+
+            # Log
             logging.getLogger(pystr.LOGGER).info(u"Friend {} added".format(friend))
         # end if
     # end for
@@ -89,7 +101,13 @@ def import_statistics(session, statistics):
         if session.query(db.obj.Statistic).filter(and_(db.obj.Statistic.statistic_date)):
             logging.getLogger(pystr.LOGGER).error(u"Statistic {} already exists".format(statistic))
         else:
+            # Add
             session.add(statistic)
+
+            # Commit
+            session.commit()
+
+            # Log
             logging.getLogger(pystr.LOGGER).info(u"Statistic {} added".format(statistic))
         # end if
     # end for
@@ -111,7 +129,13 @@ def import_tweets(session, tweets):
                                                      db.obj.Tweeted.tweet_tweet_id == tweet.tweet_tweet_id)):
             logging.getLogger(pystr.LOGGER).error(u"Tweeted {} already exists".format(tweet))
         else:
+            # Add
             session.add(tweet)
+
+            # Commit
+            session.commit()
+
+            # Log
             logging.getLogger(pystr.LOGGER).info(u"Tweeted {} added".format(tweet))
         # end if
     # end for
@@ -156,7 +180,4 @@ def import_database(output_dir, mysql_connector):
     # Import tweets
     logging.getLogger(pystr.LOGGER).info(u"Importing tweets...")
     import_tweets(mysql_session, tweets)
-
-    # Commit
-    mysql_session.commit()
 # end export_database
