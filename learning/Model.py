@@ -25,8 +25,6 @@
 # Imports
 import pickle
 import md5
-import spacy
-from db.obj.Model import Model as DbModel
 
 
 # Model not found exception

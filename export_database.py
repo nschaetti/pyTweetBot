@@ -31,14 +31,11 @@ import logging
 
 
 # Function to export the database
-def export_database(output_dir, config, mysql_connector, action_scheduler, friends_manager):
+def export_database(output_dir, mysql_connector):
     """
     Function to export the database
     :param output_dir:
-    :param config:
     :param mysql_connector:
-    :param action_scheduler:
-    :param friends_manager:
     :return:
     """
     # Files
