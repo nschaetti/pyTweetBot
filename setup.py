@@ -17,7 +17,7 @@ setup(name='pyTweetBot',
       packages=['config', 'db', 'directmessages', 'executor', 'friends', 'learning', 'mail', 'news', 'patterns',
                 'retweet', 'stats', 'templates', 'tools', 'tweet', 'twitter'],
       install_requires=['nltk', 'argparse', 'logging', 'tweepy', 'sklearn', 'pygithub', 'brotli', 'httplib2',
-                        'urlparse2', 'HTMLParser', 'bs4', 'simplejson', 'dnspython'],
+                        'urlparse2', 'HTMLParser', 'bs4', 'simplejson', 'dnspython', 'dill'],
       test_suite='nose.collector',
       tests_require=['nose']
 )
