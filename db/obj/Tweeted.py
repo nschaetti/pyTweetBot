@@ -98,4 +98,34 @@ class Tweeted(Base):
         # end if
     # end exists
 
+    ######################################################
+    # OVERRIDE
+    ######################################################
+
+    # To string
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        return "Tweeted(id={}, tweet_id={}, tweet_text={}, date={})".format(
+            self.tweet_id,
+            self.tweet_tweet_id,
+            self.tweet_tweet_text,
+            self.tweet_date)
+    # end __str__
+
+    # To unicode
+    def __unicode__(self):
+        """
+        To unicode
+        :return:
+        """
+        return u"Tweeted(id={}, tweet_id={}, tweet_text={}, date={})".format(
+            self.tweet_id,
+            self.tweet_tweet_id,
+            self.tweet_tweet_text,
+            self.tweet_date)
+    # end __unicode__
+
 # end Action

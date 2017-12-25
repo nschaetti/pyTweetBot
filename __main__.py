@@ -51,6 +51,8 @@ from execute_actions import execute_actions
 from stats.TweetStatistics import TweetStatistics
 from follower_dataset import follower_dataset
 from create_database import create_database
+from export_database import export_database
+from import_database import import_database
 from direct_messages import direct_messages
 import tools.strings as pystr
 
@@ -153,12 +155,12 @@ if __name__ == "__main__":
     add_default_arguments(tools_parser)
     tools_parser.add_argument("--create-database", action='store_true',
                               help="Create the database structure on the MySQL host", default=False)
-    tools_parser.add_argument("--export", action='store_true',
+    tools_parser.add_argument("--export-database", action='store_true',
                               help="Export tweets, tweeted and followers/friends to a file", default=False)
-    tools_parser.add_argument("--import", action='store_true',
+    tools_parser.add_argument("--import-database", action='store_true',
                               help="Import tweets, tweeted and followers/friends from a file", default=False)
-    tools_parser.add_argument("--file", type=str,
-                              help="File to import / to export to", default="")
+    tools_parser.add_argument("--output", type=str,
+                              help="Direction to import / to export to", default=".")
     tools_parser.add_argument("--create-config", action='store_true',
                               help="Create an empty configuration file", default=False)
 
@@ -318,6 +320,10 @@ if __name__ == "__main__":
             create_database(config)
         elif args.create_config:
             create_config(args.config)
+        elif args.export_database:
+            export_database(args.output, mysql_connector)
+        elif args.import_database:
+            import_database(args.output, mysql_connector)
         # end if
     # Update statistics
     elif args.command == "user-statistics":

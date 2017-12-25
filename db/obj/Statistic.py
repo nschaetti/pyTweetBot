@@ -44,4 +44,36 @@ class Statistic(Base):
     statistic_statuses_count = Column(Integer, nullable=False, default=0)
     statistic_date = Column(DateTime, nullable=False, default=datetime.datetime.now())
 
+    ######################################################
+    # OVERRIDE
+    ######################################################
+
+    # To string
+    def __str__(self):
+        """
+        To string
+        :return:
+        """
+        return "Statistic(id={}, friends_count={}, followers_count={}, statuses_count={}, date={})".format(
+            self.statistic_id,
+            self.statistic_friends_count,
+            self.statistic_followers_count,
+            self.statistic_statuses_count,
+            self.statistic_date)
+    # end __str__
+
+    # To unicode
+    def __unicode__(self):
+        """
+        To unicode
+        :return:
+        """
+        return u"Statistic(id={}, friends_count={}, followers_count={}, statuses_count={}, date={})".format(
+            self.statistic_id,
+            self.statistic_friends_count,
+            self.statistic_followers_count,
+            self.statistic_statuses_count,
+            self.statistic_date)
+    # end __unicode__
+
 # end Statistic

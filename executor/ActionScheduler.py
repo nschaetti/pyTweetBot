@@ -388,7 +388,7 @@ class ActionScheduler(object):
         """
         # Get all actions
         exec_actions = self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_type == action_type)\
-            .order_by(db.obj.Action.action_order).all()
+            .order_by(pyTweetBot.db.obj.Action.action_order).all()
 
         return exec_actions[0] if len(exec_actions) > 0 else None
     # end _get_exec_action
