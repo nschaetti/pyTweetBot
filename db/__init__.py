@@ -4,6 +4,7 @@
 
 # Import
 from DBConnector import DBConnector
+from obj import *
 """from .obj.Action import Action
 from .obj.Base import Base
 from .obj.Follower import Follower
