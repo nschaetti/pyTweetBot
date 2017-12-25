@@ -25,14 +25,14 @@
 # Import
 import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, or_
-#from .Base import Base
+from .Base import Base
 import tweet as tw
-import pyTweetBot
+import pyTweetBot.db
 import tweepy
 
 
 # Tweet
-class Tweeted(pyTweetBot.db.obj.Base):
+class Tweeted(Base):
     """
     Tweet
     """
