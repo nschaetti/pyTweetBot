@@ -66,7 +66,7 @@ def update_statistics(config):
     mail_builder['diff_statuses'] = (n_statuses - last_stats.statistic_statuses_count)
 
     # Mail
-    to_address = config.get_email()
+    to_address = config.email
 
     # Mail sender
     sender = MailSender(subject="Your weekly update", from_address="pytweetbot@bot.ai", to_addresses=[to_address],
