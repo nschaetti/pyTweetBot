@@ -85,7 +85,6 @@ class GoogleNewsHunter(Hunter):
         tweet_blob = TextBlob(current_news[1])
 
         # Check language
-        print(self._lang)
         if tweet_blob.detect_language() in self._lang:
             # Return
             return Tweet(text=current_news[1], url=current_news[0], hashtags=self._hashtags)
