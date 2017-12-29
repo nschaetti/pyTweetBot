@@ -74,3 +74,6 @@ INFO_ADD_RETWEET_SCHEDULER = u"Adding Tweet \"{}\" to the scheduler"
 
 # Twitter wait time
 INFO_TWITTER_WAIT = u"Wait 60 seconds (Twitter limits)"
+
+# ALSEEP
+INFO_ASLEEP = u"I'm asleep!"

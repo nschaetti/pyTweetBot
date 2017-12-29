@@ -28,6 +28,7 @@ try:
 except ImportError:
     pass
 # end try
+import pyTweetBot.tools.strings as pystr
 from pyTweetBot.twitter.TweetBotConnect import RequestLimitReached
 import logging
 import tweepy
@@ -76,6 +77,7 @@ class ExecutorThread(Thread):
             if self._config.is_awake():
                 self()
             else:
+                logging.getLogger(pystr.LOGGER).info(pystr.INFO_ASLEEP)
                 self._wait_next_action()
             # end if
         # end while
@@ -114,15 +116,13 @@ class ExecutorThread(Thread):
         """
         Execute the next action
         """
-        print(u"__call__")
         # Try to execute
         try:
             # Lock
             with mutex:
-                print(u"mutex")
                 # Get next action
                 action = self._scheduler.next_action_to_execute(self._action_type)
-                print(u"action : {}".format(action))
+
                 # Execute if found
                 if action is not None:
                     # Execute

@@ -266,7 +266,6 @@ class ActionScheduler(object):
         :param action_type:
         :return:
         """
-        print(u"next_action_to_execute")
         return self._get_exec_action(action_type)
     # end next_action_to_execute
 
@@ -393,7 +392,6 @@ class ActionScheduler(object):
             .order_by(pyTweetBot.db.obj.Action.action_order).all()
 
         # Log debug
-        print(exec_actions)
         logging.getLogger(pystr.LOGGER).debug(u"_get_exec_action : {}".format(exec_actions))
 
         return exec_actions[0] if len(exec_actions) > 0 else None
