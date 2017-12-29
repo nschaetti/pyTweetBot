@@ -123,17 +123,17 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
                     # end try
                 else:
                     logging.getLogger(pystr.LOGGER).debug(
-                        pystr.DEBUG_ON_TITLE_TOO_LOW.format(tweet.get_text(), probs['pos'])
+                        pystr.DEBUG_ON_TITLE_TOO_LOW.format(tweet.get_text(), prediction)
                     )
                 # end if
             else:
                 logging.getLogger(pystr.LOGGER).debug(
-                    pystr.DEBUG_TWEET_BELOW_THRESHOLD.format(tweet.get_text(), probs['pos']))
+                    pystr.DEBUG_TWEET_BELOW_THRESHOLD.format(tweet.get_text(), prediction))
             # end if
         else:
             # Debug
             logging.getLogger(pystr.LOGGER).debug(
-                pystr.DEBUG_TWEET_NEGATIVE.format(tweet.get_text(), probs['pos'], censor_prediction, tweet.already_tweeted())
+                pystr.DEBUG_TWEET_NEGATIVE.format(tweet.get_text(), prediction, censor_prediction, tweet.already_tweeted())
             )
         # end if
     # end for
