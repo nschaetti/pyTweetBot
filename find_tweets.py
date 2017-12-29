@@ -32,6 +32,8 @@ import tweet as tw
 import tools.strings as pystr
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
+import pickle
+import os
 
 ####################################################
 # Globals
@@ -49,11 +51,11 @@ from tweet.GoogleNewsHunter import GoogleNewsHunter
 
 
 # Find new tweets from various sources
-def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
+def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
     """
     Find tweet in the hunters
     :param config: BotConfig configuration object
-    :param model: Path to model file for classification
+    :param model_file: Path to model file for classification
     :param action_scheduler: Scheduler object
     :param n_pages: Number of pages to analyze
     :param threshold: Probability threshold to be accepted as tweet
@@ -62,7 +64,18 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     tweet_finder = TweetFinder(shuffle=True)
 
     # Load model
-    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
+    # tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
+
+    # Load censor
+    censor = learning.CensorModel.load_censor(config)
+
+    # Load model
+    if os.path.exists(model_file):
+        model = pickle.load(open(model_file, 'rb'))
+    else:
+        logging.getLogger(pystr.LOGGER).error(u"Cannot find mode {}".format(model_file))
+        exit()
+    # end if
 
     # Add RSS streams
     for rss_stream in config.rss:
@@ -100,8 +113,11 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         # end try
 
         # Predict class
-        prediction, probs = model(bow(tokenizer.tokenize(page_text)))
-        censor_prediction, _ = censor(page_text)
+        """prediction, probs = model(bow(tokenizer.tokenize(page_text)))
+        censor_prediction, _ = censor(page_text)"""
+        prediction = model.predict(page_text)
+        probs = model.predict_proba(page_text)
+        censor_prediction = censor(page_text)
 
         # Debug
         logging.getLogger(pystr.LOGGER).debug(

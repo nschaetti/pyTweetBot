@@ -78,6 +78,15 @@ INFO_TWITTER_WAIT = u"Wait 60 seconds (Twitter limits)"
 # ALSEEP
 INFO_ASLEEP = u"I'm asleep!"
 
+# Finalizing training...
+INFO_FINIALIZING_TRAINING = u"Finalizing training..."
+
+# Saving model
+INFO_SAVING_MODEL = u"Training finished... Saving model to {}"
+
+# Test result
+INFO_TEST_RESULT = u"Success rate of {} on dataset"
+
 ############################################
 # DEBUG
 ############################################
