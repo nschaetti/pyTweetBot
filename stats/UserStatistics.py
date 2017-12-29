@@ -75,8 +75,8 @@ class UserStatistics(object):
         Insert a value in the statistics table.
         """
         # Stats
-        n_followers = self._friend_manager.n_followers()
-        n_following = self._friend_manager.n_following()
+        n_followers = self._friend_manager.n_followers
+        n_following = self._friend_manager.n_following
         n_statuses = ActionScheduler().n_statuses()
 
         # Add
