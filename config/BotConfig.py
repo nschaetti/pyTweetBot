@@ -278,7 +278,11 @@ class BotConfig(object):
         :return: True if awake, False otherwise
         """
         # Sleep time
-        (sleep_time, wake_time) = self.scheduler['sleep']
+        try:
+            (sleep_time, wake_time) = self.scheduler['sleep']
+        except KeyError:
+            return True
+        # end try
 
         # Now
         now_time = datetime.datetime.utcnow()
