@@ -24,11 +24,9 @@
 
 # Imports
 import smtplib
-import sys
 import logging
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import dns.resolver
 import pyTweetBot.tools.strings as pystr
 
 
@@ -110,18 +108,7 @@ class MailSender(object):
         msg.attach(part1)
         msg.attach(part2)
 
-        """answers = dns.resolver.query('gmail.com', 'MX')
-        if len(answers) <= 0:
-            logging.getLogger(pystr.LOGGER).error('No mail servers found for destination\n')
-            return False
-        # end if
-
-        # Just pick the first answer
-        print(answers[0].exchange)
-        server = str(answers[0].exchange)
-
         # Send the message via local SMTP server.
-        s = smtplib.SMTP(server)"""
         s = smtplib.SMTP("localhost")
 
         # EHLO & starttls
