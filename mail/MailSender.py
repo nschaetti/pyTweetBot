@@ -110,7 +110,7 @@ class MailSender(object):
         msg.attach(part1)
         msg.attach(part2)
 
-        answers = dns.resolver.query('gmail.com', 'MX')
+        """answers = dns.resolver.query('gmail.com', 'MX')
         if len(answers) <= 0:
             logging.getLogger(pystr.LOGGER).error('No mail servers found for destination\n')
             return False
@@ -121,7 +121,8 @@ class MailSender(object):
         server = str(answers[0].exchange)
 
         # Send the message via local SMTP server.
-        s = smtplib.SMTP(server)
+        s = smtplib.SMTP(server)"""
+        s = smtplib.SMTP("smtp.gmail.com:587")
 
         # EHLO & starttls
         s.ehlo()
