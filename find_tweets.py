@@ -90,8 +90,8 @@ def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
         # Add for each tuple language/country
         for language in news['languages']:
             for country in news['countries']:
-                tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=news['languages'], country=country,
-                                                  hashtags=news['hashtags'], n_pages=n_pages))
+                tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country,
+                                                  hashtags=news['hashtags'], n_pages=n_pages, languages=news['languages']))
             # end for
         # end for
 
