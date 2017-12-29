@@ -90,3 +90,6 @@ DEBUG_TWEET_BELOW_THRESHOLD = u"Tweet \"{}\" below threshold ({})"
 
 # Tweet on title but too low
 DEBUG_ON_TITLE_TOO_LOW = u"Tweet \"{}\" on title but too low ({})"
+
+# Wrong language
+DEBUG_WRONG_LANGUAGE = u"Tweet \"{}\" not in {}"
