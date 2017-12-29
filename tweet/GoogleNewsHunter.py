@@ -18,7 +18,7 @@ class GoogleNewsHunter(Hunter):
     """
 
     # Constructor
-    def __init__(self, search_term, lang, country, hashtags, n_pages=2):
+    def __init__(self, search_term, lang, country, hashtags, languages, n_pages=2):
         """
         Constructor
         :param search_term: Search term
@@ -33,6 +33,7 @@ class GoogleNewsHunter(Hunter):
         self._google_news_client = GoogleNewsClient(search_term, lang, country)
         self._news = list()
         self._current_page = 0
+        self._languages = languages
     # end __init__
 
     # To unicode
@@ -85,7 +86,7 @@ class GoogleNewsHunter(Hunter):
         tweet_blob = TextBlob(current_news[1])
 
         # Check language
-        if tweet_blob.detect_language() in self._lang:
+        if tweet_blob.detect_language() in self._languages:
             # Return
             return Tweet(text=current_news[1], url=current_news[0], hashtags=self._hashtags)
         else:
