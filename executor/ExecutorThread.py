@@ -114,13 +114,15 @@ class ExecutorThread(Thread):
         """
         Execute the next action
         """
+        print(u"__call__")
         # Try to execute
         try:
             # Lock
             with mutex:
+                print(u"mutex")
                 # Get next action
                 action = self._scheduler.next_action_to_execute(self._action_type)
-
+                print(u"action : {}".format(action))
                 # Execute if found
                 if action is not None:
                     # Execute
