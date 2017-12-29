@@ -23,11 +23,7 @@
 #
 
 # Imports
-try:
-    from pyTweetBot.friends.FriendsManager import ActionAlreadyDone
-except ImportError:
-    pass
-# end try
+from pyTweetBot.friends.FriendsManager import ActionAlreadyDone
 import pyTweetBot.tools.strings as pystr
 from pyTweetBot.twitter.TweetBotConnect import RequestLimitReached
 import logging
