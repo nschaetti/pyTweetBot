@@ -105,7 +105,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
 
         # Debug
         logging.getLogger(pystr.LOGGER).debug(
-            pystr.DEBUG_NEW_TWEET.format(tweet.get_text())
+            pystr.DEBUG_NEW_TWEET_FOUND.format(tweet.get_text())
         )
 
         # Predicted as tweet?
