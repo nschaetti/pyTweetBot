@@ -105,7 +105,7 @@ class GoogleNewsClient(object):
 
         # Add page's news
         news += self._get_page(page)
-
+        print(len(news))
         # Wait for random time
         time.sleep(random.randint(15, 35))
 
