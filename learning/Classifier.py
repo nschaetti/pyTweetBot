@@ -28,6 +28,8 @@ import numpy as np
 from nltk.tokenize import TweetTokenizer
 from CensorModel import CensorModel
 import features
+import logging
+import tools.strings as pystr
 
 
 # Text classifier
@@ -289,7 +291,17 @@ class Classifier(object):
         :param opt: Loading option
         :return: The model object
         """
-        return pickle.load(open(opt, 'r'))
+        # Log
+        logging.getLogger(pystr.LOGGER).info(u"Loading model {}".format(opt))
+
+        # Load
+        model = pickle.load(open(opt, 'r'))
+
+        # Log
+        logging.getLogger(pystr.LOGGER).info(u"Model {} loaded".format(opt))
+
+        # Load
+        return model
     # end load
 
     # Load a complete model and censor with path to model

@@ -67,15 +67,15 @@ class Action(Base):
         elif self.action_type == "Like":
             # Like
             pyTweetBot.twitter.TweetBotConnector().like(self.action_tweet_id)
-            Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
+            pyTweetBot.db.obj.Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
         elif self.action_type == "Tweet":
             # Tweet
             pyTweetBot.twitter.TweetBotConnector().tweet(self.action_tweet_text)
-            Tweeted.insert_tweet(self.action_tweet_text)
+            pyTweetBot.db.obj.Tweeted.insert_tweet(self.action_tweet_text)
         elif self.action_type == "Retweet":
             # Retweet
             pyTweetBot.twitter.TweetBotConnector().retweet(self.action_tweet_id)
-            Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
+            pyTweetBot.db.obj.Tweeted.insert_retweet(self.action_tweet_id, self.action_tweet_text)
         # end if
     # end
 
