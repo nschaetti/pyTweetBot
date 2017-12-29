@@ -33,6 +33,7 @@ import logging
 from pyTweetBot.patterns.singleton import singleton
 import random
 import sys
+import pyTweetBot.tools.strings as pystr
 
 
 # Reservoir full exception
@@ -389,6 +390,9 @@ class ActionScheduler(object):
         # Get all actions
         exec_actions = self._session.query(pyTweetBot.db.obj.Action).filter(pyTweetBot.db.obj.Action.action_type == action_type)\
             .order_by(pyTweetBot.db.obj.Action.action_order).all()
+
+        # Log debug
+        logging.getLogger(pystr.LOGGER).debug(u"_get_exec_action : {}".format(exec_actions))
 
         return exec_actions[0] if len(exec_actions) > 0 else None
     # end _get_exec_action
