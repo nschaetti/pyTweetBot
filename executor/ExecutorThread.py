@@ -24,11 +24,11 @@
 
 # Imports
 try:
-    from friends.FriendsManager import ActionAlreadyDone
+    from pyTweetBot.friends.FriendsManager import ActionAlreadyDone
 except ImportError:
     pass
 # end try
-from twitter.TweetBotConnect import RequestLimitReached
+from pyTweetBot.twitter.TweetBotConnect import RequestLimitReached
 import logging
 import tweepy
 from threading import Thread, Lock

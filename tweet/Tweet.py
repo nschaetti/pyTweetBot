@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Imports
-import db.obj
+import pyTweetBot.db.obj
 from .TweetFactory import TweetFactory
 
 
@@ -130,7 +130,7 @@ class Tweet(object):
         Already tweeted?
         :return: True/False
         """
-        return db.obj.Tweeted.exists(self)
+        return pyTweetBot.db.obj.Tweeted.exists(self)
     # end already_tweeted
 
     ######################################

@@ -26,7 +26,7 @@ import datetime
 import tweepy
 import time
 import logging
-from patterns.singleton import singleton
+from pyTweetBot.patterns.singleton import singleton
 
 
 # Request limits reached.

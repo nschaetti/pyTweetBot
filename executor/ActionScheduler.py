@@ -30,7 +30,7 @@ import pyTweetBot.db
 import pyTweetBot.db.obj
 from sqlalchemy import and_
 import logging
-from patterns.singleton import singleton
+from pyTweetBot.patterns.singleton import singleton
 import random
 import sys
 

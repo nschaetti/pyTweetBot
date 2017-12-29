@@ -29,8 +29,8 @@ import time
 import re
 import pyTweetBot.twitter.TweetBotConnect
 from textblob import TextBlob
-import tools
-import tools.strings as pystr
+import pyTweetBot.tools
+import pyTweetBot.tools.strings as pystr
 import urllib2
 
 

@@ -24,9 +24,8 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-from db.obj.Base import Base
-from patterns.singleton import singleton
+import pyTweetBot.db.obj
+from pyTweetBot.patterns.singleton import singleton
 
 
 @singleton
@@ -42,7 +41,7 @@ class DBConnector(object):
         :param db_name:
         """
         self._engine = create_engine("mysql://{}:{}@{}/{}?charset=utf8mb4".format(username, password, host, db_name))
-        Base.metadata.bind = self._engine
+        pyTweetBot.db.obj.Base.metadata.bind = self._engine
         db_session = sessionmaker(bind=self._engine)
         self._session = db_session()
     # end __init__

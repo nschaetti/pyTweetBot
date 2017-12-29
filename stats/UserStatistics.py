@@ -24,12 +24,12 @@
 
 # Imports
 import logging
-from db.DBConnector import DBConnector
-from executor.ActionScheduler import ActionScheduler
-from db.obj.Statistic import Statistic
-from patterns.singleton import singleton
-from twitter.TweetBotConnect import TweetBotConnector
-from friends.FriendsManager import FriendsManager
+from pyTweetBot.db.DBConnector import DBConnector
+from pyTweetBot.executor.ActionScheduler import ActionScheduler
+from pyTweetBot.db.obj.Statistic import Statistic
+from pyTweetBot.patterns.singleton import singleton
+from pyTweetBot.twitter.TweetBotConnect import TweetBotConnector
+from pyTweetBot.friends.FriendsManager import FriendsManager
 from sqlalchemy import update, delete, select
 from sqlalchemy.orm import load_only
 from sqlalchemy import or_, and_, not_

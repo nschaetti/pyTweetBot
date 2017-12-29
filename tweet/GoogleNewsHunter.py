@@ -5,10 +5,10 @@
 # Import
 from textblob import TextBlob
 from .Hunter import Hunter
-from news.GoogleNewsClient import GoogleNewsClient
+from pyTweetBot.news.GoogleNewsClient import GoogleNewsClient
 from .Tweet import Tweet
 import logging
-import tools.strings as pystr
+import pyTweetBot.tools.strings as pystr
 
 
 # Hunter for Google News
