@@ -131,8 +131,9 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
                     pystr.DEBUG_TWEET_BELOW_THRESHOLD.format(tweet.get_text(), probs['pos']))
             # end if
         else:
+            # Debug
             logging.getLogger(pystr.LOGGER).debug(
-                pystr.DEBUG_TWEET_NEGATIVE.format(tweet.get_text(), probs['pos'], tweet.already_tweeted())
+                pystr.DEBUG_TWEET_NEGATIVE.format(tweet.get_text(), probs['pos'], censor_prediction, tweet.already_tweeted())
             )
         # end if
     # end for

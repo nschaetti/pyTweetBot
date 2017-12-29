@@ -83,7 +83,7 @@ INFO_ASLEEP = u"I'm asleep!"
 ############################################
 
 # Tweet rejected
-DEBUG_TWEET_NEGATIVE = u"Tweet \"{}\" negative ({}) or already tweeted ({})"
+DEBUG_TWEET_NEGATIVE = u"Tweet \"{}\" negative ({}), censored ({}) or already tweeted ({})"
 
 # Tweet prob below threshold
 DEBUG_TWEET_BELOW_THRESHOLD = u"Tweet \"{}\" below threshold ({})"
