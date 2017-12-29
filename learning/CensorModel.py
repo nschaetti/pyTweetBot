@@ -59,6 +59,7 @@ class CensorModel(object):
         # For each forbidden word
         for word in self._forbidden_words:
             if word.lower() in x.lower():
+                print(word)
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
         # end for
@@ -73,5 +74,17 @@ class CensorModel(object):
     #################################################
     # Static
     #################################################
+
+    # Load a complete model and censor with path to model
+    @staticmethod
+    def load_censor(config):
+        """
+        Load a complete model and censor with path to model
+        :param config:
+        :return:
+        """
+        # Load model
+        return CensorModel(config)
+    # end load_model
 
 # end Model
