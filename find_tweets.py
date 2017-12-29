@@ -73,9 +73,12 @@ def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
     if os.path.exists(model_file):
         model = pickle.load(open(model_file, 'rb'))
     else:
-        logging.getLogger(pystr.LOGGER).error(u"Cannot find mode {}".format(model_file))
+        logging.getLogger(pystr.LOGGER).error(u"Cannot find model {}".format(model_file))
         exit()
     # end if
+
+    # Mode loaded
+    logging.getLogger(pystr.LOGGER).info(u"Model {} loaded".format(model_file))
 
     # Add RSS streams
     for rss_stream in config.rss:
@@ -115,8 +118,8 @@ def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
         # Predict class
         """prediction, probs = model(bow(tokenizer.tokenize(page_text)))
         censor_prediction, _ = censor(page_text)"""
-        prediction = model.predict(page_text)
-        probs = model.predict_proba(page_text)
+        prediction = model.predict([page_text])[0]
+        probs = model.predict_proba([page_text])[0]
         censor_prediction = censor(page_text)
 
         # Debug
