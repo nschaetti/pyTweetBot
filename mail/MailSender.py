@@ -25,9 +25,11 @@
 # Imports
 import smtplib
 import sys
+import logging
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import dns.resolver
+import pyTweetBot.tools.strings as pystr
 
 
 # Mail sender tool
@@ -122,8 +124,12 @@ class MailSender(object):
 
         # sendmail function takes 3 arguments: sender's address, recipient's address
         # and message to send - here it is sent as one string.
-        s.sendmail("pytweetbot@bot.ai", self._to_addresses[0], msg.as_string())
-        s.quit()
+        try:
+            s.sendmail("pytweetbot@bot.ai", self._to_addresses[0], msg.as_string())
+            s.quit()
+        except smtplib.SMTPServerDisconnected as e:
+            logging.getLogger(pystr.LOGGER).error(u"SMTP server disconnected : {}".format(e))
+        # end try
 
         # Ok
         return True
