@@ -23,7 +23,7 @@
 #
 
 # Imports
-from pyTweetBot.friends.FriendsManager import ActionAlreadyDone as AAD
+import pyTweetBot.friends.FriendsManager
 import pyTweetBot.tools.strings as pystr
 from pyTweetBot.twitter.TweetBotConnect import RequestLimitReached
 import logging
@@ -139,7 +139,7 @@ class ExecutorThread(Thread):
 
             # Wait
             self._wait_next_action()
-        except AAD as e:
+        except pyTweetBot.friends.ActionAlreadyDone as e:
             # Delete action
             with mutex:
                 self._scheduler.delete(action)
