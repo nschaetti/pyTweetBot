@@ -77,3 +77,16 @@ INFO_TWITTER_WAIT = u"Wait 60 seconds (Twitter limits)"
 
 # ALSEEP
 INFO_ASLEEP = u"I'm asleep!"
+
+############################################
+# DEBUG
+############################################
+
+# Tweet rejected
+DEBUG_TWEET_NEGATIVE = u"Tweet {} negative or already tweeted"
+
+# Tweet prob below threshold
+DEBUG_TWEET_BELOW_THRESHOLD = u"Tweet {} below threshold ({})"
+
+# Tweet on title but too low
+DEBUG_ON_TITLE_TOO_LOW = u"Tweet {} on title but too low ({})"

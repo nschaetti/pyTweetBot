@@ -121,8 +121,17 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
                             tweet.get_tweet().encode('ascii', errors='ignore')))
                         pass
                     # end try
+                else:
+                    logging.getLogger(pystr.LOGGER).debug(
+                        pystr.DEBUG_ON_TITLE_TOO_LOW.format(tweet.get_text(), probs['pos'])
+                    )
                 # end if
+            else:
+                logging.getLogger(pystr.LOGGER).debug(
+                    pystr.DEBUG_TWEET_BELOW_THRESHOLD.format(tweet.get_text(), probs['pos']))
             # end if
+        else:
+            logging.getLogger(pystr.LOGGER).debug(pystr.DEBUG_TWEET_NEGATIVE.format(tweet.get_text()))
         # end if
     # end for
 # end if
