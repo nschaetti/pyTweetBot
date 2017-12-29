@@ -122,7 +122,7 @@ class MailSender(object):
 
         # Send the message via local SMTP server.
         s = smtplib.SMTP(server)"""
-        s = smtplib.SMTP("smtp.gmail.com:587")
+        s = smtplib.SMTP("localhost")
 
         # EHLO & starttls
         s.ehlo()
