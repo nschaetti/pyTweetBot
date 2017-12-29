@@ -102,7 +102,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         # Predict class
         prediction, probs = model(bow(tokenizer.tokenize(page_text)))
         censor_prediction, _ = censor(page_text)
-
+        print(u"### : {}".format(tweet.get_text()))
         # Predicted as tweet?
         if censor_prediction == "pos" and (prediction == "pos" or on_title) and not tweet.already_tweeted():
             if probs['pos'] >= threshold or on_title:
