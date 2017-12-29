@@ -117,10 +117,15 @@ class MailSender(object):
         # end if
 
         # Just pick the first answer
+        print(answers[0].exchange)
         server = str(answers[0].exchange)
 
         # Send the message via local SMTP server.
         s = smtplib.SMTP(server)
+
+        # EHLO & starttls
+        s.ehlo()
+        s.starttls()
 
         # sendmail function takes 3 arguments: sender's address, recipient's address
         # and message to send - here it is sent as one string.
