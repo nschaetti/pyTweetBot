@@ -144,7 +144,7 @@ class TwitterHunter(Hunter):
                     for url in urls:
                         # Get page info
                         try:
-                            page_parser = tools.PageParser(url)
+                            page_parser = pyTweetBot.tools.PageParser(url)
                         except Exception as e:
                             logging.getLogger(pystr.LOGGER).warning(
                                 pystr.ERROR_RETRIEVING_PAGE.format(url, e)
@@ -157,7 +157,7 @@ class TwitterHunter(Hunter):
                                 "http://" in page_parser.raw_title or "https://" in page_parser.raw_title):
                             # Get true page info
                             try:
-                                true_page_parser = tools.PageParser(page_parser.raw_title)
+                                true_page_parser = pyTweetBot.tools.PageParser(page_parser.raw_title)
                             except Exception as e:
                                 logging.getLogger(pystr.LOGGER).warning(
                                     pystr.ERROR_RETRIEVING_PAGE.format(page_parser.raw_title, e)
