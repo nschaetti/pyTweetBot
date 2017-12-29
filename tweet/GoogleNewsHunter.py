@@ -90,7 +90,9 @@ class GoogleNewsHunter(Hunter):
             # Return
             return Tweet(text=current_news[1], url=current_news[0], hashtags=self._hashtags)
         else:
-            logging.getLogger(pystr.LOGGER).debug(pystr.DEBUG_WRONG_LANGUAGE.format(current_news[1], self._lang))
+            logging.getLogger(pystr.LOGGER).debug(
+                pystr.DEBUG_WRONG_LANGUAGE.format(current_news[1], tweet_blob.detect_language(), self._lang)
+            )
             return self.next()
         # end if
     # end next
