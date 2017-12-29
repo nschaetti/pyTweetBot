@@ -76,7 +76,7 @@ class UserStatistics(object):
         """
         # Stats
         n_followers = self._friend_manager.n_followers
-        n_following = self._friend_manager.n_following
+        n_following = self._friend_manager.n_followings
         n_statuses = ActionScheduler().n_statuses()
 
         # Add
