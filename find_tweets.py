@@ -120,7 +120,7 @@ def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
         censor_prediction, _ = censor(page_text)"""
         prediction = model.predict([page_text])[0]
         probs = model.predict_proba([page_text])[0]
-        censor_prediction = censor(page_text)
+        censor_prediction, _ = censor(page_text)
 
         # Debug
         logging.getLogger(pystr.LOGGER).debug(
