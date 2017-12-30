@@ -59,7 +59,6 @@ class CensorModel(object):
         # For each forbidden word
         for word in self._forbidden_words:
             if word.lower() in x.lower():
-                print(u"{} in \"{}\"".format(word.lower(), x.lower()))
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
         # end for
