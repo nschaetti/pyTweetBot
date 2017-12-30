@@ -129,8 +129,8 @@ def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
 
         # Predicted as tweet?
         if censor_prediction == "pos" and (prediction == "pos" or on_title) and not tweet.already_tweeted():
-            if probs['pos'] >= threshold or on_title:
-                if not on_title or probs['pos'] >= 0.9:
+            if probs[1] >= threshold or on_title:
+                if not on_title or probs[1] >= 0.9:
                     # Try to add
                     try:
                         logging.getLogger(pystr.LOGGER).info(pystr.INFO_ADD_TWEET_SCHEDULER.format(
