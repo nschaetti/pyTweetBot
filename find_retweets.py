@@ -77,6 +77,9 @@ def find_retweets(config, model_file, action_scheduler, text_size=80, threshold=
 
     # For each retweet finders
     for retweet_finder in retweet_finders:
+        # Log
+        logging.getLogger(pystr.LOGGER).info(u"Changing hunter to {}".format(retweet_finder))
+
         # For each tweet
         for retweet, polarity, subjectivity in retweet_finder:
             # Minimum size, not retweet, and not coming from use
