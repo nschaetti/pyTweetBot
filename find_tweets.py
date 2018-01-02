@@ -63,9 +63,6 @@ def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
 
-    # Load model
-    # tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
-
     # Load censor
     censor = learning.CensorModel.load_censor(config)
 
@@ -116,8 +113,6 @@ def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
         # end try
 
         # Predict class
-        """prediction, probs = model(bow(tokenizer.tokenize(page_text)))
-        censor_prediction, _ = censor(page_text)"""
         prediction = model.predict([page_text])[0]
         probs = model.predict_proba([page_text])[0]
         censor_prediction, _ = censor(page_text)

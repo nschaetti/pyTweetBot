@@ -24,6 +24,8 @@
 
 # Import
 import logging
+import os
+import pickle
 from db.obj.Tweeted import Tweeted
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from retweet.RetweetFinder import RetweetFinder
@@ -44,13 +46,12 @@ import tools.strings as pystr
 
 
 # Find retweets and add it to the DB
-def find_retweets(config, model, action_scheduler, text_size=80, threshold=0.5):
+def find_retweets(config, model_file, action_scheduler, text_size=80, threshold=0.5):
     """
     Find retweets and add it to the DB
     :param config:
-    :param model:
+    :param model_file:
     :param action_scheduler:
-    :param features:
     :param text_size:
     :param threshold:
     :return:
@@ -63,8 +64,16 @@ def find_retweets(config, model, action_scheduler, text_size=80, threshold=0.5):
         retweet_finders.append(RetweetFinder(search_keywords=keyword))
     # end for
 
+    # Load censor
+    censor = learning.CensorModel.load_censor(config)
+
     # Load model
-    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
+    if os.path.exists(model_file):
+        model = pickle.load(open(model_file, 'rb'))
+    else:
+        logging.getLogger(pystr.LOGGER).error(pystr.ERROR_CANNOT_FIND_MODEL.format(model_file))
+        exit()
+    # end if
 
     # For each retweet finders
     for retweet_finder in retweet_finders:
@@ -74,12 +83,13 @@ def find_retweets(config, model, action_scheduler, text_size=80, threshold=0.5):
             if len(retweet.text) >= text_size and retweet.text[:3] != u"RT " \
                     and retweet.author.screen_name != config.twitter['user']:
                 # Predict class
-                prediction, probs = model(bow(tokenizer.tokenize(retweet.text)))
+                prediction = model.predict([retweet.text])[0]
+                probs = model.predict_proba([retweet.text])[0]
                 censor_prediction, _ = censor(retweet.text)
 
                 # Predicted as tweet
                 if prediction == "pos" and censor_prediction == "pos" and not Tweeted.exists(retweet):
-                    if probs['pos'] >= threshold:
+                    if probs[1] >= threshold:
                         # Try to add
                         try:
                             logging.getLogger(pystr.LOGGER).\

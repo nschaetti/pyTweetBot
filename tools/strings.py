@@ -57,6 +57,9 @@ ERROR_TITLE_TOO_SHORT_BAD_LANGUAGE = u"Title is too short ({}) or wrong language
 # Not enough page data
 ERROR_NOT_ENOUGH_PAGE_DATA = u"Not enough page data ({})"
 
+# Cannot find model
+ERROR_CANNOT_FIND_MODEL = u"Cannot find model {}"
+
 #########################################
 # WARNINGS
 #########################################
