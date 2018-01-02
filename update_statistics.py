@@ -23,9 +23,9 @@
 #
 
 # Import
-from stats.UserStatistics import UserStatistics
-from mail.MailBuilder import MailBuilder
-from mail.MailSender import MailSender
+from pyTweetBot.stats.UserStatistics import UserStatistics
+from pyTweetBot.mail.MailBuilder import MailBuilder
+from pyTweetBot.mail.MailSender import MailSender
 import pkg_resources
 
 
@@ -47,7 +47,7 @@ def update_statistics(config):
     n_followers, n_following, n_statuses = UserStatistics().update_statistics()
 
     # Get template
-    template = pkg_resources.resource_string("templates", 'weekly_statistics.html')
+    template = pkg_resources.resource_string("pyTweetBot.templates", 'weekly_statistics.html')
 
     # Mail builder
     mail_builder = MailBuilder(template)
