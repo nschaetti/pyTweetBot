@@ -71,6 +71,24 @@ class RetweetFinder(object):
         return current_tweet
     # end next
 
+    # To unicode
+    def __unicode__(self):
+        """
+        To unicode
+        :return:
+        """
+        return u"RetweetFinder({})".format(self._search_keywords)
+    # end __unicode__
+
+    # To str
+    def __str__(self):
+        """
+        To str
+        :return:
+        """
+        return "RetweetFinder({})".format(self._search_keywords)
+    # end __str__
+
     ############################################
     # Private
     ############################################
