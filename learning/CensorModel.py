@@ -74,4 +74,16 @@ class CensorModel(object):
     # Static
     #################################################
 
+    # Load a complete model and censor with path to model
+    @staticmethod
+    def load_censor(config):
+        """
+        Load a complete model and censor with path to model
+        :param config:
+        :return:
+        """
+        # Load model
+        return CensorModel(config)
+    # end load_model
+
 # end Model

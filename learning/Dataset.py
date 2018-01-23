@@ -50,6 +50,38 @@ class Dataset(object):
     # end __init__
 
     #################################################
+    # Properties
+    #################################################
+
+    # Data
+    @property
+    def data(self):
+        """
+        Data
+        :return:
+        """
+        data = list()
+        for (text, c) in self._texts:
+            data.append(text)
+        # end for
+        return data
+    # end data
+
+    # Targets
+    @property
+    def targets(self):
+        """
+        Targets
+        :return:
+        """
+        targets = list()
+        for (text, c) in self._texts:
+            targets.append(c)
+        # end for
+        return targets
+    # end targets
+
+    #################################################
     # Public
     #################################################
 

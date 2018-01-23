@@ -57,6 +57,9 @@ ERROR_TITLE_TOO_SHORT_BAD_LANGUAGE = u"Title is too short ({}) or wrong language
 # Not enough page data
 ERROR_NOT_ENOUGH_PAGE_DATA = u"Not enough page data ({})"
 
+# Cannot find model
+ERROR_CANNOT_FIND_MODEL = u"Cannot find model {}"
+
 #########################################
 # WARNINGS
 #########################################
@@ -74,3 +77,34 @@ INFO_ADD_RETWEET_SCHEDULER = u"Adding Tweet \"{}\" to the scheduler"
 
 # Twitter wait time
 INFO_TWITTER_WAIT = u"Wait 60 seconds (Twitter limits)"
+
+# ALSEEP
+INFO_ASLEEP = u"I'm asleep!"
+
+# Finalizing training...
+INFO_FINIALIZING_TRAINING = u"Finalizing training..."
+
+# Saving model
+INFO_SAVING_MODEL = u"Training finished... Saving model to {}"
+
+# Test result
+INFO_TEST_RESULT = u"Success rate of {} on dataset"
+
+############################################
+# DEBUG
+############################################
+
+# Tweet rejected
+DEBUG_TWEET_NEGATIVE = u"Tweet \"{}\" negative ({}), censored ({}) or already tweeted ({})"
+
+# Tweet prob below threshold
+DEBUG_TWEET_BELOW_THRESHOLD = u"Tweet \"{}\" below threshold ({})"
+
+# Tweet on title but too low
+DEBUG_ON_TITLE_TOO_LOW = u"Tweet \"{}\" on title but too low ({})"
+
+# Wrong language
+DEBUG_WRONG_LANGUAGE = u"Tweet \"{}\" ({}) not in {}"
+
+# New tweet found
+DEBUG_NEW_TWEET_FOUND = u"New tweet found \"{}\""

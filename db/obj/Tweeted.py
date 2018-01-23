@@ -26,7 +26,7 @@
 import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, or_
 from .Base import Base
-import tweet as tw
+import pyTweetBot.tweet as tw
 import pyTweetBot.db
 import tweepy
 

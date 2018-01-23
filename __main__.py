@@ -108,7 +108,7 @@ def create_logger(name, log_level=logging.INFO, log_format="%(asctime)s :: %(lev
     # Create a file handler if needed
     if log_file != "":
         handler = logging.FileHandler(log_file)
-        handler.setLevel(logging.INFO)
+        handler.setLevel(log_level)
 
         # Create a logging format
         formatter = logging.Formatter(log_format)

@@ -24,9 +24,8 @@
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import pyTweetBot
-#from db.obj.Base import Base
-from patterns.singleton import singleton
+import pyTweetBot.db.obj
+from pyTweetBot.patterns.singleton import singleton
 
 
 @singleton

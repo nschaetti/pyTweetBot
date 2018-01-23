@@ -32,6 +32,8 @@ import tweet as tw
 import tools.strings as pystr
 from tweet.RSSHunter import RSSHunter
 from tweet.GoogleNewsHunter import GoogleNewsHunter
+import pickle
+import os
 
 ####################################################
 # Globals
@@ -49,11 +51,11 @@ from tweet.GoogleNewsHunter import GoogleNewsHunter
 
 
 # Find new tweets from various sources
-def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
+def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
     """
     Find tweet in the hunters
     :param config: BotConfig configuration object
-    :param model: Path to model file for classification
+    :param model_file: Path to model file for classification
     :param action_scheduler: Scheduler object
     :param n_pages: Number of pages to analyze
     :param threshold: Probability threshold to be accepted as tweet
@@ -61,8 +63,19 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)
 
+    # Load censor
+    censor = learning.CensorModel.load_censor(config)
+
     # Load model
-    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
+    if os.path.exists(model_file):
+        model = pickle.load(open(model_file, 'rb'))
+    else:
+        logging.getLogger(pystr.LOGGER).error(u"Cannot find model {}".format(model_file))
+        exit()
+    # end if
+
+    # Mode loaded
+    logging.getLogger(pystr.LOGGER).info(u"Model {} loaded".format(model_file))
 
     # Add RSS streams
     for rss_stream in config.rss:
@@ -75,7 +88,7 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         for language in news['languages']:
             for country in news['countries']:
                 tweet_finder.add(GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country,
-                                                  hashtags=news['hashtags'], n_pages=n_pages))
+                                                  hashtags=news['hashtags'], n_pages=n_pages, languages=news['languages']))
             # end for
         # end for
 
@@ -100,13 +113,19 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
         # end try
 
         # Predict class
-        prediction, probs = model(bow(tokenizer.tokenize(page_text)))
+        prediction = model.predict([page_text])[0]
+        probs = model.predict_proba([page_text])[0]
         censor_prediction, _ = censor(page_text)
+
+        # Debug
+        logging.getLogger(pystr.LOGGER).debug(
+            pystr.DEBUG_NEW_TWEET_FOUND.format(tweet.get_text())
+        )
 
         # Predicted as tweet?
         if censor_prediction == "pos" and (prediction == "pos" or on_title) and not tweet.already_tweeted():
-            if probs['pos'] >= threshold or on_title:
-                if not on_title or probs['pos'] >= 0.9:
+            if probs[1] >= threshold or on_title:
+                if not on_title or probs[1] >= 0.9:
                     # Try to add
                     try:
                         logging.getLogger(pystr.LOGGER).info(pystr.INFO_ADD_TWEET_SCHEDULER.format(
@@ -121,8 +140,20 @@ def find_tweets(config, model, action_scheduler, n_pages=2, threshold=0.5):
                             tweet.get_tweet().encode('ascii', errors='ignore')))
                         pass
                     # end try
+                else:
+                    logging.getLogger(pystr.LOGGER).debug(
+                        pystr.DEBUG_ON_TITLE_TOO_LOW.format(tweet.get_text(), prediction)
+                    )
                 # end if
+            else:
+                logging.getLogger(pystr.LOGGER).debug(
+                    pystr.DEBUG_TWEET_BELOW_THRESHOLD.format(tweet.get_text(), prediction))
             # end if
+        else:
+            # Debug
+            logging.getLogger(pystr.LOGGER).debug(
+                pystr.DEBUG_TWEET_NEGATIVE.format(tweet.get_text(), prediction, censor_prediction, tweet.already_tweeted())
+            )
         # end if
     # end for
 # end if

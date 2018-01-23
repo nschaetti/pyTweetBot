@@ -26,12 +26,17 @@
 import logging
 import os
 import sys
-import learning
-import learning.features
-from nltk.tokenize import TweetTokenizer
 from learning.Model import Model
 from learning.Dataset import Dataset
 import tools.strings as pystr
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import svm
+import pickle
 
 ####################################################
 # Functions
@@ -55,28 +60,15 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
         model = Model.load(model_file)
     else:
         if model_type == "NaiveBayes":
-            model = learning.NaiveBayesClassifier(
-                classes=['pos', 'neg'],
-                smoothing='dp',
-                smoothing_param=0.05
-            )
+            model = MultinomialNB()
         elif model_type == "DecisionTree":
-            model = learning.DecisionTree(
-                classes=['pos', 'neg']
-            )
+            model = DecisionTreeClassifier()
+        elif model_type == "RandomForest":
+            model = RandomForestClassifier()
+        elif model_type == "SVM":
+            model = svm.SVC()
         # end if
     # end if
-
-    # Tokenizer
-    tokenizer = TweetTokenizer()
-
-    # Join features
-    bow = learning.features.BagOfGrams()
-
-    # Add features
-    bow.add(learning.features.BagOfWords())
-    bow.add(learning.features.BagOf2Grams())
-    bow.add(learning.features.BagOf3Grams())
 
     # Load dataset
     if os.path.exists(data_set_file):
@@ -86,43 +78,20 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
         exit()
     # end if
 
-    # Finalized?
-    if not model.finalized():
-        # For each text in the dataset
-        index = 1
-        for text, c in dataset:
-            # Tokens
-            tokens = tokenizer.tokenize(text)
+    # Data and targets
+    data = dataset.data
+    targets = dataset.targets
 
-            # Log
-            logging.getLogger(u"pyTweetBot").info\
-            (
-                u"Training model on example {}/{} with c={} and {} tokens".format(index, len(dataset), c, len(tokens))
-            )
-
-            # Add training example
-            model.train(bow(tokens), c)
-
-            # Info
-            """logging.getLogger(u"pyTweetBot").info\
-            (
-                u"Model with {} tokens (neg={}/pos={})".format(model.get_n_tokens(), model.get_n_tokens('neg'), model.get_n_tokens('pos'))
-            )"""
-            logging.getLogger(pystr.LOGGER).info(u"Classifier {}".format(model))
-
-            # Index
-            index += 1
-        # end for
-    else:
-        logging.getLogger(u"pyTweetBot").error(u"Model already finalized...")
-        exit()
-    # end if
+    # Count, TFIDF, model
+    text_clf = Pipeline([('vec', CountVectorizer(ngram_range=(1, 1))),
+                         ('tfidf', TfidfTransformer()),
+                         ('clf', model)])
 
     # Finalize training
-    logging.getLogger(u"pyTweetBot").info(u"Finalizing training...")
-    model.finalize()
+    logging.getLogger(pystr.LOGGER).info(pystr.INFO_FINIALIZING_TRAINING)
+    text_clf.fit(data, targets)
 
     # Show performance
-    logging.getLogger(u"pyTweetBot").info(u"Training finished... Saving model to {}".format(model_file))
-    model.save(model_file)
+    logging.getLogger(pystr.LOGGER).info(pystr.INFO_SAVING_MODEL.format(model_file))
+    pickle.dump(text_clf, open(model_file, 'wb'))
 # end if

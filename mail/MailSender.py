@@ -24,10 +24,10 @@
 
 # Imports
 import smtplib
-import sys
+import logging
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import dns.resolver
+import pyTweetBot.tools.strings as pystr
 
 
 # Mail sender tool
@@ -108,22 +108,23 @@ class MailSender(object):
         msg.attach(part1)
         msg.attach(part2)
 
-        answers = dns.resolver.query('gmail.com', 'MX')
-        if len(answers) <= 0:
-            sys.stderr.write('No mail servers found for destination\n')
-            return False
-        # end if
-
-        # Just pick the first answer
-        server = str(answers[0].exchange)
-
         # Send the message via local SMTP server.
-        s = smtplib.SMTP(server)
+        s = smtplib.SMTP("localhost")
+
+        # EHLO & starttls
+        s.ehlo()
+        s.starttls()
 
         # sendmail function takes 3 arguments: sender's address, recipient's address
         # and message to send - here it is sent as one string.
-        s.sendmail("pytweetbot@bot.ai", self._to_addresses[0], msg.as_string())
-        s.quit()
+        try:
+            print(self._to_addresses[0])
+            print(msg.as_string())
+            s.sendmail("pytweetbot@bot.ai", self._to_addresses[0], msg.as_string())
+            s.quit()
+        except smtplib.SMTPServerDisconnected as e:
+            logging.getLogger(pystr.LOGGER).error(u"SMTP server disconnected : {}".format(e))
+        # end try
 
         # Ok
         return True

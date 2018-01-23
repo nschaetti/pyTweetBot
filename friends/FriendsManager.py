@@ -23,9 +23,9 @@
 #
 
 import datetime
-import executor
-from patterns.singleton import singleton
-import pyTweetBot
+import pyTweetBot.executor
+from pyTweetBot.patterns.singleton import singleton
+import pyTweetBot.db.obj
 from sqlalchemy import update, delete
 from sqlalchemy.orm import load_only
 from sqlalchemy import and_, not_
@@ -300,14 +300,14 @@ class FriendsManager(object):
         # New statistic object
         statistic = pyTweetBot.db.obj.Statistic(statistic_friends_count=self.n_following(),
                                      statistic_followers_count=self.n_followers(),
-                                     statistic_statuses_count=executor.ActionScheduler().n_statuses())
+                                     statistic_statuses_count=pyTweetBot.executor.ActionScheduler().n_statuses())
 
         # Add the statistic
         self._session.add(statistic)
 
         # Commit changes
         self._session.commit()
-        return self.n_followers, self.n_following, executor.ActionScheduler().n_statuses()
+        return self.n_followers, self.n_following, pyTweetBot.executor.ActionScheduler().n_statuses()
     # end _insert_statistic
 
     # Get followers

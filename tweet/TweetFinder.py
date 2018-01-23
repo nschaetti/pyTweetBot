@@ -87,6 +87,14 @@ class TweetFinder(Hunter):
         self._tweet_factory = tweet_factory
     # end set_factory
 
+    # Go to next source
+    def next_source(self):
+        """
+        Go to next source
+        """
+        self._current += 1
+    # end next_source
+
     ######################################################
     # PRIVATE
     ######################################################

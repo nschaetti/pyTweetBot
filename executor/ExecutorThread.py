@@ -23,12 +23,9 @@
 #
 
 # Imports
-try:
-    from friends.FriendsManager import ActionAlreadyDone
-except ImportError:
-    pass
-# end try
-from twitter.TweetBotConnect import RequestLimitReached
+import pyTweetBot.friends.FriendsManager
+import pyTweetBot.tools.strings as pystr
+from pyTweetBot.twitter.TweetBotConnect import RequestLimitReached
 import logging
 import tweepy
 from threading import Thread, Lock
@@ -76,6 +73,7 @@ class ExecutorThread(Thread):
             if self._config.is_awake():
                 self()
             else:
+                logging.getLogger(pystr.LOGGER).info(pystr.INFO_ASLEEP)
                 self._wait_next_action()
             # end if
         # end while
@@ -141,7 +139,7 @@ class ExecutorThread(Thread):
 
             # Wait
             self._wait_next_action()
-        except ActionAlreadyDone as e:
+        except pyTweetBot.friends.ActionAlreadyDone as e:
             # Delete action
             with mutex:
                 self._scheduler.delete(action)

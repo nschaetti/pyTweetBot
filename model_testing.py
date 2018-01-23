@@ -25,8 +25,10 @@
 # Import
 import logging
 import os
-import learning
+import numpy as np
 from learning.Dataset import Dataset
+import pickle
+import tools.strings as pystr
 
 
 ####################################################
@@ -40,7 +42,7 @@ from learning.Dataset import Dataset
 
 
 # Test a classifier
-def model_testing(config, data_set_file, model_file, text_size=2000, threshold=0.5):
+def model_testing(data_set_file, model_file, text_size=2000, threshold=0.5):
     """
     Test a classifier
     :param data_set_file: Path to the dataset file
@@ -55,60 +57,32 @@ def model_testing(config, data_set_file, model_file, text_size=2000, threshold=0
         logging.error(u"Cannot find data set file {}".format(data_set_file))
     # end if
 
-    # Load model
-    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model_file)
+    # Data and targets
+    pre_data = dataset.data
+    pre_targets = dataset.targets
 
-    # Stats
-    confusion_matrix = {'pos': {'pos': 0.0, 'neg': 0.0}, 'neg': {'pos': 0.0, 'neg': 0.0}}
-
-    # Print model
-    print(u"Using model {}".format(model))
-
-    # For each URL in the dataset
-    index = 1
-    for text, c in dataset:
-        if len(text) > text_size:
-            # Log
-            print(u"Testing sample {}".format(index))
-
-            # Predict
-            _, probs = model(bow(tokenizer.tokenize(text)))
-
-            # Threshold
-            if probs['pos'] > threshold:
-                prediction = 'pos'
-            else:
-                prediction = 'neg'
-            # end if
-
-            # Save result
-            confusion_matrix[prediction][c] += 1.0
-
-            # Compare
-            print(u"Predicted {} ({}) for observation {}".format(prediction, probs[prediction], c))
-
-            # Print false positive
-            if prediction == 'pos' and c == 'neg':
-                print(u"")
-                print(text)
-                print(u"")
-            # end if
-
-            # Index
-            index += 1
+    # Data
+    data = list()
+    targets = list()
+    for index, text in enumerate(pre_data):
+        if len(text) >= text_size:
+            data.append(text)
+            targets.append(pre_targets[index])
         # end if
     # end for
 
-    # False positive/negative
-    false_positive = confusion_matrix['pos']['neg'] / float(index-1)
-    false_negative = confusion_matrix['neg']['pos'] / float(index-1)
-    success_rate = (confusion_matrix['pos']['pos'] + confusion_matrix['neg']['neg']) / float(index-1)
+    # Load model
+    text_clf = pickle.load(open(model_file, 'rb'))
+
+    # Predicted
+    predicted = text_clf.predict(data)
+
+    # Test
+    success_rate = np.mean(predicted == targets)
 
     # Show performance
     print\
     (
-        u"Success rate of {} on dataset, {} false positive, {} false negative"
-            .format(success_rate*100.0, false_positive*100.0, false_negative*100.0)
+        pystr.INFO_TEST_RESULT.format(success_rate*100.0)
     )
-
 # end if

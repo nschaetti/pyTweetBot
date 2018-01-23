@@ -23,9 +23,9 @@
 #
 
 # Import
-from stats.UserStatistics import UserStatistics
-from mail.MailBuilder import MailBuilder
-from mail.MailSender import MailSender
+from pyTweetBot.stats.UserStatistics import UserStatistics
+from pyTweetBot.mail.MailBuilder import MailBuilder
+from pyTweetBot.mail.MailSender import MailSender
 import pkg_resources
 
 
@@ -47,7 +47,7 @@ def update_statistics(config):
     n_followers, n_following, n_statuses = UserStatistics().update_statistics()
 
     # Get template
-    template = pkg_resources.resource_string("templates", 'weekly_statistics.html')
+    template = pkg_resources.resource_string("pyTweetBot.templates", 'weekly_statistics.html')
 
     # Mail builder
     mail_builder = MailBuilder(template)
@@ -66,7 +66,7 @@ def update_statistics(config):
     mail_builder['diff_statuses'] = (n_statuses - last_stats.statistic_statuses_count)
 
     # Mail
-    to_address = config.get_email()
+    to_address = config.email
 
     # Mail sender
     sender = MailSender(subject="Your weekly update", from_address="pytweetbot@bot.ai", to_addresses=[to_address],

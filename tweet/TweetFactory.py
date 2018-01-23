@@ -4,7 +4,7 @@
 
 # Imports
 import itertools
-from patterns.singleton import singleton
+from pyTweetBot.patterns.singleton import singleton
 
 
 @singleton

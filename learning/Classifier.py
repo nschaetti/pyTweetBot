@@ -29,7 +29,7 @@ from nltk.tokenize import TweetTokenizer
 from CensorModel import CensorModel
 import features
 import logging
-import tools.strings as pystr
+import pyTweetBot.tools.strings as pystr
 
 
 # Text classifier

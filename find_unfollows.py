@@ -25,6 +25,9 @@
 # Import
 import logging
 import learning
+import os
+import pickle
+import tools.strings as pystr
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
 
 ####################################################
@@ -41,18 +44,25 @@ from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullErr
 
 
 # Find user to unfollow to and add it to the DB
-def find_unfollows(config, friends_manager, model, action_scheduler, threshold=0.5):
+def find_unfollows(config, friends_manager, model_file, action_scheduler, threshold=0.5):
     """
     Find tweet to like and add it to the DB
     :param config: Bot configuration object.
     :param friends_manager: Friend manager object.
-    :param model: Path to the model's Pickle file.
+    :param model_file: Path to the model's Pickle file.
     :param action_scheduler: Action scheduler object.
-    :param features: String describing features.
     :param threshold: Probability threshold to accept unfollow.
     """
+    # Load censor
+    censor = learning.CensorModel.load_censor(config)
+
     # Load model
-    tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
+    if os.path.exists(model_file):
+        model = pickle.load(open(model_file, 'rb'))
+    else:
+        logging.getLogger(pystr.LOGGER).error(u"Cannot find model {}".format(model_file))
+        exit()
+        # end if
 
     # Unfollow interval in days
     unfollow_day = int(config.friends['unfollow_interval'] / 86400.0)
@@ -80,11 +90,12 @@ def find_unfollows(config, friends_manager, model, action_scheduler, threshold=0
     for friend in friends_manager.get_following():
         if not friend.friend_follower:
             # Predict class
-            prediction, probs = model(bow(tokenizer(friend.friend_description)))
+            prediction = model.predict([friend.friend_description])[0]
+            probs = model.predict_proba([friend.friend_description])[0]
             censor_prediction, _ = censor(friend.friend_description)
 
             # Predicted as unfollow
-            if prediction == 'neg' or censor_prediction == 'neg' or probs['pos'] < threshold:
+            if prediction == 'neg' or censor_prediction == 'neg' or probs[1] < threshold:
                 try:
                     logging.getLogger(u"pyTweetBot").info(
                         u"Adding Friend \"{}\" to unfollow to the scheduler".format(friend.friend_screen_name))

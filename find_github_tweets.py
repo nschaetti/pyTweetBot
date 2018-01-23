@@ -197,7 +197,7 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, in
     :param waiting_time: Waiting time between each tweets (for instantaneous tweeting)
     """
     # Github settings
-    github_settings = config.get_github_config()
+    github_settings = config.github
 
     # Login info
     login = github_settings['login']

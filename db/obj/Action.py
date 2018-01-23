@@ -28,7 +28,7 @@ from sqlalchemy import Column, String, BigInteger, DateTime, Enum
 from .Base import Base
 import pyTweetBot.twitter
 import pyTweetBot.friends
-# from db.obj.Tweeted import Tweeted
+from pyTweetBot.db.obj.Tweeted import Tweeted
 
 
 # Action
