@@ -291,6 +291,7 @@ class Classifier(object):
         :param opt: Loading option
         :return: The model object
         """
+        
         # Log
         logging.getLogger(pystr.LOGGER).info(u"Loading model {}".format(opt))
 
