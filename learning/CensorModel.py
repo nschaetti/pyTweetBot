@@ -44,8 +44,10 @@ class CensorModel(object):
             w = Word(word)
             print(word)
             print(w.lemmatize())
+            print(w.lemmatize('v'))
             print(u"")
         # end for
+        exit()
     # end __init__
 
     #################################################
