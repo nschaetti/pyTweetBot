@@ -39,6 +39,7 @@ class CensorModel(object):
         """
         # Forbidden words
         self._forbidden_words = config.forbidden_words
+        print(self._forbidden_words)
     # end __init__
 
     #################################################
@@ -58,6 +59,7 @@ class CensorModel(object):
         """
         # For each forbidden word
         for word in self._forbidden_words:
+            print(word)
             if word.lower() in x.lower():
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
