@@ -69,9 +69,6 @@ class CensorModel(object):
         # For each forbidden word
         for word in text_blob.words:
             if Word(word.lower()).lemmatize() in self._forbidden_words:
-                print(text_blob.words)
-                print(u"NEG because of {}".format(word))
-                exit()
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
         # end for
