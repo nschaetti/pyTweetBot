@@ -142,7 +142,7 @@ def find_follows(config, model, action_scheduler, friends_manager, text_size, n_
                     censor_prediction, _ = censor(author.description)
 
                     # Predicted as follow
-                    if prediction == 'pos' and censor_prediction == 'pos' and probs['pos'] >= threshold:
+                    if prediction == 'pos' and censor_prediction == 'pos' and probs[1] >= threshold:
                         # Add
                         add_follow_action(action_scheduler, author)
                     # end if
