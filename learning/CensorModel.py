@@ -60,7 +60,10 @@ class CensorModel(object):
         """
         # Analyze text
         text_blob = TextBlob(x)
-        print(text_blob.words)
+        for w in text_blob.words:
+            print(w)
+            print(w.lemmatize())
+        # end for
         exit()
         # For each forbidden word
         for word in self._forbidden_words:
