@@ -40,14 +40,12 @@ class CensorModel(object):
         """
         # Forbidden words
         self._forbidden_words = config.forbidden_words
-        for word in self._forbidden_words:
-            w = Word(word)
-            print(word)
-            print(w.lemmatize())
-            print(w.lemmatize('v'))
-            print(u"")
+
+        # Extract
+        self._forbidden_words = list()
+        for word in config.forbidden_words:
+            self._forbidden_words.append(Word(word.lower()).lemmatize())
         # end for
-        exit()
     # end __init__
 
     #################################################
@@ -67,17 +65,13 @@ class CensorModel(object):
         """
         # Analyze text
         text_blob = TextBlob(x)
-        for w in text_blob.words:
-            print(w)
-            print(w.lemmatize())
-        # end for
-        exit()
+        print(text_blob.words)
         # For each forbidden word
-        for word in self._forbidden_words:
-            print(word)
-            if word.lower() in x.lower():
+        for word in text_blob.words:
+            if Word(word.lower()).lemmatize() in self._forbidden_words:
                 print(u"")
-                print(u"NEG")
+                print(u"NEG because of {}".format(word))
+                exit()
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
         # end for
