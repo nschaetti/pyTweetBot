@@ -43,7 +43,7 @@ class CensorModel(object):
         for word in self._forbidden_words:
             w = Word(word)
             print(word)
-            print(word.lemmatize())
+            print(w.lemmatize())
             print(u"")
         # end for
     # end __init__
