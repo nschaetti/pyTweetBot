@@ -42,7 +42,7 @@ class Friend(Base):
     friend_id = Column(BigInteger, primary_key=True, autoincrement=True)
     friend_screen_name = Column(String(100), nullable=False, unique=True)
     friend_description = Column(String(1000), nullable=False)
-    friend_location = Column(String(100), nullable=False)
+    friend_location = Column(String(200), nullable=False)
     friend_follower = Column(Boolean, nullable=False, default=False)
     friend_following = Column(Boolean, nullable=False, default=False)
     friend_follower_date = Column(DateTime, nullable=True, default=None)
