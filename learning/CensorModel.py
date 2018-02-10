@@ -23,7 +23,7 @@
 #
 
 # Imports
-from textblob import TextBlob
+from textblob import TextBlob, Word
 
 
 # Forbidden words classifier
@@ -40,7 +40,12 @@ class CensorModel(object):
         """
         # Forbidden words
         self._forbidden_words = config.forbidden_words
-        print(self._forbidden_words)
+        for word in self._forbidden_words:
+            w = Word(word)
+            print(word)
+            print(word.lemmatize())
+            print(u"")
+        # end for
     # end __init__
 
     #################################################
