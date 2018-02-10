@@ -23,6 +23,7 @@
 #
 
 # Imports
+from textblob import TextBlob
 
 
 # Forbidden words classifier
@@ -57,11 +58,15 @@ class CensorModel(object):
         :param x: Text to classify
         :return:
         """
-        print(x)
+        # Analyze text
+        text_blob = TextBlob(x)
+        print(text_blob.words)
+        exit()
         # For each forbidden word
         for word in self._forbidden_words:
             print(word)
             if word.lower() in x.lower():
+                print(u"")
                 print(u"NEG")
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
