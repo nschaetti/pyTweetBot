@@ -57,14 +57,16 @@ class CensorModel(object):
         :param x: Text to classify
         :return:
         """
+        print(x)
         # For each forbidden word
         for word in self._forbidden_words:
             print(word)
             if word.lower() in x.lower():
+                print(u"NEG")
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
         # end for
-
+        print(u"POS")
         return 'pos', {'neg': 0.0, 'pos': 1.0}
     # end __call__
 
