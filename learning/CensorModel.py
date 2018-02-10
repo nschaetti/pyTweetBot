@@ -65,17 +65,17 @@ class CensorModel(object):
         """
         # Analyze text
         text_blob = TextBlob(x)
-        print(text_blob.words)
+
         # For each forbidden word
         for word in text_blob.words:
             if Word(word.lower()).lemmatize() in self._forbidden_words:
-                print(u"")
+                print(text_blob.words)
                 print(u"NEG because of {}".format(word))
                 exit()
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
         # end for
-        print(u"POS")
+
         return 'pos', {'neg': 0.0, 'pos': 1.0}
     # end __call__
 
