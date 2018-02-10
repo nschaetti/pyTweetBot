@@ -168,22 +168,22 @@ The friends section has four parameters.
 
 You have then to create the database on your MySQL host
 
-    python pyTweetBot.py database
+    python pyTweetBot.py tools
         --create : Create the database structure on the MySQL host
         --export : Export tweets, tweeted and followers/friends to a file
         --file : File to import / to export to
 
 You can use the "create" action for that :
 
-    python pyTweetBot.py --config /path/to/config.json --create
+    python pyTweetBot.py tools --config /path/to/config.json --create
 
 It is possible to export bot's data to a file with the export command.
 
-    python pyTweetBot.py --config /path/to/config.json --export --file export_file.p
+    python pyTweetBot.py tools --config /path/to/config.json --export --file export_file.p
 
 And then import the bot's data from the file
 
-    python pyTweetBot.py --config /path/to/config.json --import --file export_file.p
+    python pyTweetBot.py tools --config /path/to/config.json --import --file export_file.p
 
 ## Model training
 
