@@ -19,7 +19,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
+# along with pyTweetBot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 # Import
@@ -141,6 +141,7 @@ def create_config(config_filename):
 ####################################################
 # Main function
 ####################################################
+
 
 if __name__ == "__main__":
 
