@@ -264,7 +264,7 @@ class BotConfig(object):
         """
         if 'intervals' in setting.keys():
             # For each intervals
-            for interval in setting['interval']:
+            for interval in setting['intervals']:
                 day = interval['day']
                 start = interval['start']
                 end = interval['end']
