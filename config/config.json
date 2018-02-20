@@ -34,9 +34,17 @@
 	],
 	"direct_message" : "",
 	"tweet" : {
-		"max_tweets" : 1200,
+		"max_tweets" : 1800,
 		"exclude" : [],
-		"interval" : [2.0, 4.0]
+		"interval" : [4.0, 6.0],
+		"intervals" : [
+			{
+				"day": 5,
+				"start": 17,
+				"end": 23,
+				"interval" : [1.0, 3.0]
+			}
+		]
 	},
 	"news" :
 	[
@@ -55,7 +63,7 @@
 	"retweet" :
 	{
 		"max_retweets" : 600,
-		"max_likes" : 600,
+		"max_likes" : 0,
 		"keywords" : [],
 		"nbpages" : 40,
 		"retweet_prob" : 0.5,
