@@ -249,8 +249,13 @@ class BotConfig(object):
         elif setting == "follow" or setting == "unfollow":
             (min_time, max_time) = self.get_current_interval(self.friends)
         # end if
-        print(setting)
-        print(min_time, max_time)
+
+        # Unfollow
+        if setting == "unfollow":
+            min_time -= 5
+            max_time -= 5
+        # end if
+
         # Return random waiting time
         return random.randint(min_time * 60, max_time * 60)
     # end get_random_waiting_time
