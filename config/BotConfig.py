@@ -255,7 +255,8 @@ class BotConfig(object):
             min_time -= 5
             max_time -= 5
         # end if
-
+        print(setting)
+        print(min_time, max_time)
         # Return random waiting time
         return random.randint(min_time * 60, max_time * 60)
     # end get_random_waiting_time
