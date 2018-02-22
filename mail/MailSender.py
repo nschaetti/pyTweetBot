@@ -118,8 +118,6 @@ class MailSender(object):
         # sendmail function takes 3 arguments: sender's address, recipient's address
         # and message to send - here it is sent as one string.
         try:
-            print(self._to_addresses[0])
-            print(msg.as_string())
             s.sendmail("pytweetbot@bot.ai", self._to_addresses[0], msg.as_string())
             s.quit()
         except smtplib.SMTPServerDisconnected as e:

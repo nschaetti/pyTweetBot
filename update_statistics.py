@@ -46,32 +46,34 @@ def update_statistics(config):
     # Update statistics in the DB
     n_followers, n_following, n_statuses = UserStatistics().update_statistics()
 
-    # Get template
-    template = pkg_resources.resource_string("pyTweetBot.templates", 'weekly_statistics.html')
+    if last_stats is not None:
+        # Get template
+        template = pkg_resources.resource_string("pyTweetBot.templates", 'weekly_statistics.html')
 
-    # Mail builder
-    mail_builder = MailBuilder(template)
+        # Mail builder
+        mail_builder = MailBuilder(template)
 
-    # Last report date
-    mail_builder['date_last'] = unicode(last_stats.statistic_date)
+        # Last report date
+        mail_builder['date_last'] = unicode(last_stats.statistic_date)
 
-    # Parameter template
-    mail_builder['followers'] = n_followers
-    mail_builder['following'] = n_following
-    mail_builder['statuses'] = n_statuses
+        # Parameter template
+        mail_builder['followers'] = n_followers
+        mail_builder['following'] = n_following
+        mail_builder['statuses'] = n_statuses
 
-    # Differences
-    mail_builder['diff_followers'] = (n_followers - last_stats.statistic_followers_count)
-    mail_builder['diff_following'] = (n_following - last_stats.statistic_friends_count)
-    mail_builder['diff_statuses'] = (n_statuses - last_stats.statistic_statuses_count)
+        # Differences
+        mail_builder['diff_followers'] = (n_followers - last_stats.statistic_followers_count)
+        mail_builder['diff_following'] = (n_following - last_stats.statistic_friends_count)
+        mail_builder['diff_statuses'] = (n_statuses - last_stats.statistic_statuses_count)
 
-    # Mail
-    to_address = config.email
+        # Mail
+        to_address = config.email
 
-    # Mail sender
-    sender = MailSender(subject="Your weekly update", from_address="pytweetbot@bot.ai", to_addresses=[to_address],
-                        msg=mail_builder.message())
+        # Mail sender
+        sender = MailSender(subject="Your weekly update", from_address="pytweetbot@bot.ai", to_addresses=[to_address],
+                            msg=mail_builder.message())
 
-    # Send
-    sender.send()
+        # Send
+        sender.send()
+    # end if
 # end update_statistics

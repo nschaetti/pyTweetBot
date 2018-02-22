@@ -109,7 +109,11 @@ class UserStatistics(object):
         statistics = self.get_statistics()
 
         # Return
-        return statistics[pos]
+        try:
+            return statistics[pos]
+        except IndexError:
+            return None
+        # end try
     # end get_last_statistics
 
 # end UserStatistics

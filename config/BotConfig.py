@@ -243,16 +243,45 @@ class BotConfig(object):
         :return: A random interval
         """
         if setting == "tweet":
-            (min_time, max_time) = self.tweet['interval']
+            (min_time, max_time) = self.get_current_interval(self.tweet)
         elif setting == "retweet" or setting == "like":
-            (min_time, max_time) = self.retweet['interval']
+            (min_time, max_time) = self.get_current_interval(self.retweet)
         elif setting == "follow" or setting == "unfollow":
-            (min_time, max_time) = self.friends['interval']
+            (min_time, max_time) = self.get_current_interval(self.friends)
+        # end if
+
+        # Unfollow
+        if setting == "unfollow":
+            min_time -= 5
+            max_time -= 5
         # end if
 
         # Return random waiting time
         return random.randint(min_time * 60, max_time * 60)
     # end get_random_waiting_time
+
+    # Get current interval
+    def get_current_interval(self, setting):
+        """
+        Get current interval
+        :param setting:
+        :return:
+        """
+        if 'intervals' in setting.keys():
+            # For each intervals
+            for interval in setting['intervals']:
+                day = interval['day']
+                start = interval['start']
+                end = interval['end']
+                now = datetime.datetime.now()
+                if now.weekday() == day and start >= now.hour and end <= now.hour:
+                    return interval['interval']
+                # end if
+            # end for
+        # end if
+
+        return setting['interval']
+    # end get_current_interval
 
     # Wait between action
     def wait_next_action(self, setting):

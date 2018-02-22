@@ -23,6 +23,7 @@
 #
 
 # Imports
+from textblob import TextBlob, Word
 
 
 # Forbidden words classifier
@@ -39,6 +40,12 @@ class CensorModel(object):
         """
         # Forbidden words
         self._forbidden_words = config.forbidden_words
+
+        # Extract
+        self._forbidden_words = list()
+        for word in config.forbidden_words:
+            self._forbidden_words.append(Word(word.lower()).lemmatize())
+        # end for
     # end __init__
 
     #################################################
@@ -56,9 +63,12 @@ class CensorModel(object):
         :param x: Text to classify
         :return:
         """
+        # Analyze text
+        text_blob = TextBlob(x)
+
         # For each forbidden word
-        for word in self._forbidden_words:
-            if word.lower() in x.lower():
+        for word in text_blob.words:
+            if Word(word.lower()).lemmatize() in self._forbidden_words:
                 return 'neg', {'neg': 1.0, 'pos': 0.0}
             # end if
         # end for
