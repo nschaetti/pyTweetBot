@@ -1,4 +1,6 @@
-# pyTweetBot
+<p align="center"><img src="docs/images/pytweetbot.png" /></p>
+
+--------------------------------------------------------------------------------
 A Twitter bot written in Python to replace yourself, search and publish news about specific subjects on Twitter.
 
 ## Installation

@@ -11,6 +11,10 @@ default_config = \
 	"hashtags":
 	[
 	],
+	"tweet" :
+	{
+		"max_tweets" : 1100,
+	},
 	"friends" :
 	{
 		"max_new_followers" : 40,
@@ -23,7 +27,7 @@ default_config = \
 	[
 	],
 	"direct_message" : "",
-	"news_settings" : {
+	"google_news" : {
 		"max_tweets" : 1200,
 		"exclude" : [],
 		"interval" : [2.0, 4.0]

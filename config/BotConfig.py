@@ -274,7 +274,7 @@ class BotConfig(object):
                 start = interval['start']
                 end = interval['end']
                 now = datetime.datetime.now()
-                if now.weekday() == day and start >= now.hour and end <= now.hour:
+                if now.weekday() == day and now.hour >= start and now.hour <= end:
                     return interval['interval']
                 # end if
             # end for
