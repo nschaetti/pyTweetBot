@@ -52,7 +52,7 @@ def execute_actions(config, action_scheduler, no_tweet=False, no_retweet=False, 
     thread_queue = Queue()
 
     # Filter
-    filters = {'tweet': no_tweet, 'retweet': no_retweet, 'like': no_like, 'follow': no_follow, 'unfollow': no_unfollow}
+    filters = {'Tweet': no_tweet, 'Retweet': no_retweet, 'Like': no_like, 'Follow': no_follow, 'Unfollow': no_unfollow}
 
     # For each action type
     for action_type in action_scheduler.action_types:
