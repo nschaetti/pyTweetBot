@@ -29,6 +29,7 @@ from Queue import Queue
 from config.BotConfig import BotConfig
 from executor.ExecutorThread import ExecutorThread
 import tools.strings as pystr
+import time
 
 ####################################################
 # Main function
@@ -54,11 +55,15 @@ def execute_actions(config, action_scheduler, no_tweet=False, no_retweet=False, 
     # Filter
     filters = {'Tweet': no_tweet, 'Retweet': no_retweet, 'Like': no_like, 'Follow': no_follow, 'Unfollow': no_unfollow}
 
+    # Interrupt event
+    run_event = threading.Event()
+    run_event.set()
+
     # For each action type
     for action_type in action_scheduler.action_types:
         if not filters[action_type]:
             # New executor thread
-            executor_thread = ExecutorThread(config, action_scheduler, action_type)
+            executor_thread = ExecutorThread(config, action_scheduler, action_type, run_event)
 
             # Start executing action
             logging.getLogger(pystr.LOGGER).info(u"Start thread for action type {}...".format(action_type))
@@ -74,8 +79,17 @@ def execute_actions(config, action_scheduler, no_tweet=False, no_retweet=False, 
 
     # Waiting for the thread to terminate
     try:
-        thread_queue.join()
+        while 1:
+            time.sleep(1)
+        # end while
     except (KeyboardInterrupt, SystemExit):
+        # Log
         logging.getLogger(pystr.LOGGER).info(u"Stopping executing action with scheduler...")
+
+        # Clear event
+        run_event.clear()
+
+        # Join
+        thread_queue.join()
     # end try
 # end execute_actions
