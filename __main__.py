@@ -257,6 +257,14 @@ if __name__ == "__main__":
     executor_parser.add_argument("--daemon", action='store_true', help="Run executor in daemon mode", default=False)
     executor_parser.add_argument("--break-time", action='store_true',
                                  help="Show break duration between execution for the current time", default=False)
+    executor_parser.add_argument("--no-follow", action='store_true', help="Do not execute follow actions",
+                                 default=False)
+    executor_parser.add_argument("--no-unfollow", action='store_true', help="Do not execute unfollow actions",
+                                 default=False)
+    executor_parser.add_argument("--no-tweet", action='store_true', help="Do not execute tweet actions", default=False)
+    executor_parser.add_argument("--no-retweet", action='store_true', help="Do not execute retweet actions",
+                                 default=False)
+    executor_parser.add_argument("--no-like", action='store_true', help="Do not execute like actions", default=False)
 
     # GitHub tweets
     github_tweets_parser = command_subparser.add_parser("find-github-tweets")
@@ -379,7 +387,15 @@ if __name__ == "__main__":
         statistics_generator(twitter_connector, args.stats_file, args.n_pages, args.stream, args.info)
     # Executor
     elif args.command == "execute":
-        execute_actions(config, action_scheduler)
+        execute_actions(
+            config,
+            action_scheduler,
+            args.no_tweet,
+            args.no_retweet,
+            args.no_like,
+            args.no_follow,
+            args.no_unfollow
+        )
     # List future action
     elif args.command == "actions":
         list_actions(action_scheduler, args.type)
