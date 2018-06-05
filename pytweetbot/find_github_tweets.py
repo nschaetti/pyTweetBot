@@ -25,11 +25,13 @@
 # Import
 import logging
 import time
+
 from github import Github
+
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from tweet.TweetFactory import TweetFactory
 from twitter.TweetBotConnect import TweetBotConnector
-import db.obj
+
 
 ####################################################
 # Globals
@@ -164,7 +166,7 @@ def compute_tweet(tweet_text, action_scheduler, instantaneous):
     :return: True if tweeted/added, False otherwise.
     """
     # if not instantaneous
-    if not db.obj.Tweeted.exists(tweet_text):
+    if not pytweetbot.db.obj.Tweeted.exists(tweet_text):
         if not instantaneous:
             if not add_tweet(action_scheduler, tweet_text):
                 return False
@@ -172,7 +174,7 @@ def compute_tweet(tweet_text, action_scheduler, instantaneous):
         else:
             # TODO: Tweeted should be insert in TweetBotConnector.tweet()
             TweetBotConnector().tweet(tweet_text)
-            db.obj.Tweeted().insert_tweet(tweet_text)
+            pytweetbot.db.obj.Tweeted().insert_tweet(tweet_text)
         # end if
     else:
         return False

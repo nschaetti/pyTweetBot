@@ -23,13 +23,15 @@
 #
 
 # Imports
-import pickle
-import numpy as np
-from nltk.tokenize import TweetTokenizer
-from CensorModel import CensorModel
-import features
 import logging
+import pickle
+
+import numpy as np
 import pyTweetBot.tools.strings as pystr
+from nltk.tokenize import TweetTokenizer
+
+import features
+from CensorModel import CensorModel
 
 
 # Text classifier

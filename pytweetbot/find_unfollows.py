@@ -24,11 +24,13 @@
 
 # Import
 import logging
-import learning
 import os
 import pickle
+
+import learning
 import tools.strings as pystr
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
+
 
 ####################################################
 # Globals

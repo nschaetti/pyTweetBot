@@ -26,11 +26,13 @@
 import logging
 import os
 import pickle
+
+import learning
+import tools.strings as pystr
 from db.obj.Tweeted import Tweeted
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from retweet.RetweetFinder import RetweetFinder
-import learning
-import tools.strings as pystr
+
 
 ####################################################
 # Globals

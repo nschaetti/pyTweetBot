@@ -24,10 +24,11 @@
 
 # Import
 import datetime
+
 from sqlalchemy import Column, BigInteger, String, DateTime, Integer
+
+from pytweetbot.db import DBConnector
 from .Base import Base
-from sqlalchemy.types import Enum
-from db.DBConnector import DBConnector
 
 
 # Model description

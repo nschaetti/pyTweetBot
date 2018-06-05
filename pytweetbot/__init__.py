@@ -23,18 +23,3 @@
 #
 
 # Import
-import config
-import db
-import directmessages
-import executor
-import friends
-import learning
-import mail
-import news
-import patterns
-import retweet
-import stats
-import templates
-import tools
-import tweet
-import twitter

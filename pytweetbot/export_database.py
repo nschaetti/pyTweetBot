@@ -22,12 +22,11 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import db.obj
-from sqlalchemy import create_engine
-import pickle
-import tools.strings as pystr
 import logging
+import os
+import pickle
+
+import tools.strings as pystr
 
 
 # Function to export the database
@@ -48,10 +47,10 @@ def export_database(output_dir, mysql_connector):
     mysql_session = mysql_connector.get_session()
 
     # Get from database
-    actions = mysql_session.query(db.obj.Action).all()
-    friends = mysql_session.query(db.obj.Friend).all()
-    statistics = mysql_session.query(db.obj.Statistic).all()
-    tweets = mysql_session.query(db.obj.Tweeted).all()
+    actions = mysql_session.query(pytweetbot.db.obj.Action).all()
+    friends = mysql_session.query(pytweetbot.db.obj.Friend).all()
+    statistics = mysql_session.query(pytweetbot.db.obj.Statistic).all()
+    tweets = mysql_session.query(pytweetbot.db.obj.Tweeted).all()
 
     # Save all
     logging.getLogger(pystr.LOGGER).info(u"Exporting data to {}".format(output_dir))

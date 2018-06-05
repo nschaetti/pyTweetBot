@@ -23,14 +23,16 @@
 #
 
 # Import
-import tweepy
 import logging
-import time
 import random
-import db.obj
+import time
+
+import tweepy
+
 import learning
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
 from twitter.TweetBotConnect import TweetBotConnector
+
 
 ####################################################
 # Globals
@@ -50,7 +52,7 @@ def add_follow_action(action_scheduler, friend):
     :return:
     """
     try:
-        if type(friend) is db.obj.Friend:
+        if type(friend) is pytweetbot.db.obj.Friend:
             logging.getLogger(u"pyTweetBot").info(
                 u"Adding Friend \"{}\" to follow to the scheduler".format(friend.friend_screen_name))
             action_scheduler.add_follow(friend.friend_screen_name)
@@ -64,7 +66,7 @@ def add_follow_action(action_scheduler, friend):
         exit()
         pass
     except ActionAlreadyExists:
-        if type(friend) is db.obj.Friend:
+        if type(friend) is pytweetbot.db.obj.Friend:
             logging.getLogger(u"pyTweetBot").error(
                 u"Follow action for \"{}\" already exists in the database".format(
                     friend.friend_screen_name))

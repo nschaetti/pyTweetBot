@@ -23,10 +23,10 @@
 #
 
 # Import
-import datetime
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, DateTime, Boolean, Enum, and_, update
+from sqlalchemy import Column, Integer, BigInteger, Enum, and_
+
+from pytweetbot.db import DBConnector
 from .Base import Base
-from db.DBConnector import DBConnector
 
 
 # Bot's impact statistics

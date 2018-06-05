@@ -24,11 +24,11 @@
 
 # Import
 from sqlalchemy import Column, BigInteger, String, Float, ForeignKey, Integer
-from .Base import Base
 from sqlalchemy.orm import relationship
+
+from pytweetbot.db import DBConnector
+from .Base import Base
 from .Model import Model
-from db.DBConnector import DBConnector
-from sqlalchemy import and_
 
 
 # Model's tokens
