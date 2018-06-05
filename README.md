@@ -65,8 +65,18 @@ You need to following package to install pyTweetBot.
 * scipy
 * mysql-python
 
+### Installation
 
-## Installation
+    pip install pyTweetBot
+
+## Authors
+
+* **Nils Schaetti** - *Initial work* - [nschaetti](https://github.com/nschaetti/)
+
+## License
+
+This project is licensed under the GPLv3 License - see the [LICENSE](LICENSE) file
+for details.
 
 ### Configuration file
 
