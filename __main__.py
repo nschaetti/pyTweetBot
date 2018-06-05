@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : pyTweetBot.py
-# Description : pyTweetBot main execution file.
+# File : __main__.py
+# Description : pyTweetBot main file.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -66,8 +66,7 @@ import tools.strings as pystr
 def add_default_arguments(p):
     """
     Add default arguments
-    :param parser:
-    :return:
+    :param p: Parser to add the argument to.
     """
     # Configuration and log
     p.add_argument("--config", type=str, help="Configuration file", required=True)
@@ -80,7 +79,7 @@ def add_default_arguments(p):
 def add_model_argument(p, required):
     """
     Add model argument
-    :param p: Parser object
+    :param p: Parser to add the argument to.
     :param required: Is the model argument required?
     """
     # Model
@@ -122,12 +121,11 @@ def create_logger(name, log_level=logging.INFO, log_format="%(asctime)s :: %(lev
 # end create_logger
 
 
-# Create config file
+# Write default configuration file
 def create_config(config_filename):
     """
-    Create config file
-    :param config_filename:
-    :return:
+    Write default configuration file.
+    :param config_filename: The path to the configuration file.
     """
     # Get template
     empty_config = pkg_resources.resource_string("config", 'config.json')
@@ -143,10 +141,13 @@ def create_config(config_filename):
 ####################################################
 
 
+# Main function
 if __name__ == "__main__":
-
+    """
+    Main function
+    """
     # Argument parser
-    parser = argparse.ArgumentParser(prog="pyTweetBot", description="pyTweetBot - A smart Twitter bot to replace yourself")
+    parser = argparse.ArgumentParser(prog="pyTweetBot", description="pyTweetBot - A smart Twitter bot")
 
     # Command subparser
     command_subparser = parser.add_subparsers(dest="command")
@@ -216,7 +217,7 @@ if __name__ == "__main__":
     train_parser.add_argument("--action", type=str,
                               help="Create a data set (dataset), train or test a model (train/test)")
     train_parser.add_argument("--dataset", type=str, help="Input/output data set file")
-    train_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
+    train_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News to analyze", default=2)
     train_parser.add_argument("--rss", type=str, help="Specific RSS stream to capture", default="")
     train_parser.add_argument("--news", type=str, help="Specific Google News research to capture", default="")
     train_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
