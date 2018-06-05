@@ -28,6 +28,8 @@ import threading
 from Queue import Queue
 from config.BotConfig import BotConfig
 from executor.ExecutorThread import ExecutorThread
+import tools.strings as pystr
+import time
 
 ####################################################
 # Main function
@@ -35,35 +37,59 @@ from executor.ExecutorThread import ExecutorThread
 
 
 # Execute actions
-def execute_actions(config, action_scheduler):
+def execute_actions(config, action_scheduler, no_tweet=False, no_retweet=False, no_like=False, no_follow=False, no_unfollow=False):
     """
     Execute actions
+    :param config:
     :param action_scheduler:
-    :param action_type:
+    :param no_tweet:
+    :param no_retweet:
+    :param no_like:
+    :param no_follow:
+    :param no_unfollow:
+    :return:
     """
     # List of threads
     thread_queue = Queue()
 
+    # Filter
+    filters = {'Tweet': no_tweet, 'Retweet': no_retweet, 'Like': no_like, 'Follow': no_follow, 'Unfollow': no_unfollow}
+
+    # Interrupt event
+    run_event = threading.Event()
+    run_event.set()
+
     # For each action type
     for action_type in action_scheduler.action_types:
-        # New executor thread
-        executor_thread = ExecutorThread(config, action_scheduler, action_type)
+        if not filters[action_type]:
+            # New executor thread
+            executor_thread = ExecutorThread(config, action_scheduler, action_type, run_event)
 
-        # Start executing action
-        logging.getLogger(u"pyTweetBot").info(u"Start thread for action type {}...".format(action_type))
+            # Start executing action
+            logging.getLogger(pystr.LOGGER).info(u"Start thread for action type {}...".format(action_type))
 
-        # Start as daemon
-        executor_thread.daemon = True
-        executor_thread.start()
+            # Start as daemon
+            executor_thread.daemon = True
+            executor_thread.start()
 
-        # Add to queue
-        thread_queue.put(executor_thread)
+            # Add to queue
+            thread_queue.put(executor_thread)
+        # end if
     # end for
 
     # Waiting for the thread to terminate
     try:
-        thread_queue.join()
+        while 1:
+            time.sleep(1)
+        # end while
     except (KeyboardInterrupt, SystemExit):
-        logging.getLogger(u"pyTweetBot").info(u"Stopping executing action with scheduler...")
+        # Log
+        logging.getLogger(pystr.LOGGER).info(u"Stopping executing action with scheduler...")
+
+        # Clear event
+        run_event.clear()
+
+        # Join
+        thread_queue.join()
     # end try
 # end execute_actions
