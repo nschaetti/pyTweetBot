@@ -16,10 +16,8 @@ RUN apt-get -y install git
 RUN git clone https://github.com/nschaetti/pyTweetBot.git
 WORKDIR /pyTweetBot
 
-RUN git clone https://github.com/nschaetti/nsNLP.git
-
-
-RUN apt-get -y install python3
+# Install Python package
+RUN apt-get -y install python2.7
 RUN apt-get -y install python-pip
 RUN pip install simplejson
 RUN pip install sqlalchemy
@@ -31,23 +29,8 @@ RUN pip install dnspython
 RUN pip install sklearn
 RUN pip install scipy
 RUN pip install spacy
-
-RUN git clone https://github.com/nschaetti/Oger.git
-
-RUN pip install mdp
-
-RUN pip install  matplotlib
-RUN apt-get -y install python-tk
 RUN pip install nltk
 RUN pip install textblob
-#RUN pip install
-#RUN pip install
-#RUN pip install
-#RUN pip install
-#RUN pip install
-#RUN pip install
-#RUN pip install
-#RUN pip install
 
 
 ENTRYPOINT /bin/bash
