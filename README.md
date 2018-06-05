@@ -11,7 +11,7 @@ Join our community to create datasets and deep-learning models! Chat with us on 
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytweetbot.svg?style=flat-square)
 [![Codecov](https://img.shields.io/codecov/c/github/nschaetti/pytweetbot/master.svg?style=flat-square)](https://codecov.io/gh/nschaetti/pyTweetBot)
-[![Documentation Status](	https://img.shields.io/readthedocs/pytweetbot/latest.svg?style=flat-square)](http://pytweetbot.readthedocs.io/en/latest/?badge=latest&style=flat-square)
+[![Documentation Status](https://img.shields.io/readthedocs/pytweetbot/latest.svg?style=flat-square)](http://pytweetbot.readthedocs.io/en/latest/?badge=latest&style=flat-square)
 [![Build Status](https://img.shields.io/travis/nschaetti/pytweetbot/master.svg?style=flat-square)](https://travis-ci.org/nschaetti/pyTweetBot)
 
 This repository consists of:
