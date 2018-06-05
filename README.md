@@ -291,5 +291,18 @@ pyTweetBot launch an executor thread for each action type. You can launch the ex
 
 ### Files
 
-* [pyTweetBot.py](pyTweetBot.py) : Main Python file;
+* [__main__.py](__main__.py) : Main Python file;
+* [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) : Code of conduct for contributors;
+* [CONTRIBUTING.md](CONTRIBUTING.md) : Instructions if you want to contribute;
+* [convert_dataset.py](convert_dataset.py) :
+* [create_dataset.py](create_dataset.py) :
+* [direct_messages.py](direct_messages.py) : Send direct messages;
+* [Dockerfile](Dockerfile) : Docker configuration file;
+* [execute_actions.py](execute_actions.py) : Launch the threads to execute actions;
+* [export_database.py](export_database.py) : Tool functions to export a database;
+* [find_follows.py](find_follows.py) : Find Twitter users to follow;
+* [find_github_tweets.py](find_github_tweets.py) : Find tweet about Github activities;
+* [find_reweets.py](find_retweets.py) : Find posts to retweet;
+* [find_tweets.py](find_tweets.py) : Find content on the web to tweet;
 * [find_tweets.py](find_tweets.py) : Python code to find new contents to tweet;
+* [find_unfollows.py](find_unfollows.py) : Find Twitter users to unfollow;
