@@ -1,8 +1,69 @@
 <p align="center"><img src="docs/images/pytweetbot.png" /></p>
 
 --------------------------------------------------------------------------------
-A Twitter bot written in Python to replace yourself, search and publish news about specific subjects on Twitter.
+A Twitter bot and library written in Python to replace yourself, search and publish news about specific subjects on Twitter, and automatize content publishing.
 
+<a href="https://twitter.com/intent/tweet?text=pyTweetBot%20is%20A%20Twitter%20bot%20written%20in%20Python%20to%20replace%20yourself,%20search%20and%20publish%20news%20about%20specific%20subjects%20on%20Twitter&url=https://github.com/nschaetti/pyTweetBot&hashtags=pytweetbot,twitter,python">
+    <img style='vertical-align: text-bottom !important;' src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Tweet">
+</a>
+
+Join our community to create datasets and deep-learning models! Chat with us on [Gitter](https://gitter.im/EchoTorch/Lobby) and join the [Google Group](https://groups.google.com/forum/#!forum/echotorch/) to collaborate with us.
+
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytweetbot.svg?style=flat-square)
+[![Codecov](https://img.shields.io/codecov/c/github/nschaetti/pytweetbot/master.svg?style=flat-square)](https://codecov.io/gh/nschaetti/pyTweetBot)
+[![Documentation Status](	https://img.shields.io/readthedocs/pytweetbot/latest.svg?style=flat-square)](http://echotorch.readthedocs.io/en/latest/?badge=latest&style=flat-square)
+[![Build Status](https://img.shields.io/travis/nschaetti/pytweetbot/master.svg?style=flat-square)](https://travis-ci.org/nschaetti/pyTweetBot)
+
+This repository consists of:
+
+* pytweetbot.config : Configuration file management;
+* pytweetbot.db : MySQL database management;
+* pytweetbot.directmessages : Twitter direct message functions;
+* pytweetbot.docs : Documentation;
+* pytweetbot.executor : Function and objects to execute actions;
+* pytweetbot.friends : Function and objects to manage friends and followers;
+* pytweetbot.learning : Machine learning functions;
+* pytweetbot.mail : Mail functions;
+* pytweetbot.news : Manage news acquisition and sources;
+* pytweetbot.patterns : Python class patterns;
+* pytweetbot.retweet : Manage retweets and sources;
+* pytweetbot.stats : Statistics;
+* pytweetbot.templates : HTML templates for mail;
+* pytweetbot.tools : Tools;
+* pytweetbot.tweet : Manage tweets;
+* pytweetbot.twitter : Manage access to Twitter;
+
+## Getting started
+
+These instructions will get you a copy of the project up and running
+on your local machine for development and testing purposes.
+See deployment for notes on how to deploy the project on a live system.
+
+### Prerequisites
+
+You need to following package to install pyTweetBot.
+
+* nltk
+* argparse
+* logging
+* tweepy
+* sklearn
+* pygithub
+* brotli
+* httplib2
+* urlparse2
+* HTMLParser
+* bs4
+* simplejson
+* dnspython
+* dill
+* lxml
+* sqlalchemy
+* feedparser
+* textblob
+* numpy
+* scipy
+* mysql-python
 
 ## Installation
 
