@@ -7,11 +7,11 @@ A Twitter bot and library written in Python to replace yourself, search and publ
     <img style='vertical-align: text-bottom !important;' src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Tweet">
 </a>
 
-Join our community to create datasets and deep-learning models! Chat with us on [Gitter](https://gitter.im/EchoTorch/Lobby) and join the [Google Group](https://groups.google.com/forum/#!forum/echotorch/) to collaborate with us.
+Join our community to create datasets and deep-learning models! Chat with us on [Gitter](https://gitter.im/pyTweetBot/Lobby) and join the [Google Group](https://groups.google.com/forum/#!forum/pytweetbot) to collaborate with us.
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytweetbot.svg?style=flat-square)
 [![Codecov](https://img.shields.io/codecov/c/github/nschaetti/pytweetbot/master.svg?style=flat-square)](https://codecov.io/gh/nschaetti/pyTweetBot)
-[![Documentation Status](	https://img.shields.io/readthedocs/pytweetbot/latest.svg?style=flat-square)](http://echotorch.readthedocs.io/en/latest/?badge=latest&style=flat-square)
+[![Documentation Status](	https://img.shields.io/readthedocs/pytweetbot/latest.svg?style=flat-square)](http://pytweetbot.readthedocs.io/en/latest/?badge=latest&style=flat-square)
 [![Build Status](https://img.shields.io/travis/nschaetti/pytweetbot/master.svg?style=flat-square)](https://travis-ci.org/nschaetti/pyTweetBot)
 
 This repository consists of:
