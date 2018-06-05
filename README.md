@@ -78,6 +78,8 @@ You need to following package to install pyTweetBot.
 This project is licensed under the GPLv3 License - see the [LICENSE](LICENSE) file
 for details.
 
+## Configuration
+
 ### Configuration file
 
 pyTweetBot takes its configuration in a JSON file which looks as follow :
