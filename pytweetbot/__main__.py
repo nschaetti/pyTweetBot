@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : __main__.py
-# Description : pyTweetBot main file.
+# File : pyTweetBot.py
+# Description : pyTweetBot main execution file.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -66,7 +66,8 @@ import tools.strings as pystr
 def add_default_arguments(p):
     """
     Add default arguments
-    :param p: Parser to add the argument to.
+    :param parser:
+    :return:
     """
     # Configuration and log
     p.add_argument("--config", type=str, help="Configuration file", required=True)
@@ -79,7 +80,7 @@ def add_default_arguments(p):
 def add_model_argument(p, required):
     """
     Add model argument
-    :param p: Parser to add the argument to.
+    :param p: Parser object
     :param required: Is the model argument required?
     """
     # Model
@@ -121,11 +122,12 @@ def create_logger(name, log_level=logging.INFO, log_format="%(asctime)s :: %(lev
 # end create_logger
 
 
-# Write default configuration file
+# Create config file
 def create_config(config_filename):
     """
-    Write default configuration file.
-    :param config_filename: The path to the configuration file.
+    Create config file
+    :param config_filename:
+    :return:
     """
     # Get template
     empty_config = pkg_resources.resource_string("config", 'config.json')
@@ -141,13 +143,10 @@ def create_config(config_filename):
 ####################################################
 
 
-# Main function
 if __name__ == "__main__":
-    """
-    Main function
-    """
+
     # Argument parser
-    parser = argparse.ArgumentParser(prog="pyTweetBot", description="pyTweetBot - A smart Twitter bot")
+    parser = argparse.ArgumentParser(prog="pyTweetBot", description="pyTweetBot - A smart Twitter bot to replace yourself")
 
     # Command subparser
     command_subparser = parser.add_subparsers(dest="command")
@@ -217,7 +216,7 @@ if __name__ == "__main__":
     train_parser.add_argument("--action", type=str,
                               help="Create a data set (dataset), train or test a model (train/test)")
     train_parser.add_argument("--dataset", type=str, help="Input/output data set file")
-    train_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News to analyze", default=2)
+    train_parser.add_argument("--n-pages", type=int, help="Number of pages on Google News", default=2)
     train_parser.add_argument("--rss", type=str, help="Specific RSS stream to capture", default="")
     train_parser.add_argument("--news", type=str, help="Specific Google News research to capture", default="")
     train_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
@@ -258,6 +257,14 @@ if __name__ == "__main__":
     executor_parser.add_argument("--daemon", action='store_true', help="Run executor in daemon mode", default=False)
     executor_parser.add_argument("--break-time", action='store_true',
                                  help="Show break duration between execution for the current time", default=False)
+    executor_parser.add_argument("--no-follow", action='store_true', help="Do not execute follow actions",
+                                 default=False)
+    executor_parser.add_argument("--no-unfollow", action='store_true', help="Do not execute unfollow actions",
+                                 default=False)
+    executor_parser.add_argument("--no-tweet", action='store_true', help="Do not execute tweet actions", default=False)
+    executor_parser.add_argument("--no-retweet", action='store_true', help="Do not execute retweet actions",
+                                 default=False)
+    executor_parser.add_argument("--no-like", action='store_true', help="Do not execute like actions", default=False)
 
     # GitHub tweets
     github_tweets_parser = command_subparser.add_parser("find-github-tweets")
@@ -380,7 +387,15 @@ if __name__ == "__main__":
         statistics_generator(twitter_connector, args.stats_file, args.n_pages, args.stream, args.info)
     # Executor
     elif args.command == "execute":
-        execute_actions(config, action_scheduler)
+        execute_actions(
+            config,
+            action_scheduler,
+            args.no_tweet,
+            args.no_retweet,
+            args.no_like,
+            args.no_follow,
+            args.no_unfollow
+        )
     # List future action
     elif args.command == "actions":
         list_actions(action_scheduler, args.type)
