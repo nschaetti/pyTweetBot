@@ -41,17 +41,19 @@ class ExecutorThread(Thread):
     """
 
     # Constuctor
-    def __init__(self, config, scheduler, action_type):
+    def __init__(self, config, scheduler, action_type, run_event):
         """
         Constructor
         :param config: BotConfig object containing bot configuration
         :param scheduler: ActionScheduler object
         :param action_type: Which type of action the thread must execute
+        :param run_event: Interrupt event
         """
         # Properties
         self._scheduler = scheduler
         self._action_type = action_type
         self._config = config
+        self._run_event = run_event
 
         # Tread
         Thread.__init__(self)
@@ -68,7 +70,7 @@ class ExecutorThread(Thread):
         :return:
         """
         # Main loop
-        while True:
+        while self._run_event.is_set():
             # Execute actions if awake or wait
             if self._config.is_awake():
                 self()
@@ -77,6 +79,9 @@ class ExecutorThread(Thread):
                 self._wait_next_action()
             # end if
         # end while
+
+        # Log
+        logging.getLogger(pystr.LOGGER).info(u"Shutting down thread for action {}".format(self._action_type))
     # end run
 
     ##############################################
@@ -161,4 +166,3 @@ class ExecutorThread(Thread):
     # end __call__
 
 # end ExecutorThread
-
