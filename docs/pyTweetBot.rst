@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    pyTweetBot.config
+    config
     pyTweetBot.db
     pyTweetBot.directmessages
     pyTweetBot.executor
