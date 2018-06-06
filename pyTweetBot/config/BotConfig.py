@@ -64,11 +64,16 @@ class FieldNotAvailable(Exception):
 # It will check that a field a available when
 # asked for or will raise a FieldNotAvailable exception.
 class BotConfig(object):
-    """
-    This class reads the JSON configuration file and
+    """This class reads the JSON configuration file and
     check that all required field is set.
     It will check that a field a available when
     asked for or will raise a FieldNotAvailable exception.
+
+    .. note:
+        Simple note
+
+    Arguments:
+        data (dict): Configuration data as a dictionary.
     """
 
     # Constructor
@@ -227,6 +232,13 @@ class BotConfig(object):
 
     # Is setting available
     def is_available(self, key):
+        r"""Is a setting available in the loaded configuration?
+
+        Arguments:
+            key: Setting's key in the configuration
+
+        Returns:
+        """
         """
         Is setting available?
         :param key: Key to check the availability
@@ -237,11 +249,18 @@ class BotConfig(object):
 
     # Get a random interval
     def get_random_interval(self, setting):
+        r"""Get a random waiting time for a specific type of actions.
+
+        Arguments:
+            setting: Setting type. Can be tweet, retweet, like, follow, unfollow
+
+        Returns:
+                A time interval as an integer corresponding to the time in seconds.
         """
-        Get a random interval for a specific action type
-        :param setting: Setting type (tweet, retweet, friend)
-        :return: A random interval
-        """
+        # Setting type str or unicode
+        assert isinstance(setting, str) or isinstance(setting, unicode)
+
+        # Which action type
         if setting == "tweet":
             (min_time, max_time) = self.get_current_interval(self.tweet)
         elif setting == "retweet" or setting == "like":

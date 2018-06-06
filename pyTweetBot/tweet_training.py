@@ -23,19 +23,12 @@
 #
 
 # Import
-import argparse
 import logging
 import os
 import datetime
-from config.BotConfig import BotConfig
-from db.DBConnector import DBConnector
-from learning.StatisticalModel import StatisticalModel
-from learning.Statistical2GramModel import Statistical2GramModel
-from learning.TFIDFModel import TFIDFModel
 from bs4 import BeautifulSoup
 import urllib
 import pickle
-from HTMLParser import HTMLParser
 
 ####################################################
 # Functions
@@ -84,7 +77,7 @@ def tweet_training(dataset_file, model_file="", test=False, param='dp', type='st
     :param type: Model's type (stat, tfidf, stat2, textblob)
     """
     # Load model or create
-    if os.path.exists(model_file):
+    """if os.path.exists(model_file):
         model = StatisticalModel.load_from_file(model_file)
     else:
         if type == "stat":
@@ -97,10 +90,10 @@ def tweet_training(dataset_file, model_file="", test=False, param='dp', type='st
                                           last_update=datetime.datetime.utcnow(), smoothing=param,
                                           smoothing_param=0.5)
         # end
-    # end if
+    # end if"""
 
     # Load dataset
-    if os.path.exists(dataset_file):
+    """if os.path.exists(dataset_file):
         with open(dataset_file, 'r') as f:
             dataset = pickle.load(f)
             n_samples = len(dataset[0].keys())
@@ -223,6 +216,6 @@ def tweet_training(dataset_file, model_file="", test=False, param='dp', type='st
         for url in false_positive_urls:
             print(url)
         # end for
-    # end if
+    # end if"""
 
-# end if
+# end tweet_training

@@ -26,7 +26,7 @@
 from sqlalchemy import Column, BigInteger, String, Float, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
-from pytweetbot.db import DBConnector
+from pyTweetBot.db import DBConnector
 from .Base import Base
 from .Model import Model
 

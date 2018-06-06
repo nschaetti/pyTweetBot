@@ -25,7 +25,7 @@
 # Import
 from sqlalchemy import Column, Integer, BigInteger, Enum, and_
 
-from pytweetbot.db import DBConnector
+from pyTweetBot.db import DBConnector
 from .Base import Base
 
 

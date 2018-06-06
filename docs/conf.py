@@ -30,8 +30,11 @@ sys.path.insert(0, os.path.abspath('../pytweetbot'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.githubpages']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.githubpages',
+    'sphinx.ext.viewcode'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -89,7 +92,14 @@ html_theme = 'sphinx_rtd_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'canonical_url': 'https://pytweetbot.readthedocs.io/en/develop/',
+    'collapse_navigation': False,
+    'display_version': True,
+    'logo_only': True
+}
+
+html_logo = "_static/img/pytweetbot.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -106,6 +116,14 @@ html_sidebars = {
         'relations.html',  # needs 'show_related': True theme option to display
         'searchbox.html',
     ]
+}
+
+
+html_context = {
+    'css_files': [
+        'https://fonts.googleapis.com/css?family=Lato',
+        '_static/css/pytweetbot_theme.css'
+    ],
 }
 
 

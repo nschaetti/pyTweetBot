@@ -63,7 +63,11 @@ class NoFactory(Exception):
 # end NoFactory
 
 
-# Manage bot's action
+"""
+Created on 1 January 2018
+@author: Nils Schaetti
+"""
+
 @singleton
 class ActionScheduler(object):
     """
