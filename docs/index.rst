@@ -16,6 +16,7 @@ Welcome to pyTweetBot's documentation!
    :caption: Contents:
 
    about
+   README
 
 
 
