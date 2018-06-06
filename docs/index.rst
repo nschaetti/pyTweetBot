@@ -11,6 +11,9 @@ pyTweetBot documentation
    :maxdepth: 1
    :caption: Notes
 
+   notes/*
+
+
 .. toctree::
    :maxdepth: 1
    :caption: Package Reference
