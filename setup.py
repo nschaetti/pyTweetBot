@@ -1,4 +1,6 @@
-from setuptools import setup
+from setuptools import setup, find_packages
+
+import pyTweetBot
 
 setup(
       name='pyTweetBot',
@@ -15,8 +17,7 @@ setup(
       author_email='n.schaetti@gmail.com',
       license='GPL',
       include_package_data=True,
-      packages=['config', 'db', 'directmessages', 'executor', 'friends', 'learning', 'mail', 'news', 'patterns',
-                'retweet', 'stats', 'templates', 'tools', 'tweet', 'twitter'],
+      packages=find_packages(),
       install_requires=['nltk', 'argparse', 'logging', 'tweepy', 'sklearn', 'pygithub', 'brotli', 'httplib2',
                         'urlparse2', 'HTMLParser', 'bs4', 'simplejson', 'dnspython', 'dill', 'lxml', 'sqlalchemy',
                         'feedparser', 'textblob', 'numpy', 'scipy', 'mysql-python'],
