@@ -119,14 +119,6 @@ html_sidebars = {
 }
 
 
-html_context = {
-    'css_files': [
-        'https://fonts.googleapis.com/css?family=Lato',
-        '_static/css/pytweetbot_theme.css'
-    ],
-}
-
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
