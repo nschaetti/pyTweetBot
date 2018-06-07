@@ -1,7 +1,10 @@
 pyTweetBot.find_github_tweets
 =============================
 
-Find Twitter user to follows accordingly to parameters set in the config file.
+Tweet activities of the repositories of an GitHub account like creation and how many pushes.
+The tweet will look like this :
+
+    I made {n} contributions on {date} to project #{project name}, #GitHub #{project topics}
 
 pyTweetBot.find\_github\_tweets module
 --------------------------------------
