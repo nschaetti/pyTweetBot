@@ -22,14 +22,16 @@
 # along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Imports
+import pyTweetBot.db.obj
 from sqlalchemy import create_engine
 
 
-# Function to create the database
 def create_database(config):
-    """
-    Function to create the database.
-    :param config: The bot configuration object
+    """Function to create the database structure and tables.
+
+    Arguments:
+        config (BotConfig): The bot configuration object
     """
     # Settings
     host = config.database['host']
@@ -42,5 +44,5 @@ def create_database(config):
 
     # Create all tables in  the engine. This is equivalent to "Create Table"
     # statements in raw SQL.
-    pytweetbot.db.obj.Base.metadata.create_all(engine, checkfirst=True)
+    pyTweetBot.db.obj.Base.metadata.create_all(engine, checkfirst=True)
 # end create_database

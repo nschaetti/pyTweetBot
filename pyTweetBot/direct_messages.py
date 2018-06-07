@@ -45,12 +45,16 @@ import tools.strings as pystr
 ####################################################
 
 
-# Send direct message to new followers
 def direct_messages(config):
-    """
-    Send direct messages to new followers
-    :param config:
-    :return:
+    """This function send direct messages to followers
+    if they have not been contacted before.
+
+    Example:
+        $ config = BotConfig.load("config.json")
+        $ direct_messages(config)
+
+    Arguments:
+        config (BotConfig): Bot configuration object
     """
     # Connection to Twitter
     twitter_connector = TweetBotConnector(config)

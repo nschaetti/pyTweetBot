@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    pyTweetBot.learning.features
+    learning.features
 
 Submodules
 ----------

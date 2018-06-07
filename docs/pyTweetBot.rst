@@ -1,53 +1,8 @@
-pyTweetBot package
-==================
-
-Subpackages
------------
-
-.. toctree::
-
-    config
-    pyTweetBot.db
-    pyTweetBot.directmessages
-    pyTweetBot.executor
-    pyTweetBot.friends
-    pyTweetBot.learning
-    pyTweetBot.mail
-    pyTweetBot.news
-    pyTweetBot.patterns
-    pyTweetBot.retweet
-    pyTweetBot.stats
-    pyTweetBot.templates
-    pyTweetBot.tools
-    pyTweetBot.tweet
-    pyTweetBot.twitter
+pyTweetBot submodules
+=====================
 
 Submodules
 ----------
-
-pyTweetBot.convert\_dataset module
-----------------------------------
-
-.. automodule:: pyTweetBot.convert_dataset
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-pyTweetBot.create\_database module
-----------------------------------
-
-.. automodule:: pyTweetBot.create_database
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-pyTweetBot.direct\_messages module
-----------------------------------
-
-.. automodule:: pyTweetBot.direct_messages
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 pyTweetBot.execute\_actions module
 ----------------------------------

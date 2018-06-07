@@ -1,5 +1,5 @@
-pyTweetBot.config
-=================
+pyTweetBot.config package
+=========================
 
 .. automodule:: pyTweetBot.config
 

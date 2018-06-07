@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    pyTweetBot.db
+    db.obj
 
 Submodules
 ----------

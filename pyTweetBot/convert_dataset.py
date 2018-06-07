@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# File : pyTweetBot.py
-# Description : pyTweetBot main execution file.
+# File : convert_dataset.py
+# Description : Convert a dataset from old format to the new one.
 # Auteur : Nils Schaetti <n.schaetti@gmail.com>
 # Date : 01.05.2017 17:59:05
 # Lieu : Nyon, Suisse
@@ -19,8 +19,19 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
+# along with pyTweetBot.  If not, see <http://www.gnu.org/licenses/>.
 #
+"""This file contains a command line tool to convert a dataset from
+the old format to the new one. The old format is composed of two lists
+of URLs and texts. The new dataset format is a Dataset object containing
+texts and class labels. This tool will download all the page's text
+of the URls contained in the old dataset.
+
+Example:
+    Here is a simple example to convert a file::
+
+        $ python convert_dataset.py --input old.p --output new.p
+"""
 
 # Import
 import argparse

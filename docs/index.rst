@@ -36,6 +36,19 @@ pyTweetBot documentation
    tweet
    twitter
 
+.. toctree::
+   :glob:
+   :maxdepth: 1
+   :caption: Submodules
+
+   submodules/*
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Modules
+
+   modules
+
 
 Indices and tables
 ==================
