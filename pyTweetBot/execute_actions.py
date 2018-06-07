@@ -45,9 +45,9 @@ def execute_actions(config, action_scheduler, no_tweet=False, no_retweet=False, 
          >>> execute_actions(config, action_scheduler)
 
     Arguments:
-        config (BotConfig): Bot configuration object
-        action_scheduler (ActionScheduler): Action management object
-        no_tweet (Boolean): Do not execute tweet action
+        * config (BotConfig): Bot configuration object
+        * action_scheduler (ActionScheduler): Action management object
+        * no_tweet (Boolean): Do not execute tweet action
         no_retweet (Boolean): Do not execute retweet action
         no_like (Boolean): Do not execute like action
         no_follow (Boolean): Do not execute follow action
