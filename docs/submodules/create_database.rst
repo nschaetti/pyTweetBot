@@ -7,8 +7,8 @@ structure and tables.
 Example:
     Here is a simple example to create the database::
 
-        $ config = BotConfig.load("config.json")
-        $ create_database(config)
+        >>> config = BotConfig.load("config.json")
+        >>> create_database(config)
 
 pyTweetBot.create\_database module
 ----------------------------------
