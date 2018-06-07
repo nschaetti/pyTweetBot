@@ -25,9 +25,8 @@
 import logging
 import os
 import pickle
-
+import db.obj
 from sqlalchemy import and_, or_
-
 import tools.strings as pystr
 
 
@@ -42,10 +41,10 @@ def import_actions(session, actions):
     # For each action
     for action in actions:
         # Type
-        if session.query(pytweetbot.db.obj.Action).filter(
-                and_(pytweetbot.db.obj.Action.action_type == action.action_type,
-                     pytweetbot.db.obj.Action.action_id == action.action_id,
-                     pytweetbot.db.obj.Action.action_tweet_text == action.action_tweet_text)).count() > 0:
+        if session.query(db.obj.Action).filter(
+                and_(db.obj.Action.action_type == action.action_type,
+                     db.obj.Action.action_id == action.action_id,
+                     db.obj.Action.action_tweet_text == action.action_tweet_text)).count() > 0:
             logging.getLogger(pystr.LOGGER).error(u"Action {} already exists".format(action))
         else:
             # Add
@@ -72,8 +71,8 @@ def import_friends(session, friends):
     # For each friend
     for friend in friends:
         # Exists?
-        if session.query(pytweetbot.db.obj.Friend).filter(and_(
-                        pytweetbot.db.obj.Friend.friend_screen_name == friend.friend_screen_name)):
+        if session.query(db.obj.Friend).filter(and_(
+                        db.obj.Friend.friend_screen_name == friend.friend_screen_name)):
             logging.getLogger(pystr.LOGGER).error(u"Friend {} already exists".format(friend))
         else:
             # Add
@@ -100,7 +99,7 @@ def import_statistics(session, statistics):
     # For each statistics
     for statistic in statistics:
         # Exists?
-        if session.query(pytweetbot.db.obj.Statistic).filter(and_(pytweetbot.db.obj.Statistic.statistic_date)):
+        if session.query(db.obj.Statistic).filter(and_(db.obj.Statistic.statistic_date)):
             logging.getLogger(pystr.LOGGER).error(u"Statistic {} already exists".format(statistic))
         else:
             # Add
@@ -127,8 +126,8 @@ def import_tweets(session, tweets):
     # For each tweets
     for tweet in tweets:
         # Exists?
-        if session.query(pytweetbot.db.obj.Tweeted).filter(or_(pytweetbot.db.obj.Tweeted.tweet_tweet_text == tweet.tweet_tweet_text,
-                                                               pytweetbot.db.obj.Tweeted.tweet_tweet_id == tweet.tweet_tweet_id)).count() > 0:
+        if session.query(db.obj.Tweeted).filter(or_(db.obj.Tweeted.tweet_tweet_text == tweet.tweet_tweet_text,
+                                                    db.obj.Tweeted.tweet_tweet_id == tweet.tweet_tweet_id)).count() > 0:
             logging.getLogger(pystr.LOGGER).error(u"Tweeted {} already exists".format(tweet))
         else:
             # Add

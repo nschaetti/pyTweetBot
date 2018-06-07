@@ -23,37 +23,33 @@
 #
 
 # Import
-import argparse
-import logging
 import os
 import sys
-from config.BotConfig import BotConfig
-from db.DBConnector import DBConnector
-from tweet.RSSHunter import RSSHunter
-from tweet.GoogleNewsHunter import GoogleNewsHunter
-from tweet.TweetFinder import TweetFinder
-from retweet.RetweetFinder import RetweetFinder
 from twitter.TweetBotConnect import TweetBotConnector
-import pickle
 import time
 from learning.Dataset import Dataset
-
-####################################################
-# Main function
-####################################################
+import tools.strings as pystr
 
 
 # Create a dataset or add data from a list of Twitter users
 def follower_dataset(twitter_connect, dataset_file, info, source='followers', text_size=50):
-    """
-    Create a dataset or add data from a list of Twitter users.
-    :param dataset_file:
-    :param info:
-    :return:
+    """Create a dataset or add textual data from a list of Twitter users.
+
+    Example:
+        >>> config = BotConfig.load("config.json")
+        >>> twitter_connector = TweetBotConnector(config)
+        >>> follower_dataset(twitter_connect, "dataset.p", False, 'followers')
+
+    Arguments:
+        * twitter_connect (TweetBotConnector): Twitter bot connector object of type :class:`pyTweetBot.twitter.TweetBotConnect`
+        * dataset_file (str): Path to the dataset file to load or create.
+        * info (bool): If True, show information about the dataset and exit
+        * source (str): Can be 'follower' or 'following'. Set where to load users from.
+        * text_size (int): Minimum user's description length to take the profile into account.
     """
     # Load or create dataset
     if os.path.exists(dataset_file):
-        print(u"Opening dataset file {}".format(dataset_file))
+        print(pystr.INFO_OPENING_DATASET_FILE.format(dataset_file))
         dataset = Dataset.load(dataset_file)
     else:
         dataset = Dataset()
@@ -71,7 +67,7 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
     elif source == 'following':
         cursor = twitter_connect.get_following_cursor()
     else:
-        sys.stderr.write(u"Unknown source {}\n".format(source))
+        sys.stderr.write(pystr.ERROR_UNKNOWN_SOURCE.format(source))
         exit()
     # end if
 
@@ -82,9 +78,9 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
             # Minimum text length
             if len(user.description) >= text_size and not dataset.is_in(user.description):
                 # Ask
-                print(u"Would you classify the following element as negative(n) or positive(p)?")
-                print(u"Text : {}".format(user.description))
-                observed = raw_input(u"Positive or negative (p/n) (q for quit, s for skip) : ").lower()
+                print(pystr.DIALOG_CLASS_LABEL)
+                print(pystr.DIALOG_USER_DESCRIPTION.format(user.description))
+                observed = raw_input(pystr.DIALOG_INPUT_CLASS_LABEL).lower()
 
                 # Add as example
                 if observed == 'q':
@@ -103,7 +99,7 @@ def follower_dataset(twitter_connect, dataset_file, info, source='followers', te
         # end for
 
         # Wait 1 minutes for the next page
-        print(u"Waiting 1 minutes for the next page (Twitter rate limit)")
+        print(pystr.INFO_TWITTER_WAIT)
         time.sleep(60)
     # end for
 

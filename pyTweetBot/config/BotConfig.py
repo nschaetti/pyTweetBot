@@ -99,9 +99,10 @@ class BotConfig(object):
     # Get database settings
     @property
     def database(self):
-        """
-        Get database settings
-        :return: Database settings (username, password, database)
+        """Get database settings
+
+        Returns:
+            Database settings (username, password, database)
         """
         return self['database']
     # end database_config
@@ -109,9 +110,10 @@ class BotConfig(object):
     # Get Twitter settings
     @property
     def twitter(self):
-        """
-        Get Twitter settings
-        :return:
+        """Get Twitter settings
+
+        Returns:
+            Twitter settings (tokens)
         """
         return self['twitter']
     # end twitter
@@ -119,9 +121,10 @@ class BotConfig(object):
     # Get friends settings
     @property
     def friends(self):
-        """
-        Get friends settings
-        :return:
+        """Get friends settings
+
+        Returns:
+            Friends settings
         """
         return self['friends']
     # end friends
