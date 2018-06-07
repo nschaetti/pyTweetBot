@@ -50,8 +50,8 @@ def direct_messages(config):
     if they have not been contacted before.
 
     Example:
-        $ config = BotConfig.load("config.json")
-        $ direct_messages(config)
+        >>> config = BotConfig.load("config.json")
+        >>> direct_messages(config)
 
     Arguments:
         config (BotConfig): Bot configuration object
