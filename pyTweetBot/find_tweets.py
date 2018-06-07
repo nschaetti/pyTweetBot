@@ -26,7 +26,6 @@
 import logging
 import os
 import pickle
-
 import learning
 import tools.strings as pystr
 import tweet as tw
@@ -37,30 +36,21 @@ from tweet.RSSHunter import RSSHunter
 from tweet.TweetFinder import TweetFinder
 
 
-####################################################
-# Globals
-####################################################
-
-
-####################################################
-# Functions
-####################################################
-
-
-####################################################
-# Main function
-####################################################
-
-
 # Find new tweets from various sources
 def find_tweets(config, model_file, action_scheduler, n_pages=2, threshold=0.5):
-    """
-    Find tweet in the hunters
-    :param config: BotConfig configuration object
-    :param model_file: Path to model file for classification
-    :param action_scheduler: Scheduler object
-    :param n_pages: Number of pages to analyze
-    :param threshold: Probability threshold to be accepted as tweet
+    """Find tweet from Google News and RSS streams.
+
+    Examples:
+        >>> config = BotConfig.load("config.json")
+        >>> action_scheduler = ActionScheduler(config=config)
+        >>> find_tweets(config, "model.p", action_scheduler)
+
+    Arguments:
+        * config (BotConfig): BotConfig configuration object of type :class:`pyTweetBot.config.BotConfig`
+        * model_file (str): Path to model file for classification
+        * action_scheduler (ActionScheduler): Scheduler object of type :class:`pyTweetBot.executor.ActionScheduler`
+        * n_pages (int): Number of pages to analyze
+        * threshold (float): Probability threshold to be accepted as tweet
     """
     # Tweet finder
     tweet_finder = TweetFinder(shuffle=True)

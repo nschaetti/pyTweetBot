@@ -46,7 +46,7 @@ def prepare_project_name(project_name):
     """Replace - by space in the project name and put the first letter of each word to uppercase.
 
     Arguments:
-        * project_name: GitHub project's name
+        * project_name (unicode): GitHub project's name
 
     Returns:
         The cleaned project name

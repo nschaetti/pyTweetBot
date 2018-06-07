@@ -19,7 +19,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License
-# along with pyTweetBar.  If not, see <http://www.gnu.org/licenses/>.
+# along with pyTweetBot.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 # Import
@@ -32,28 +32,19 @@ import tools.strings as pystr
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
 
 
-####################################################
-# Globals
-####################################################
-
-####################################################
-# Functions
-####################################################
-
-####################################################
-# Main function
-####################################################
-
-
 # Find user to unfollow to and add it to the DB
 def find_unfollows(config, friends_manager, model_file, action_scheduler, threshold=0.5):
-    """
-    Find tweet to like and add it to the DB
-    :param config: Bot configuration object.
-    :param friends_manager: Friend manager object.
-    :param model_file: Path to the model's Pickle file.
-    :param action_scheduler: Action scheduler object.
-    :param threshold: Probability threshold to accept unfollow.
+    """Find Twitter users to unfollow according to the parameters in the configuration file.
+
+    Example:
+        >>> find_unfollows()
+
+    Arguments:
+        * config (BotConfig): Bot configuration object of type :class:`pyTweetBot.config.BotConfig`
+        * friends_manager (FriendsManager): Friend manager object of type :class:`pyTweetBot.friends.FriendsManager`
+        * model_file (str): Path to the model's Pickle file.
+        * action_scheduler (ActionScheduler): Action scheduler object.
+        * threshold (float): Probability threshold to accept unfollow.
     """
     # Load censor
     censor = learning.CensorModel.load_censor(config)

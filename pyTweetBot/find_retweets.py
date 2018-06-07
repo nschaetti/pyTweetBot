@@ -26,7 +26,6 @@
 import logging
 import os
 import pickle
-
 import learning
 import tools.strings as pystr
 from db.obj.Tweeted import Tweeted
@@ -34,29 +33,21 @@ from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExis
 from retweet.RetweetFinder import RetweetFinder
 
 
-####################################################
-# Globals
-####################################################
-
-####################################################
-# Functions
-####################################################
-
-####################################################
-# Main function
-####################################################
-
-
 # Find retweets and add it to the DB
 def find_retweets(config, model_file, action_scheduler, text_size=80, threshold=0.5):
-    """
-    Find retweets and add it to the DB
-    :param config:
-    :param model_file:
-    :param action_scheduler:
-    :param text_size:
-    :param threshold:
-    :return:
+    """Find tweets to retweet from search terms set in the config file.
+
+    Example:
+        >>> config = BotConfig.load("config.json")
+        >>> action_scheduler = ActionScheduler(config=config)
+        >>> find_retweets(config, "model.p", action_scheduler)
+
+    Arguments:
+        * config (BotConfig): Bot configuration object of type :class:`pyTweetBot.config.BotConfig`
+        * model_file (str): Path to the file containing the classifier model
+        * action_scheduler (ActionScheduler): Action scheduler object of type :class:`pyTweetBot.executor.ActionScheduler`
+        * text_size (int): Minimum text length to take a tweet into account
+        * threshold (float): Minimum to reach to be classified as positive
     """
     # Retweet finders
     retweet_finders = list()
