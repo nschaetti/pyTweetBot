@@ -44,10 +44,13 @@ from twitter.TweetBotConnect import TweetBotConnector
 
 # Prepare project name
 def prepare_project_name(project_name):
-    """
-    Prepare the project's name
-    :param project_name: GitHub project's name
-    :return: The project's name prepared
+    """Replace - by space in the project name and put the first letter of each word to uppercase.
+
+    Arguments:
+        * project_name: GitHub project's name
+
+    Returns:
+        The cleaned project name
     """
     project_name = project_name.replace(u'-', u' ')
     if u' ' in project_name:
@@ -59,14 +62,17 @@ def prepare_project_name(project_name):
 
 # Create tweet text
 def create_tweet_text(contrib_counter, contrib_date, project_name, project_url, topics):
-    """
-    Create tweet's text for push event
-    :param contrib_counter: Number of contributions
-    :param contrib_date: Date of the push
-    :param project_name: GitHub project's name
-    :param project_url: GitHub project's URL
-    :param topics: GitHub poject's topics
-    :return: The created text.
+    """Create the tweet's text for a git push event.
+
+    Arguments:
+        * contrib_counter (int): Number of contributions
+        * contrib_date (datetime): Date of the push
+        * project_name (unicode): GitHub project's name
+        * project_url (str): GitHub project's URL
+        * topics (list): GitHub project's topics
+
+    Returns:
+        The tweet's text.
     """
     # Tweet text
     tweet_text = u"I made {} contributions on {} to project #{}, #GitHub".format\
@@ -91,13 +97,16 @@ def create_tweet_text(contrib_counter, contrib_date, project_name, project_url, 
 
 # Create tweet text for repo creation
 def create_tweet_text_create(project_name, project_description, project_url, topics):
-    """
-    Create tweet text for repo creation
-    :param project_name: GitHub project's name
-    :param project_description: GitHub project's description
-    :param project_url: GitHub project's URL
-    :param topics: GitHub project's topics.
-    :return: The created text.
+    """Create tweet's text for a git repository creation.
+
+    Arguments:
+        * project_name (unicode): GitHub project's name
+        * project_description (unicode): GitHub project's description
+        * project_url (unicode): GitHub project's URL
+        * topics (list): GitHub project's topics.
+
+    Returns:
+        :return: The created text.
     """
     # Tweet text
     tweet_text = u"Check my project {} on #GitHub : {}".format \
@@ -131,11 +140,14 @@ def create_tweet_text_create(project_name, project_description, project_url, top
 
 # Add tweet to scheduler
 def add_tweet(action_scheduler, tweet_text):
-    """
-    Add tweet to scheduler
-    :param action_scheduler: The action scheduler object
-    :param tweet_text: Text to tweet
-    :return: True if ok, False if problem.
+    """Add tweet through the scheduler
+
+    Arguments:
+        * action_scheduler: The action scheduler object
+        * tweet_text: Text to tweet
+
+    Returns:
+        * True if ok, False if problem.
     """
     # Add to scheduler
     try:
