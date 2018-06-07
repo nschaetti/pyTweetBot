@@ -31,11 +31,14 @@ import tools.strings as pystr
 
 # Function to export the database
 def export_database(output_dir, mysql_connector):
-    """
-    Function to export the database
-    :param output_dir:
-    :param mysql_connector:
-    :return:
+    """Export a database from a MySQL database to a series of files.
+
+    Example:
+        >>> export_database(".", mysql_connector)
+
+    Arguments:
+        * output_dir (str): The output directory path
+        * mysql_connector (DBConnector) : A connector object of type :class:`pyTweetBot.db.DBConnector`
     """
     # Files
     actions_file = os.path.join(output_dir, u"actions.p")
