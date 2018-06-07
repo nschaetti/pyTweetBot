@@ -25,6 +25,7 @@
 import logging
 import os
 import pickle
+import pyTweetBot.db.obj
 
 import tools.strings as pystr
 
@@ -51,10 +52,10 @@ def export_database(output_dir, mysql_connector):
     mysql_session = mysql_connector.get_session()
 
     # Get from database
-    actions = mysql_session.query(pytweetbot.db.obj.Action).all()
-    friends = mysql_session.query(pytweetbot.db.obj.Friend).all()
-    statistics = mysql_session.query(pytweetbot.db.obj.Statistic).all()
-    tweets = mysql_session.query(pytweetbot.db.obj.Tweeted).all()
+    actions = mysql_session.query(pyTweetBot.db.obj.Action).all()
+    friends = mysql_session.query(pyTweetBot.db.obj.Friend).all()
+    statistics = mysql_session.query(pyTweetBot.db.obj.Statistic).all()
+    tweets = mysql_session.query(pyTweetBot.db.obj.Tweeted).all()
 
     # Save all
     logging.getLogger(pystr.LOGGER).info(u"Exporting data to {}".format(output_dir))

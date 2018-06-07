@@ -26,10 +26,9 @@
 import logging
 import random
 import time
-
 import tweepy
-
 import learning
+import db.obj
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
 from twitter.TweetBotConnect import TweetBotConnector
 
@@ -45,14 +44,14 @@ from twitter.TweetBotConnect import TweetBotConnector
 
 # Add follow action
 def add_follow_action(action_scheduler, friend):
-    """
-    Add follow action
-    :param action_scheduler: Action scheduler object
-    :param friend: Friend to add as a db.obj.Friend or tweepy.User object
-    :return:
+    """Add a follow action through the scheduler.
+
+    Arguments:
+        * action_scheduler (ActionScheduler): An action scheduler objet of type :class:`pyTweetBot.executor.ActionScheduler`
+        * friend (Friend of tweepy.User): A friend object (:class:`pyTweetBot.db.obj.Friend`) or a tweepy.User object.
     """
     try:
-        if type(friend) is pytweetbot.db.obj.Friend:
+        if type(friend) is db.obj.Friend:
             logging.getLogger(u"pyTweetBot").info(
                 u"Adding Friend \"{}\" to follow to the scheduler".format(friend.friend_screen_name))
             action_scheduler.add_follow(friend.friend_screen_name)
@@ -66,7 +65,7 @@ def add_follow_action(action_scheduler, friend):
         exit()
         pass
     except ActionAlreadyExists:
-        if type(friend) is pytweetbot.db.obj.Friend:
+        if type(friend) is db.obj.Friend:
             logging.getLogger(u"pyTweetBot").error(
                 u"Follow action for \"{}\" already exists in the database".format(
                     friend.friend_screen_name))
@@ -86,15 +85,19 @@ def add_follow_action(action_scheduler, friend):
 
 # Find user to follow to and add it to the DB
 def find_follows(config, model, action_scheduler, friends_manager, text_size, n_pages=20, threshold=0.5):
-    """
-    Find tweet to like and add it to the DB
-    :param config: Bot's configuration object
-    :param model: Classification model's file
-    :param action_scheduler: Action scheduler object
-    :param friends_manager: Friends manager object
-    :param text_size: Minimum text size to be accepted
-    :param n_pages: Number of pages to search for each term
-    :param threshold: Minimum probability to accept following
+    """Find Twitter user to follows accordingly to parameters set in the config file.
+
+    Example:
+        >>> find_follows()
+
+    Arguments:
+        * config: Bot's configuration object
+        * model: Classification model's file
+        * action_scheduler: Action scheduler object
+        * friends_manager: Friends manager object
+        * text_size: Minimum text size to be accepted
+        * n_pages: Number of pages to search for each term
+        * threshold: Minimum probability to accept following
     """
     # Load model
     tokenizer, bow, model, censor = learning.Classifier.load_model(config, model)
