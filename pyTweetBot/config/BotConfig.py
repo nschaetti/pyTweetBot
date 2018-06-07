@@ -39,8 +39,7 @@ from .required_fields import required_fields
 
 # Exception raised when a required field is missing
 class MissingRequiredField(Exception):
-    """
-    Exception raised when a required field is missing
+    """Exception raised when a required field is missing
     """
     pass
 # end MissingRequiredField
@@ -48,8 +47,7 @@ class MissingRequiredField(Exception):
 
 # Field not available
 class FieldNotAvailable(Exception):
-    """
-    Field is not available
+    """Field is not available
     """
     pass
 # end FieldNotAvailable
@@ -78,10 +76,6 @@ class BotConfig(object):
 
     # Constructor
     def __init__(self, data):
-        """
-        Constructor
-        :param data: Settings read from JSON file as a dictionary
-        """
         # Check required fields
         config_ok, missing_field = self._check_config(data)
         if not config_ok:
@@ -101,7 +95,7 @@ class BotConfig(object):
     def database(self):
         """
         Returns:
-            Database settings (username, password, database)
+            Database configuration (username, password, database)
         """
         return self['database']
     # end database_config
@@ -111,7 +105,7 @@ class BotConfig(object):
     def twitter(self):
         """
         Returns:
-            Twitter settings (tokens)
+            Twitter configuration (dict)
         """
         return self['twitter']
     # end twitter
@@ -121,7 +115,7 @@ class BotConfig(object):
     def friends(self):
         """
         Returns:
-            Friends settings
+            Friends configuration (dict)
         """
         return self['friends']
     # end friends
@@ -131,7 +125,7 @@ class BotConfig(object):
     def hashtags(self):
         """
         Returns:
-            Hashtags settings
+            Hashtags configuration (dict)
         """
         return self['hashtags']
     # end hashtags
@@ -140,8 +134,8 @@ class BotConfig(object):
     @property
     def direct_message(self):
         """
-        Get direct message config
-        :return:
+        Returns:
+            Direct message configuration (dict)
         """
         return self['direct_message']
     # end direct_message
@@ -150,8 +144,8 @@ class BotConfig(object):
     @property
     def tweet(self):
         """
-        Get tweet settings
-        :return:
+        Returns:
+            Tweet settings configuration (dict)
         """
         return self['tweet']
     # end tweet
@@ -160,8 +154,8 @@ class BotConfig(object):
     @property
     def rss(self):
         """
-        Get RSS streams
-        :return:
+        Returns:
+            RSS streams configuration (dict)
         """
         return self['rss']
     # end rss
@@ -170,8 +164,8 @@ class BotConfig(object):
     @property
     def google_news(self):
         """
-        Get Google News settings
-        :return:
+        Returns:
+            Google News configuration (dict)
         """
         return self['news']
     # end google_news
@@ -180,8 +174,8 @@ class BotConfig(object):
     @property
     def forbidden_words(self):
         """
-        Get forbidden words
-        :return:
+        Returns:
+            Forbidden words configuration (dict)
         """
         return self['forbidden_words']
     # end forbidden_words
@@ -190,8 +184,8 @@ class BotConfig(object):
     @property
     def retweet(self):
         """
-        Get retweet settings
-        :return:
+        Returns:
+            Retweet configuration (dict)
         """
         return self['retweet']
     # end retweet
@@ -200,8 +194,8 @@ class BotConfig(object):
     @property
     def email(self):
         """
-        Get email address
-        :return:
+        Returns:
+            Email address configuration (dict)
         """
         return self['email']
     # end email
@@ -210,8 +204,8 @@ class BotConfig(object):
     @property
     def scheduler(self):
         """
-        Get scheduler config
-        :return:
+        Returns:
+            Scheduler configuration (dict)
         """
         return self['scheduler']
     # end scheduler
@@ -220,8 +214,8 @@ class BotConfig(object):
     @property
     def github(self):
         """
-        Get GitHub config
-        :return:
+        Returns:
+            GitHub configuration (dict)
         """
         return self['github']
     # end github
@@ -248,7 +242,7 @@ class BotConfig(object):
             setting (str): Setting type. Can be tweet, retweet, like, follow, unfollow
 
         Returns:
-                A time interval as an integer corresponding to the time in seconds.
+            A time interval as an integer corresponding to the time in seconds.
         """
         # Setting type str or unicode
         assert isinstance(setting, str) or isinstance(setting, unicode)
