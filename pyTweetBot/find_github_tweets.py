@@ -25,12 +25,11 @@
 # Import
 import logging
 import time
-
 from github import Github
-
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
 from tweet.TweetFactory import TweetFactory
 from twitter.TweetBotConnect import TweetBotConnector
+import db.obj
 
 
 ####################################################
@@ -170,15 +169,18 @@ def add_tweet(action_scheduler, tweet_text):
 
 # Tweet something or add it to the database
 def compute_tweet(tweet_text, action_scheduler, instantaneous):
-    """
-    Tweet something or add it to the database.
-    :param tweet_text: The text to tweet.
-    :param action_scheduler: Action scheduler object
-    :param instantaneous: Tweet directly or add it to the DB.
-    :return: True if tweeted/added, False otherwise.
+    """Tweet something directly or add it to the database.
+
+    Arguments:
+        * tweet_text (unicode): The text to tweet.
+        * action_scheduler (ActionScheduler): Action scheduler object of type (:class:`pyTweetBot.executor.ActionScheduler`)
+        * instantaneous (bool): Tweet directly (True) or add it to the DB.
+
+    Returns:
+        * True if tweeted/added, False if already in the database.
     """
     # if not instantaneous
-    if not pytweetbot.db.obj.Tweeted.exists(tweet_text):
+    if not db.obj.Tweeted.exists(tweet_text):
         if not instantaneous:
             if not add_tweet(action_scheduler, tweet_text):
                 return False
@@ -186,7 +188,7 @@ def compute_tweet(tweet_text, action_scheduler, instantaneous):
         else:
             # TODO: Tweeted should be insert in TweetBotConnector.tweet()
             TweetBotConnector().tweet(tweet_text)
-            pytweetbot.db.obj.Tweeted().insert_tweet(tweet_text)
+            db.obj.Tweeted().insert_tweet(tweet_text)
         # end if
     else:
         return False
@@ -201,14 +203,15 @@ def compute_tweet(tweet_text, action_scheduler, instantaneous):
 
 # Add tweets about GitHub activities to the database, or tweet it directly
 def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, instantaneous=False, waiting_time=0):
-    """
-    Add tweets about GitHub activities to the database, or tweet it directly.
-    :param config: Bot config object.
-    :param action_scheduler: Action scheduler object.
-    :param event_type: Type of event to tweet (push or create)
-    :param depth: Number of tweets to find.
-    :param instantaneous: Tweet the information instantaneously or not (to DB)?
-    :param waiting_time: Waiting time between each tweets (for instantaneous tweeting)
+    """Add tweets based on GitHub activities to the database, or tweet it directly.
+
+    Arguments:
+        * config (BotConfig): Bot config object of type :class:`pyTweetBot.config.BotConfig`
+        * action_scheduler (ActonScheduler): Action scheduler object of type :class:`pyTweetBot.executor.ActionScheduler`
+        * event_type (str): Type of event to tweet (push or create)
+        * depth (int): Number of events to tweet for each repository.
+        * instantaneous: Tweet the information instantaneously or not (to DB)?
+        * waiting_time: Waiting time between each tweets (for instantaneous tweeting)
     """
     # Github settings
     github_settings = config.github
@@ -291,5 +294,4 @@ def find_github_tweets(config, action_scheduler, event_type="push", depth=-1, in
             # end for
         # end if
     # end for
-
 # end if
