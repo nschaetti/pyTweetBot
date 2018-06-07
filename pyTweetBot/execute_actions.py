@@ -37,16 +37,21 @@ import time
 
 # Execute actions
 def execute_actions(config, action_scheduler, no_tweet=False, no_retweet=False, no_like=False, no_follow=False, no_unfollow=False):
-    """
-    Execute actions
-    :param config:
-    :param action_scheduler:
-    :param no_tweet:
-    :param no_retweet:
-    :param no_like:
-    :param no_follow:
-    :param no_unfollow:
-    :return:
+    """Launch threads that will execute each action thread.
+
+    Examples:
+         >>> config = BotConfig.load("config.json")
+         >>> action_scheduler = ActionScheduler(config=config)
+         >>> execute_actions(config, action_scheduler)
+
+    Arguments:
+        config (BotConfig): Bot configuration object
+        action_scheduler (ActionScheduler): Action management object
+        no_tweet (Boolean): Do not execute tweet action
+        no_retweet (Boolean): Do not execute retweet action
+        no_like (Boolean): Do not execute like action
+        no_follow (Boolean): Do not execute follow action
+        no_unfollow (Boolean): Do not execute unfollow action
     """
     # List of threads
     thread_queue = Queue()
