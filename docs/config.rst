@@ -7,6 +7,7 @@ How to use the config package
 -----------------------------
 
 Bla bla :mod:`pyTweetBot.config`
+:class:`pyTweetBot.config.BotConfig`
 
 Construction
 ^^^^^^^^^^^^
