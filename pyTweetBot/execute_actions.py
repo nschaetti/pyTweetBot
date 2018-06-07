@@ -45,7 +45,7 @@ def execute_actions(config, action_scheduler, no_tweet=False, no_retweet=False, 
          >>> execute_actions(config, action_scheduler)
 
     Arguments:
-        * config (BotConfig): Bot configuration of :class:`pyTweetBot.config.Botconfig`.
+        * config (BotConfig): Bot configuration of :class:`config.Botconfig`.
         * action_scheduler (ActionScheduler): Action management object
         * no_tweet (Boolean): Do not execute tweet action
         no_retweet (Boolean): Do not execute retweet action
