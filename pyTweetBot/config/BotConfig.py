@@ -99,8 +99,7 @@ class BotConfig(object):
     # Get database settings
     @property
     def database(self):
-        """Get database settings
-
+        """
         Returns:
             Database settings (username, password, database)
         """
@@ -110,8 +109,7 @@ class BotConfig(object):
     # Get Twitter settings
     @property
     def twitter(self):
-        """Get Twitter settings
-
+        """
         Returns:
             Twitter settings (tokens)
         """
@@ -121,8 +119,7 @@ class BotConfig(object):
     # Get friends settings
     @property
     def friends(self):
-        """Get friends settings
-
+        """
         Returns:
             Friends settings
         """
@@ -133,8 +130,8 @@ class BotConfig(object):
     @property
     def hashtags(self):
         """
-        Get hashtags settins
-        :return:
+        Returns:
+            Hashtags settings
         """
         return self['hashtags']
     # end hashtags
@@ -238,14 +235,7 @@ class BotConfig(object):
         r"""Is a setting available in the loaded configuration?
 
         Arguments:
-            key: Setting's key in the configuration
-
-        Returns:
-        """
-        """
-        Is setting available?
-        :param key: Key to check the availability
-        :return: True if available, False otherwise
+            key (str): Setting's key in the configuration
         """
         return key in self._config
     # end is_available
@@ -255,7 +245,7 @@ class BotConfig(object):
         r"""Get a random waiting time for a specific type of actions.
 
         Arguments:
-            setting: Setting type. Can be tweet, retweet, like, follow, unfollow
+            setting (str): Setting type. Can be tweet, retweet, like, follow, unfollow
 
         Returns:
                 A time interval as an integer corresponding to the time in seconds.
@@ -284,10 +274,13 @@ class BotConfig(object):
 
     # Get current interval
     def get_current_interval(self, setting):
-        """
-        Get current interval
-        :param setting:
-        :return:
+        """Get the interval between actions for the current date and time.
+
+        Arguments:
+            setting (dict): The section containing interval data as a dictionary.
+
+        Returns:
+            A list (list) with the minimum and maximum time in seconds of the current interval.
         """
         if 'intervals' in setting.keys():
             # For each intervals
@@ -307,9 +300,10 @@ class BotConfig(object):
 
     # Wait between action
     def wait_next_action(self, setting):
-        """
-        Wait next action
-        :param setting: Setting type (tweet, retweet, friend)
+        """Wait for a random period corresponding to the current interval of an action type.
+
+        Arguments:
+            * setting (dict): Setting type (tweet, retweet, friend) containing an interval field.
         """
         # Waiting time
         waiting_seconds = self.get_random_interval(setting)
@@ -324,9 +318,10 @@ class BotConfig(object):
 
     # Is the scheduler awake?
     def is_awake(self):
-        """
-        Is the scheduler awake?
-        :return: True if awake, False otherwise
+        """Is the scheduler awake or asleep?
+
+        Returns:
+            True if awake, False otherwise
         """
         # Sleep time
         try:
@@ -348,11 +343,13 @@ class BotConfig(object):
 
     # Check if required fields are available
     def _check_config(self, data):
-        """
-        Check if required field are available
-        :param data: Setting dictionary
-        :param required_fields: Dictionary of required fields
-        :return: True if required field present, False otherwise
+        """Check if a required field are available
+
+        Arguments:
+            * data (dict): Setting dictionary
+
+        Returns:
+            A boolean (True) if required field present, A tupple with False and the missing field otherwise
         """
         for key in required_fields.keys():
             if key not in data.keys():
@@ -370,10 +367,16 @@ class BotConfig(object):
 
     # Get a setting item
     def __getitem__(self, item):
-        """
-        Get setting item
-        :param item: Setting key
-        :return: The setting value
+        """Get setting item
+
+        Arguments:
+            * item (str): Setting key
+
+        Returns:
+            The setting value
+
+        Raise:
+            FieldNotAvailable
         """
         try:
             return self._config[item]
@@ -393,10 +396,13 @@ class BotConfig(object):
     # Load configuration file.
     @staticmethod
     def load(config_file):
-        """
-        Load the configuration file
-        :param config_file: Configuration filename.
-        :return: PyTweetBotConfig object.
+        """Load the configuration file
+
+        Arguments:
+            * config_file (str): Path to configuration file
+
+        Returns:
+            Bot configuration object of type :class:`pyTweetBot.config.BotConfig`.
         """
         with open(config_file, 'r') as json_file:
             data = simplejson.load(json_file)
