@@ -34,6 +34,7 @@ def export_database(output_dir, mysql_connector):
     """Export a database from a MySQL database to a series of files.
 
     Example:
+        >>> mysql_connector = DBConnector(host="localhost", username="test", password="pass", db_name="pytb")
         >>> export_database(".", mysql_connector)
 
     Arguments:
