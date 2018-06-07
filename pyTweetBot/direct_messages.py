@@ -54,7 +54,7 @@ def direct_messages(config):
         >>> direct_messages(config)
 
     Arguments:
-        config (BotConfig): Bot configuration object
+        config (BotConfig): Bot configuration object of type :class:`pyTweetBot.config.BotConfig`
     """
     # Connection to Twitter
     twitter_connector = TweetBotConnector(config)

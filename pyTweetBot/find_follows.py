@@ -31,6 +31,7 @@ import learning
 import db.obj
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
 from twitter.TweetBotConnect import TweetBotConnector
+import tools.strings as pystr
 
 
 ####################################################
@@ -52,27 +53,21 @@ def add_follow_action(action_scheduler, friend):
     """
     try:
         if type(friend) is db.obj.Friend:
-            logging.getLogger(u"pyTweetBot").info(
-                u"Adding Friend \"{}\" to follow to the scheduler".format(friend.friend_screen_name))
+            logging.getLogger(pystr.LOGGER).info(pystr.INFO_ADD_FOLLOW_SCHEDULER.format(friend.friend_screen_name))
             action_scheduler.add_follow(friend.friend_screen_name)
         elif type(friend) is tweepy.User:
-            logging.getLogger(u"pyTweetBot").info(
-                u"Adding Friend \"{}\" to follow to the scheduler".format(friend.screen_name))
+            logging.getLogger(pystr.LOGGER).info(pystr.INFO_ADD_FOLLOW_SCHEDULER.format(friend.screen_name))
             action_scheduler.add_follow(friend.screen_name)
         # end if
     except ActionReservoirFullError:
-        logging.getLogger(u"pyTweetBot").error(u"Reservoir full for follow action, exiting...")
+        logging.getLogger(pystr.LOGGER).error(pystr.ERROR_RESERVOIR_FULL_FOLLOW)
         exit()
         pass
     except ActionAlreadyExists:
         if type(friend) is db.obj.Friend:
-            logging.getLogger(u"pyTweetBot").error(
-                u"Follow action for \"{}\" already exists in the database".format(
-                    friend.friend_screen_name))
+            logging.getLogger(pystr.LOGGER).error(pystr.ERROR_FOLLOW_ALREADY_DB.format(friend.friend_screen_name))
         elif type(friend) is tweepy.User:
-            logging.getLogger(u"pyTweetBot").error(
-                u"Follow action for \"{}\" already exists in the database".format(
-                    friend.screen_name))
+            logging.getLogger(pystr.LOGGER).error(pystr.ERROR_FOLLOW_ALREADY_DB.format(friend.screen_name))
         # end if
         pass
     # end try
@@ -88,7 +83,8 @@ def find_follows(config, model, action_scheduler, friends_manager, text_size, n_
     """Find Twitter user to follows accordingly to parameters set in the config file.
 
     Example:
-        >>> find_follows()
+        >>> config = BotConfig.load("config.json")
+        >>> find_follows(config, model, action_scheduler, friends_manager, 50)
 
     Arguments:
         * config: Bot's configuration object
@@ -127,7 +123,7 @@ def find_follows(config, model, action_scheduler, friends_manager, text_size, n_
     # For each channel research for new friends
     for search_keyword in search_keywords:
         # Log
-        logging.getLogger(u"pyTweetBot").info(u"Search new possible friends in the stream {}".format(search_keyword))
+        logging.getLogger(pystr.LOGGER).info(pystr.INFO_RESEARCH_FRIEND_STREAM.format(search_keyword))
 
         # Research this keyword
         cursor = TweetBotConnector().search_tweets(search_keyword, n_pages)
@@ -155,7 +151,7 @@ def find_follows(config, model, action_scheduler, friends_manager, text_size, n_
             # end for
 
             # Wait 1 minute
-            logging.getLogger(u"pyTweetBot").info(u"Waiting for 1 minute (Twitter limits)")
+            logging.getLogger(pystr.LOGGER).info(pystr.INFO_TWITTER_WAIT)
             time.sleep(60)
         # end for
     # end for

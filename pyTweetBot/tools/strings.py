@@ -34,10 +34,12 @@ ERROR_PARSING_CONFIG_FILE = u"Error parsing configuration file : {}\n"
 
 # Reservoir full
 ERROR_RESERVOIR_FULL = u"Reservoir full for Tweet action, exiting..."
+ERROR_RESERVOIR_FULL_FOLLOW = u"Reservoir full for follow action, exiting..."
 
 # Tweet already in DB
 ERROR_TWEET_ALREADY_DB = u"Tweet \"{}\" already exists in the database"
 ERROR_RETWEET_ALREADY_DB = u"Retweet \"{}\" already exists in the database"
+ERROR_FOLLOW_ALREADY_DB = u"Follow action for \"{}\" already exists in the database"
 
 # Unknown source
 ERROR_UNKNOWN_SOURCE = u"Unknown source {}!\n"
@@ -74,6 +76,7 @@ WARNING_PAGE_RETRIEVAL = u"Page retrieval error : {}"
 # Adding tweet to DB
 INFO_ADD_TWEET_SCHEDULER = u"Adding Tweet \"{}\" to the scheduler"
 INFO_ADD_RETWEET_SCHEDULER = u"Adding Tweet \"{}\" to the scheduler"
+INFO_ADD_FOLLOW_SCHEDULER = u"Adding Friend \"{}\" to follow to the scheduler"
 
 # Twitter wait time
 INFO_TWITTER_WAIT = u"Wait 60 seconds (Twitter limits)"
@@ -89,6 +92,9 @@ INFO_SAVING_MODEL = u"Training finished... Saving model to {}"
 
 # Test result
 INFO_TEST_RESULT = u"Success rate of {} on dataset"
+
+# Research new possible friend in the stream
+INFO_RESEARCH_FRIEND_STREAM = u"Search new possible friends in the stream {}"
 
 ############################################
 # DEBUG
