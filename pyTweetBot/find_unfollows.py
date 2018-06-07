@@ -26,10 +26,10 @@
 import logging
 import os
 import pickle
-
 import learning
 import tools.strings as pystr
 from executor.ActionScheduler import ActionAlreadyExists, ActionReservoirFullError
+import tools.strings as pystr
 
 
 # Find user to unfollow to and add it to the DB
@@ -37,7 +37,10 @@ def find_unfollows(config, friends_manager, model_file, action_scheduler, thresh
     """Find Twitter users to unfollow according to the parameters in the configuration file.
 
     Example:
-        >>> find_unfollows()
+        >>> config = BotConfig.load("config.json")
+        >>> action_scheduler = ActionScheduler(config=config)
+        >>> friends_manager = FriendsManager()
+        >>> find_unfollows(config, friends_manager, "model.p", action_scheduler)
 
     Arguments:
         * config (BotConfig): Bot configuration object of type :class:`pyTweetBot.config.BotConfig`
@@ -53,7 +56,7 @@ def find_unfollows(config, friends_manager, model_file, action_scheduler, thresh
     if os.path.exists(model_file):
         model = pickle.load(open(model_file, 'rb'))
     else:
-        logging.getLogger(pystr.LOGGER).error(u"Cannot find model {}".format(model_file))
+        logging.getLogger(pystr.LOGGER).error(pystr.ERROR_CANNOT_FIND_MODEL.format(model_file))
         exit()
         # end if
 
@@ -61,25 +64,23 @@ def find_unfollows(config, friends_manager, model_file, action_scheduler, thresh
     unfollow_day = int(config.friends['unfollow_interval'] / 86400.0)
 
     # First find friends who are not following back after defined period
-    logging.getLogger(u"pyTweetBot").info(u"Searching obsolete friends to unfollow")
+    logging.getLogger(pystr.LOGGER).info(pystr.INFO_RESEARCHING_OBSOLETE_FRIENDS)
     for friend in friends_manager.get_obsolete_friends(unfollow_day):
         try:
-            logging.getLogger(u"pyTweetBot").info(
-                u"Adding obsolete Friend \"{}\" to unfollow to the scheduler".format(friend.friend_screen_name))
+            logging.getLogger(pystr.LOGGER).info(pystr.INFO_ADD_UNFOLLOW_SCHEDULER.format(friend.friend_screen_name))
             action_scheduler.add_unfollow(friend.friend_screen_name)
         except ActionReservoirFullError:
-            logging.getLogger(u"pyTweetBot").error(u"Reservoir full for Unfollow action, exiting...")
+            logging.getLogger(pystr.LOGGER).error(pystr.ERROR_RESERVOIR_FULL_UNFOLLOW)
             exit()
             pass
         except ActionAlreadyExists:
-            logging.getLogger(u"pyTweetBot").error(
-                u"Unfollow action for \"{}\" already exists in the database".format(friend.friend_screen_name))
+            logging.getLogger(pystr.LOGGER).error(pystr.ERROR_UNFOLLOW_ALREADY_DB.format(friend.friend_screen_name))
             pass
         # end try
     # end for
 
     # Find friends to unfollow (because they don't follow back and they don't meet our criterias)
-    logging.getLogger(u"pyTweetBot").info(u"Searching useless friends to unfollow")
+    logging.getLogger(pystr.LOGGER).info(pystr.INFO_RESEARCHING_USELESS_FRIENDS)
     for friend in friends_manager.get_following():
         if not friend.friend_follower:
             # Predict class
@@ -90,16 +91,14 @@ def find_unfollows(config, friends_manager, model_file, action_scheduler, thresh
             # Predicted as unfollow
             if prediction == 'neg' or censor_prediction == 'neg' or probs[1] < threshold:
                 try:
-                    logging.getLogger(u"pyTweetBot").info(
-                        u"Adding Friend \"{}\" to unfollow to the scheduler".format(friend.friend_screen_name))
+                    logging.getLogger(pystr.LOGGER).info(pystr.INFO_ADD_UNFOLLOW_SCHEDULER.format(friend.friend_screen_name))
                     action_scheduler.add_unfollow(friend.friend_screen_name)
                 except ActionReservoirFullError:
-                    logging.getLogger(u"pyTweetBot").error(u"Reservoir full for unfollow action, exiting...")
+                    logging.getLogger(pystr.LOGGER).error(pystr.ERROR_RESERVOIR_FULL_UNFOLLOW)
                     exit()
                     pass
                 except ActionAlreadyExists:
-                    logging.getLogger(u"pyTweetBot").error(
-                        u"Unfollow action for \"{}\" already exists in the database".format(friend.friend_screen_name))
+                    logging.getLogger(pystr.LOGGER).error(pystr.ERROR_UNFOLLOW_ALREADY_DB.format(friend.friend_screen_name))
                     pass
                 # end try
             # end if
