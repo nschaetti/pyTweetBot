@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
       name='pyTweetBot',
-      version='0.1.2',
+      version='0.1.3',
       description='A Twitter bot to collect articles and news from the Web and tweet/retweet it on your feed',
       classifiers=[
             'Development Status :: 3 - Alpha',
