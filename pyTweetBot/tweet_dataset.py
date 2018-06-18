@@ -74,7 +74,15 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
             for language in news['languages']:
                 for country in news['countries']:
                     tweet_finder.add(
-                        GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=n_pages))
+                        GoogleNewsHunter(
+                            search_term=news['keyword'],
+                            lang=language,
+                            country=country,
+                            hashtags=news['hashtags'] if 'hashtags' in news else list(),
+                            languages=news['languages'],
+                            n_pages=n_pages
+                        )
+                    )
                 # end for
             # end for
         # end for
