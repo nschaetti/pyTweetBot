@@ -70,7 +70,7 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
         # end for
 
         # Add Google News
-        for news in config.news:
+        for news in config.google_news:
             for language in news['languages']:
                 for country in news['countries']:
                     tweet_finder.add(
