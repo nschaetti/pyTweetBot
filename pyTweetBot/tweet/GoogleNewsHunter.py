@@ -1,6 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+# File : GoogleNewsHunter.py
+# Description : Hunt new tweets on Google News.
+# Auteur : Nils Schaetti <n.schaetti@gmail.com>
+# Date : 01.05.2017 17:59:05
+# Lieu : Nyon, Suisse
+#
+# This file is part of the pyTweetBot.
+# The pyTweetBot is a set of free software:
+# you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# pyTweetBot is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with pyTweetBot.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 # Import
 from textblob import TextBlob
@@ -21,9 +41,14 @@ class GoogleNewsHunter(Hunter):
     def __init__(self, search_term, lang, country, hashtags, languages, n_pages=2):
         """
         Constructor
-        :param search_term: Search term
-        :param lang: Language
-        :param lang_type: Sub-language
+
+        Arguments:
+            search_term (str): Term to search on Google News
+            lang (str): The language code to search on Google News
+            country (str): The country to search on Google News
+            hashtags (list): Corresponding hashtags that will be added to the tweets
+            languages (str): Which NLTK language to keep (automatically identify the language and filter it)
+            n_pages (int): Number of page to take into account
         """
         self._search_term = search_term
         self._lang = lang
@@ -40,16 +65,27 @@ class GoogleNewsHunter(Hunter):
     def __unicode__(self):
         """
         To unicode
-        :return:
+
+        Returns:
+            The object description
         """
-        return u"GoogleNewsHunter(search_term={})".format(self._search_term)
+        return u"GoogleNewsHunter(search_term={}, lang, country, hashtags, languages, n_pages)".format(
+            self._search_term,
+            self._lang,
+            self._country,
+            self._hashtags,
+            self._languages,
+            self._n_pages
+        )
     # end __unicode__
 
     # Iterator
     def __iter__(self):
         """
         Iterator
-        :return: Iterator
+
+        Returns:
+            An iterator
         """
         return self
     # end __iter__
@@ -58,7 +94,9 @@ class GoogleNewsHunter(Hunter):
     def next(self):
         """
         Next element
-        :return:
+
+        Returns:
+            The next tweet
         """
         if len(self._news) == 0:
             if self._current_page > self._n_pages:
