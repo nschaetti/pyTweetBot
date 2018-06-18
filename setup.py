@@ -19,7 +19,5 @@ setup(
                 'retweet', 'stats', 'templates', 'tools', 'tweet', 'twitter'],
       install_requires=['nltk', 'argparse', 'logging', 'tweepy', 'sklearn', 'pygithub', 'brotli', 'httplib2',
                         'urlparse2', 'HTMLParser', 'bs4', 'simplejson', 'dnspython', 'dill', 'lxml', 'sqlalchemy',
-                        'feedparser', 'textblob', 'numpy', 'scipy', 'mysql-python'],
-      test_suite='nose.collector',
-      tests_require=['nose']
+                        'feedparser', 'textblob', 'numpy', 'scipy', 'mysql-python']
 )
