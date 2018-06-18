@@ -9,10 +9,8 @@ A Twitter bot and library written in Python to replace yourself, search and publ
 
 Join our community to create datasets and deep-learning models! Chat with us on [Gitter](https://gitter.im/pyTweetBot/Lobby) and join the [Google Group](https://groups.google.com/forum/#!forum/pytweetbot) to collaborate with us.
 
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytweetbot.svg?style=flat-square)
-[![Codecov](https://img.shields.io/codecov/c/github/nschaetti/pytweetbot/master.svg?style=flat-square)](https://codecov.io/gh/nschaetti/pyTweetBot)
+[![PyPI version](https://badge.fury.io/py/pyTweetBot.svg)](https://badge.fury.io/py/pyTweetBot)
 [![Documentation Status](https://readthedocs.org/projects/pytweetbot/badge/?version=latest)](https://pytweetbot.readthedocs.io/en/latest/?badge=latest)
-[![Build Status](https://travis-ci.org/nschaetti/pyTweetBot.svg?branch=develop)](https://travis-ci.org/nschaetti/pyTweetBot)
 
 This repository consists of:
 
