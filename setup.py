@@ -4,7 +4,7 @@ import pyTweetBot
 
 setup(
       name='pyTweetBot',
-      version='0.1',
+      version='0.1.1',
       description='A Twitter bot to collect articles and news from the Web and tweet/retweet it on your feed',
       classifiers=[
             'Development Status :: 3 - Alpha',

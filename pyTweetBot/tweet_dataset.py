@@ -65,7 +65,7 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
 
     if rss == "":
         # Add RSS streams
-        for rss_stream in config.get_rss_streams():
+        for rss_stream in config.rss:
             tweet_finder.add(RSSHunter(rss_stream))
         # end for
 
