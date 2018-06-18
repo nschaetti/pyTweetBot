@@ -21,5 +21,4 @@ setup(
       install_requires=['nltk', 'argparse', 'logging', 'tweepy', 'sklearn', 'pygithub', 'brotli', 'httplib2',
                         'urlparse2', 'HTMLParser', 'bs4', 'simplejson', 'dnspython', 'dill', 'lxml', 'sqlalchemy',
                         'feedparser', 'textblob', 'numpy', 'scipy', 'mysql-python']
-
 )
