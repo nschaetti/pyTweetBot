@@ -31,8 +31,8 @@ class TweetPreparator(object):
         # No return
         hashtags_text = hashtags_text.replace(u'\n', '').replace(u'\r', '')
 
-        # Not more than 140 characters
-        reduced_text = hashtags_text[:140]
+        # Not more than Tweet.MAX_LENGTH characters
+        reduced_text = hashtags_text[:Tweet.MAX_LENGTH]
 
         # Change
         tweet.set_text(reduced_text)
