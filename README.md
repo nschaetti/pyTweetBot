@@ -84,76 +84,84 @@ pyTweetBot takes its configuration in a JSON file which looks as follow :
 
 ```javascript
 {
-    "database" :
-    {
-        "host" : "",
-        "username" : "",
-        "password" : "",
-        "database" : ""
-    },
-    "email" : "bot@bot.com",
-    "scheduler" :
-    {
-        "sleep": [6, 13]
-    },
-    "hashtags":
-    [
-    ],
-    "twitter" :
-    {
-        "auth_token1" : "",
-        "auth_token2" : "",
-        "access_token1" : "",
-        "access_token2" : "",
-        "user" : ""
-    },
-    "friends" :
-    {
-        "max_new_followers" : 40,
-        "max_new_unfollow" : 40,
-        "follow_unfollow_ratio_limit" : 1.2,
-        "interval" : [30, 45]
-    },
-    "forbidden_words" :
-    [
-    ],
-    "direct_message" : "",
-    "tweet" : {
-        "max_tweets" : 1200,
-        "exclude" : [],
-        "interval" : [2.0, 4.0]
-    },
-    "news" :
-    [
-        {
-            "keyword" : "",
-            "countries" : ["us","fr"],
-            "languages" : ["en","fr"],
-            "hashtags" : []
-        }
-    ],
-    "rss" :
-    [
-        {"url" : "http://feeds.feedburner.com/TechCrunch/startups", "hashtags" : "#startups", "via" : "@techcrunch"},
-        {"url" : "http://feeds.feedburner.com/TechCrunch/fundings-exits", "hashtags" : "#fundings", "via" : "@techcrunch"}
-    ],
-    "retweet" :
-    {
-        "max_retweets" : 600,
-        "max_likes" : 600,
-        "keywords" : [],
-        "nbpages" : 40,
-        "retweet_prob" : 0.5,
-        "limit_prob" : 1.0
-        "interval" : [2.0, 4.0]
-    },
-    "github" :
-    {
-        "login": "",
-        "password": "",
-        "exclude": [],
-        "topics" : []
-    }
+	"database" :
+	{
+		"host" : "",
+		"username" : "",
+		"password" : "",
+		"database" : ""
+	},
+	"email" : "bot@bot.com",
+	"scheduler" :
+	{
+		"sleep": [6, 13]
+	},
+	"hashtags":
+	[
+	],
+	"twitter" :
+	{
+		"auth_token1" : "",
+		"auth_token2" : "",
+		"access_token1" : "",
+		"access_token2" : "",
+		"user" : ""
+	},
+	"friends" :
+	{
+		"max_new_followers" : 40,
+		"max_new_unfollow" : 40,
+		"interval" : [15, 60],
+		"unfollow_interval" : 604800
+	},
+	"forbidden_words" :
+	[
+	],
+	"direct_message" : "",
+	"tweet" : {
+		"max_tweets" : 1800,
+		"exclude" : [],
+		"interval" : [4.0, 6.0],
+		"intervals" : [
+			{
+				"day": 5,
+				"start": 17,
+				"end": 23,
+				"interval" : [1.0, 3.0]
+			}
+		]
+	},
+	"news" :
+	[
+		{
+			"keyword" : "",
+			"countries" : ["us","fr"],
+			"languages" : ["en","fr"],
+			"hashtags" : []
+		}
+	],
+	"rss" :
+	[
+		{"url" : "http://feeds.feedburner.com/TechCrunch/startups", "hashtags" : "#startups", "lang": ["en"]},
+		{"url" : "http://feeds.feedburner.com/TechCrunch/fundings-exits", "hashtags" : "#fundings", "lang": ["en"]}
+	],
+	"retweet" :
+	{
+		"max_retweets" : 600,
+		"max_likes" : 0,
+		"keywords" : [],
+		"nbpages" : 40,
+		"retweet_prob" : 0.5,
+		"limit_prob" : 1.0,
+		"interval" : [2.0, 4.0]
+	},
+	"github" :
+	{
+		"login": "",
+		"password": "",
+		"exclude": [],
+		"topics" : []
+	}
 }
 ```
 
@@ -228,10 +236,10 @@ The friends section has four parameters.
 ```javascript
 "friends" :
 {
-    "max_new_followers" : 40,
-    "max_new_unfollow" : 40,
-    "follow_unfollow_ratio_limit" : 1.2,
-    "interval" : [30, 45]
+	"max_new_followers" : 40,
+	"max_new_unfollow" : 40,
+	"interval" : [15, 60],
+	"unfollow_interval" : 604800
 }
 ```
 
@@ -291,18 +299,18 @@ pyTweetBot launch an executor thread for each action type. You can launch the ex
 
 ### Files
 
-* [__main__.py](__main__.py) : Main Python file;
+* [pyTweetBot/__main__.py](__main__.py) : Main Python file;
 * [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) : Code of conduct for contributors;
 * [CONTRIBUTING.md](CONTRIBUTING.md) : Instructions if you want to contribute;
-* [convert_dataset.py](convert_dataset.py) :
-* [create_dataset.py](create_dataset.py) :
-* [direct_messages.py](direct_messages.py) : Send direct messages;
+* [pyTweetBot/convert_dataset.py](convert_dataset.py) :
+* [pyTweetBot/create_dataset.py](create_dataset.py) :
+* [pyTweetBot/direct_messages.py](direct_messages.py) : Send direct messages;
 * [Dockerfile](Dockerfile) : Docker configuration file;
-* [execute_actions.py](execute_actions.py) : Launch the threads to execute actions;
-* [export_database.py](export_database.py) : Tool functions to export a database;
-* [find_follows.py](find_follows.py) : Find Twitter users to follow;
-* [find_github_tweets.py](find_github_tweets.py) : Find tweet about Github activities;
-* [find_reweets.py](find_retweets.py) : Find posts to retweet;
-* [find_tweets.py](find_tweets.py) : Find content on the web to tweet;
-* [find_tweets.py](find_tweets.py) : Python code to find new contents to tweet;
-* [find_unfollows.py](find_unfollows.py) : Find Twitter users to unfollow;
+* [pyTweetBot/execute_actions.py](execute_actions.py) : Launch the threads to execute actions;
+* [pyTweetBot/export_database.py](export_database.py) : Tool functions to export a database;
+* [pyTweetBot/find_follows.py](find_follows.py) : Find Twitter users to follow;
+* [pyTweetBot/find_github_tweets.py](find_github_tweets.py) : Find tweet about Github activities;
+* [pyTweetBot/find_reweets.py](find_retweets.py) : Find posts to retweet;
+* [pyTweetBot/find_tweets.py](find_tweets.py) : Find content on the web to tweet;
+* [pyTweetBot/find_tweets.py](find_tweets.py) : Python code to find new contents to tweet;
+* [pyTweetBot/find_unfollows.py](find_unfollows.py) : Find Twitter users to unfollow;
