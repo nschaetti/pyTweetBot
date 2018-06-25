@@ -324,14 +324,14 @@ class Classifier(object):
         tokenizer = TweetTokenizer()
 
         # Join features
-        bow = features.BagOfGrams()
+        """bow = features.BagOfGrams()
 
         # Bag of gram, 2-grams, 3-grams
         bow.add(features.BagOfWords())
         bow.add(features.BagOf2Grams())
         bow.add(features.BagOf3Grams())
 
-        return tokenizer, bow, model, censor
+        return tokenizer, bow, model, censor"""
     # end load_model
 
 # end Classifier
