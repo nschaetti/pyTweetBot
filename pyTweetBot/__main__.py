@@ -220,7 +220,7 @@ if __name__ == "__main__":
     train_parser.add_argument("--rss", type=str, help="Specific RSS stream to capture", default="")
     train_parser.add_argument("--news", type=str, help="Specific Google News research to capture", default="")
     train_parser.add_argument("--info", action='store_true', help="Show information about the dataset?", default=False)
-    train_parser.add_argument("--classifier", type=str, help="Classifier type (NaiveBayes, MaxEnt, TFIDF, etc)",
+    train_parser.add_argument("--classifier", type=str, help="Classifier type (NaiveBayes, DecisionTree, RandomForest, SVM)",
                               default="NaiveBayes")
     train_parser.add_argument("--source", type=str,
                               help="Information source to classify (news, tweets, friends, followers, home)")

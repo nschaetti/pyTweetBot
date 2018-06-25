@@ -280,6 +280,21 @@ The source argument can take the following value :
 
 ### Train a model
 
+Once the dataset is created, we can train a model using the "train" action :
+
+    python -m pyTweetBot train --dataset test.p --config ../nils-config/nilsbot.json --model mymodel.p --action train --text-size 100 --classifier NaiveBayes
+
+The classifier parameter can take the following values :
+
+* NaiveBayes : Naive Bayes classifier;
+* DecisionTree : Simple decision tree;
+* RandomForest : Random forest;
+* SVM : Support Vector Machine;
+
+### Test a model
+
+
+
 ## Command line
 
 ### Launch executors
