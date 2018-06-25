@@ -65,16 +65,24 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
 
     if rss == "":
         # Add RSS streams
-        for rss_stream in config.get_rss_streams():
+        for rss_stream in config.rss:
             tweet_finder.add(RSSHunter(rss_stream))
         # end for
 
         # Add Google News
-        for news in config.get_news_config():
+        for news in config.google_news:
             for language in news['languages']:
                 for country in news['countries']:
                     tweet_finder.add(
-                        GoogleNewsHunter(search_term=news['keyword'], lang=language, country=country, n_pages=n_pages, hashtags=news['hashtags']))
+                        GoogleNewsHunter(
+                            search_term=news['keyword'],
+                            lang=language,
+                            country=country,
+                            hashtags=news['hashtags'] if 'hashtags' in news else list(),
+                            languages=news['languages'],
+                            n_pages=n_pages
+                        )
+                    )
                 # end for
             # end for
         # end for

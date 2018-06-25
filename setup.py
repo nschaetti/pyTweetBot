@@ -1,10 +1,8 @@
 from setuptools import setup, find_packages
 
-import pyTweetBot
-
 setup(
       name='pyTweetBot',
-      version='0.1',
+      version='0.1.3',
       description='A Twitter bot to collect articles and news from the Web and tweet/retweet it on your feed',
       classifiers=[
             'Development Status :: 3 - Alpha',
@@ -20,7 +18,5 @@ setup(
       packages=find_packages(),
       install_requires=['nltk', 'argparse', 'logging', 'tweepy', 'sklearn', 'pygithub', 'brotli', 'httplib2',
                         'urlparse2', 'HTMLParser', 'bs4', 'simplejson', 'dnspython', 'dill', 'lxml', 'sqlalchemy',
-                        'feedparser', 'textblob', 'numpy', 'scipy', 'mysql-python'],
-      test_suite='nose.collector',
-      tests_require=['nose']
+                        'feedparser', 'textblob', 'numpy', 'scipy', 'mysql-python']
 )

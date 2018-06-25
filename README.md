@@ -9,10 +9,8 @@ A Twitter bot and library written in Python to replace yourself, search and publ
 
 Join our community to create datasets and deep-learning models! Chat with us on [Gitter](https://gitter.im/pyTweetBot/Lobby) and join the [Google Group](https://groups.google.com/forum/#!forum/pytweetbot) to collaborate with us.
 
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytweetbot.svg?style=flat-square)
-[![Codecov](https://img.shields.io/codecov/c/github/nschaetti/pytweetbot/master.svg?style=flat-square)](https://codecov.io/gh/nschaetti/pyTweetBot)
+[![PyPI version](https://badge.fury.io/py/pyTweetBot.svg)](https://badge.fury.io/py/pyTweetBot)
 [![Documentation Status](https://readthedocs.org/projects/pytweetbot/badge/?version=latest)](https://pytweetbot.readthedocs.io/en/latest/?badge=latest)
-[![Build Status](https://travis-ci.org/nschaetti/pyTweetBot.svg?branch=develop)](https://travis-ci.org/nschaetti/pyTweetBot)
 
 This repository consists of:
 
@@ -245,7 +243,7 @@ The friends section has four parameters.
 
 You have then to create the database on your MySQL host
 
-    python pyTweetBot.py tools
+    python -m pyTweetBot tools
         --create-database : Create the database structure on the MySQL host
         --export-database : Export tweets, tweeted and followers/friends to a file
         --import-database     Import tweets, tweeted and followers/friends from a file
@@ -253,19 +251,21 @@ You have then to create the database on your MySQL host
 
 You can use the "create-database" action for that :
 
-    python pyTweetBot.py tools --config /path/to/config.json --create
+    python -m pyTweetBot tools --config /path/to/config.json --create
 
 It is possible to export bot's data to a file with the export-database command.
 
-    python pyTweetBot.py tools --config /path/to/config.json --export --file export_file.p
+    python -m pyTweetBot tools --config /path/to/config.json --export --file export_file.p
 
 And then import the bot's data from the file
 
-    python pyTweetBot.py tools --config /path/to/config.json --import --file export_file.p
+    python -m pyTweetBot tools --config /path/to/config.json --import --file export_file.p
 
 ## Model training
 
 ### Create a dataset
+
+
 
 ### Train a model
 
@@ -275,15 +275,15 @@ And then import the bot's data from the file
 
 pyTweetBot launch an executor thread for each action type. You can launch the executor daemon that way :
 
-    python pyTweetBot.py executor --config /etc/bots/bot.conf
+    python -m pyTweetBot executor --config /etc/bots/bot.conf
 
 ### Find new tweets
 
-    python pyTweetBot.py find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p
+    python -m pyTweetBot find-tweets --config /etc/bots/bot.conf --model /etc/bots/models/find_tweets.p
 
 ### Find new retweets
 
-    python pyTweetBot.py find-retweets --config /etc/bots/bot.conf --model /etc/bots/moedls/find_retweets.p
+    python -m pyTweetBot find-retweets --config /etc/bots/bot.conf --model /etc/bots/moedls/find_retweets.p
 
 ### Automatise execution with crontab
 
