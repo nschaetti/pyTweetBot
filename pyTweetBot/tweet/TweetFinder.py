@@ -145,8 +145,8 @@ class TweetFinder(Hunter):
             try:
                 return self._to_the_factory(self._hunters[self._current].next())
             except urllib2.HTTPError as e:
-                logging.getLogger(pystr.LOGGER).error(u"HTTP error while creating the tweet : {}".format(e))
-                pass
+                logging.getLogger(pystr.LOGGER).fatal(u"HTTP error while creating the tweet : {}".format(e))
+                exit()
             except StopIteration:
                 self._current += 1
                 if self._current < self._n_hunters:
