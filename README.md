@@ -265,7 +265,18 @@ And then import the bot's data from the file
 
 ### Create a dataset
 
+The first step to train a model is to create a dataset of positive and negative examples. This can be done with the
+train command and the "dataset" action.
 
+    python -m pyTweetBot train --dataset test.p --config ../nils-config/nilsbot.json --text-size 100 --action dataset --source news
+
+The source argument can take the following value :
+
+* News : URLs from Google News and and RSS streams;
+* tweets : Tweets found directly on Twitter;
+* friends : Description of Twitter users found directly on Twitter;
+* followers : Description of Twitter users found in your list of followers;
+* home : Tweets found on our home feed;
 
 ### Train a model
 
