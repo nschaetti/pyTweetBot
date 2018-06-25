@@ -81,8 +81,7 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
     # Data and targets
     data = dataset.data
     targets = dataset.targets
-    print(data[0])
-    print(targets[0])
+    print(model)
     # Count, TFIDF, model
     text_clf = Pipeline([('vec', CountVectorizer(ngram_range=(1, 1))),
                          ('tfidf', TfidfTransformer()),
