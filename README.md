@@ -290,7 +290,9 @@ The source argument can take the following value :
 
 Once the dataset is created, we can train a model using the "train" action :
 
-    python -m pyTweetBot train --dataset test.p --config ../nils-config/nilsbot.json --model mymodel.p --action train --text-size 100 --classifier NaiveBayes
+    python -m pyTweetBot train --dataset test.p --config ../nils-config/nilsbot.json --model mymodel.p --action train --text-size 100 --classifier SVM
+    INFO:pyTweetBot:Finalizing training...
+    INFO:pyTweetBot:Training finished... Saving model to mymodel.p
 
 The classifier parameter can take the following values :
 
@@ -301,7 +303,12 @@ The classifier parameter can take the following values :
 
 ### Test a model
 
+You can test your model's accuracy with the "test" action :
 
+    python -m pyTweetBot train --dataset test.p --config ../nils-config/nilsbot.json --model mymodel.p --action test --text-size 100
+    Success rate of 56.1108362197 on dataset
+
+You can now use your model to class tweets.
 
 ## Command line
 
