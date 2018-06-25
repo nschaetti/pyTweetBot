@@ -8,6 +8,8 @@ from .TweetFactory import TweetFactory
 
 # Object representing a Tweet
 class Tweet(object):
+    MAX_LENGTH = 280
+
     """
     Object representing a Tweet.
     """
@@ -86,16 +88,16 @@ class Tweet(object):
         total_length = text_length + url_length
 
         # Restrict text
-        if total_length <= 140:
+        if total_length <= self.MAX_LENGTH:
             final_text = self._text
         else:
-            final_text = self._text[:140-total_length-3] + "..."
+            final_text = self._text[:self.MAX_LENGTH-total_length-3] + "..."
             total_length = len(final_text) + url_length
         # end if
 
         # Add hashtags
         for hashtag in self._hashtags:
-            if total_length + len(hashtag) + 1 <= 140:
+            if total_length + len(hashtag) + 1 <= self.MAX_LENGTH:
                 final_text += " " + hashtag
                 total_length += len(hashtag) + 1
             # end if

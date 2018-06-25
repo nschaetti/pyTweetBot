@@ -27,6 +27,7 @@ import logging
 import time
 from github import Github
 from executor.ActionScheduler import ActionReservoirFullError, ActionAlreadyExists
+from tweet.Tweet import Tweet
 from tweet.TweetFactory import TweetFactory
 from twitter.TweetBotConnect import TweetBotConnector
 import db.obj
@@ -83,7 +84,7 @@ def create_tweet_text(contrib_counter, contrib_date, project_name, project_url, 
 
     # For each topics
     for topic in topics:
-        if len(u"{} #{}".format(tweet_text, topic)) + 21 < 140:
+        if len(u"{} #{}".format(tweet_text, topic)) + 21 < Tweet.MAX_LENGTH:
             tweet_text = u"{} #{}".format(tweet_text, topic)
         else:
             break
@@ -115,9 +116,9 @@ def create_tweet_text_create(project_name, project_description, project_url, top
     )
 
     # Check Tweet length
-    if len(tweet_text) + 21 > 130:
+    if len(tweet_text) + 21 > (Tweet.MAX_LENGTH - 10):
         # Not wanted chars
-        overflow_text = 140 - (len(tweet_text) + 21)
+        overflow_text = Tweet.MAX_LENGTH - (len(tweet_text) + 21)
 
         # Remove
         tweet_text = tweet_text[:overflow_text-10] + u"..."
@@ -125,7 +126,7 @@ def create_tweet_text_create(project_name, project_description, project_url, top
 
     # Add topics
     for topic in topics:
-        if len(u"{} #{}".format(tweet_text, topic)) + 21 < 130:
+        if len(u"{} #{}".format(tweet_text, topic)) + 21 < (Tweet.MAX_LENGTH - 10):
             tweet_text = u"{} #{}".format(tweet_text, topic)
         else:
             break
