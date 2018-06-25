@@ -26,7 +26,6 @@
 import logging
 import os
 import sys
-from learning.Model import Model
 from learning.Dataset import Dataset
 import tools.strings as pystr
 from sklearn.feature_extraction.text import CountVectorizer
@@ -36,6 +35,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
+from sklearn.preprocessing import LabelEncoder
 import pickle
 
 ####################################################
@@ -57,7 +57,7 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
     """
     # Load model or create
     if os.path.exists(model_file):
-        model = Model.load(model_file)
+        model = pickle.load(model_file)
     else:
         if model_type == "NaiveBayes":
             model = MultinomialNB()
@@ -81,9 +81,8 @@ def model_training(data_set_file, model_file="", model_type='NaiveBayes'):
     # Data and targets
     data = dataset.data
     targets = dataset.targets
-    print(type(data))
-    print(type(targets))
-
+    print(targets)
+    exit()
     # Count, TFIDF, model
     text_clf = Pipeline([('vec', CountVectorizer(ngram_range=(1, 1))),
                          ('tfidf', TfidfTransformer()),

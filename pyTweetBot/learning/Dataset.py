@@ -77,7 +77,11 @@ class Dataset(object):
         """
         targets = list()
         for (text, c) in self._texts:
-            targets.append(c)
+            if c == 'neg':
+                targets.append(0)
+            else:
+                targets.append(1)
+            # end if
         # end for
         return targets
     # end targets
