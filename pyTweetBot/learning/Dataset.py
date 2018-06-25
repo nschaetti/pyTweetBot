@@ -26,7 +26,7 @@
 import pickle
 import sys
 import json
-import pyTweetBot.learning.features as features
+# import pyTweetBot.learning.features as features
 
 sys.setrecursionlimit(10000)
 
