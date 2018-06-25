@@ -138,19 +138,19 @@ class TweetFinder(Hunter):
             raise StopIteration
         else:
             if self._first:
-                logging.getLogger(u"pyTweetBot").info(u"Changing hunter to {}".format(self._hunters[self._current]))
+                logging.getLogger(pystr.LOGGER).info(u"Changing hunter to {}".format(self._hunters[self._current]))
                 self._first = False
             # end if
 
             try:
                 return self._to_the_factory(self._hunters[self._current].next())
             except urllib2.HTTPError as e:
-                logging.error(pystr.LOGGER).error(u"HTTP error while creating the tweet : {}".format(e))
+                logging.getLogger(pystr.LOGGER).error(u"HTTP error while creating the tweet : {}".format(e))
                 pass
             except StopIteration:
                 self._current += 1
                 if self._current < self._n_hunters:
-                    logging.getLogger(u"pyTweetBot").info(u"Changing hunter to {}".format(self._hunters[self._current]))
+                    logging.getLogger(pystr.LOGGER).info(u"Changing hunter to {}".format(self._hunters[self._current]))
                 # end if
                 return self._to_the_factory(self.next())
             # end try
