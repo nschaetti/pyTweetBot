@@ -71,7 +71,7 @@ class RSSHunter(Hunter):
 
             # Analyze text
             tweet_blob = TextBlob(current_entry['title'])
-
+            print(tweet_blob)
             # Right language
             if tweet_blob.detect_language() == self._lang:
                 found = True
