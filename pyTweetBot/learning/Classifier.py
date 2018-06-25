@@ -30,7 +30,7 @@ import numpy as np
 import pyTweetBot.tools.strings as pystr
 from nltk.tokenize import TweetTokenizer
 
-import features
+# import features
 from CensorModel import CensorModel
 
 
