@@ -44,7 +44,7 @@ ERROR_FOLLOW_ALREADY_DB = u"Follow action for \"{}\" already exists in the datab
 ERROR_UNFOLLOW_ALREADY_DB = u"Unfollow action for \"{}\" already exists in the database"
 
 # Unknown source
-ERROR_UNKNOWN_SOURCE = u"Unknown source {}!\n"
+ERROR_UNKNOWN_SOURCE = u"Unknown source type {}!\n"
 
 # Unknown training action
 ERROR_UNKNOWN_TRAINING = u"Unknown training action {}\n"
@@ -105,6 +105,9 @@ INFO_RESEARCHING_OBSOLETE_FRIENDS = u"Searching obsolete friends to unfollow"
 # Searching useless friends to unfollow
 INFO_RESEARCHING_USELESS_FRIENDS = u"Searching useless friends to unfollow"
 
+# Opening dataset file
+INFO_OPENING_DATASET_FILE = u"Opening dataset file {}"
+
 ############################################
 # DEBUG
 ############################################
@@ -123,3 +126,16 @@ DEBUG_WRONG_LANGUAGE = u"Tweet \"{}\" ({}) not in {}"
 
 # New tweet found
 DEBUG_NEW_TWEET_FOUND = u"New tweet found \"{}\""
+
+#############################################
+# INTERACTIVE
+#############################################
+
+# Ask positive or negative
+DIALOG_CLASS_LABEL = u"Would you classify the following element as negative(n) or positive(p)?"
+
+# Show user description
+DIALOG_USER_DESCRIPTION = u"User description : {}"
+
+# Input to ask positive or negative class
+DIALOG_INPUT_CLASS_LABEL = u"Positive or negative (p/n) (q for quit, s for skip) : "

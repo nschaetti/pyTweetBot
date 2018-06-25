@@ -94,7 +94,8 @@ def tweet_dataset(config, dataset_file, n_pages, info, rss):
     for tweet in tweet_finder:
         # Get page's text
         try:
-            page_text = PageParser.get_text(tweet.get_url())
+            parser = PageParser(tweet.get_url())
+            page_text = parser.text
         except PageParserRetrievalError as e:
             sys.stderr.write(u"Page retrieval error : {}".format(e))
             continue
