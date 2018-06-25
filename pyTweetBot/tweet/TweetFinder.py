@@ -25,6 +25,8 @@
 from .Hunter import Hunter
 import random
 import logging
+import urllib2
+import pyTweetBot.tools.strings as pystr
 
 
 # Find new tweets from a set of
@@ -142,6 +144,9 @@ class TweetFinder(Hunter):
 
             try:
                 return self._to_the_factory(self._hunters[self._current].next())
+            except urllib2.HTTPError as e:
+                logging.error(pystr.LOGGER).error(u"HTTP error while creating the tweet : {}".format(e))
+                pass
             except StopIteration:
                 self._current += 1
                 if self._current < self._n_hunters:
