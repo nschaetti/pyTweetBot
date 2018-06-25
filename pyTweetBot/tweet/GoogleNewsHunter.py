@@ -24,6 +24,7 @@
 
 # Import
 from textblob import TextBlob
+from langdetect import detect
 from .Hunter import Hunter
 from pyTweetBot.news.GoogleNewsClient import GoogleNewsClient
 from .Tweet import Tweet
@@ -124,12 +125,12 @@ class GoogleNewsHunter(Hunter):
         tweet_blob = TextBlob(current_news[1])
 
         # Check language
-        if tweet_blob.detect_language() in self._languages:
+        if detect(current_news[1]) in self._languages:
             # Return
             return Tweet(text=current_news[1], url=current_news[0], hashtags=self._hashtags)
         else:
             logging.getLogger(pystr.LOGGER).debug(
-                pystr.DEBUG_WRONG_LANGUAGE.format(current_news[1], tweet_blob.detect_language(), self._lang)
+                pystr.DEBUG_WRONG_LANGUAGE.format(current_news[1], detect(current_news[1]), self._lang)
             )
             return self.next()
         # end if
