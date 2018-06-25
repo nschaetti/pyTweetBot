@@ -23,13 +23,8 @@
 #
 
 # Imports
-import features
 from .CensorModel import CensorModel
-# from Classifier import Classifier
 from .Dataset import Dataset
-"""from Model import Model
-from DecisionTree import DecisionTree
-from NaiveBayesClassifier import NaiveBayesClassifier"""
 
 # ALL
 __all__ = ['CensorModel', 'Dataset']
