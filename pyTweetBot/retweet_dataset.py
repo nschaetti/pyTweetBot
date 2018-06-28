@@ -77,7 +77,7 @@ def retweet_dataset(config, dataset_file, search="", info=False, source="tweets"
         pass
     else:
         # Get all finders
-        for keyword in config.get_retweet_config()['keywords']:
+        for keyword in config.retweet['keywords']:
             retweet_finders.append(RetweetFinder(search_keywords=keyword))
         # end for
     # end if
