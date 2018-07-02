@@ -65,7 +65,7 @@ class RSSHunter(Hunter):
         # Found
         found = False
 
-        while not found or self._current < len(self._entries):
+        while not found and self._current < len(self._entries):
             # Get current entry
             current_entry = self._entries[self._current]
 
@@ -73,7 +73,7 @@ class RSSHunter(Hunter):
             tweet_blob = TextBlob(current_entry['title'])
 
             # Right language
-            if tweet_blob.detect_language() == self._lang:
+            if tweet_blob.detect_language() in self._lang:
                 found = True
             # end if
 
