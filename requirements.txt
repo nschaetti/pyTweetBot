@@ -22,3 +22,4 @@ textblob
 numpy
 scipy
 mysql-python
+langdetect
