@@ -2,9 +2,9 @@
 
 version: '3.1'
 services:
-  server:
+  pytweetbot:
     build: .
-    container_name: pyTweetbot
+    container_name: pytweetbot
     stdin_open: true
     links:
         - db
@@ -20,7 +20,6 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
     environment:
         - PMA_HOST=db
     restart: always
