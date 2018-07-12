@@ -1,6 +1,6 @@
 FROM debian:buster-slim
 
-LABEL maintainer="Till Witt <witt@consider-it.de>""
+LABEL maintainer="Till Witt <witt@consider-it.de>"
 
 RUN apt-get update && \
     apt-get -y install python2.7 python-pip libmariadbclient-dev && \

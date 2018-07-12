@@ -97,3 +97,6 @@ ENV/
 
 # Not my config file
 nilsbot.json
+
+# data directory for docker
+dockerdata/
