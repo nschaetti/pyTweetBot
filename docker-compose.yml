@@ -1,0 +1,33 @@
+#docker exec -it mindchains_enodeserver /bin/bash
+
+version: '3.1'
+services:
+  pytweetbot:
+    build: .
+    container_name: pytweetbot
+    stdin_open: true
+    volumes:
+        - .:/app
+    links:
+        - db
+
+  db:
+    image: mariadb
+    environment:
+        - MYSQL_ROOT_PASSWORD=pytb
+        - MYSQL_DATABASE=pytb
+    volumes:
+        - ./dockerdata/database:/var/lib/mysql
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+        - PMA_HOST=db
+    restart: always
+    ports:
+        - 80:80
+    volumes:
+        - /sessions
+    links:
+        - db

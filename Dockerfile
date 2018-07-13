@@ -1,6 +1,7 @@
-FROM debian:buster-slim
+#FROM debian:buster-slim
+FROM ubuntu:17.10
 
-LABEL maintainer="Till Witt <witt@consider-it.de>""
+LABEL maintainer="Till Witt <witt@consider-it.de>"
 
 RUN apt-get update && \
     apt-get -y install python2.7 python-pip libmariadbclient-dev && \
