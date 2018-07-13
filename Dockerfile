@@ -1,4 +1,5 @@
-FROM debian:buster-slim
+#FROM debian:buster-slim
+FROM ubuntu:17.10
 
 LABEL maintainer="Till Witt <witt@consider-it.de>"
 

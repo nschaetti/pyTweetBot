@@ -6,6 +6,8 @@ services:
     build: .
     container_name: pytweetbot
     stdin_open: true
+    volumes:
+        - .:/app
     links:
         - db
 
